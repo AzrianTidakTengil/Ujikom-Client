@@ -46,7 +46,7 @@ class Main extends Component {
                 </div>
                 <Grid container columns={10} rowSpacing={2} columnSpacing={2}>
                     {categories.map((category, index) => (
-                        <Grid item key={index} size={2}>
+                        <Grid item key={index} size={{xs:3, sm:2}}>
                             <Card sx={{ textAlign: "center" }}>
                                 <CardActionArea>
                                     <CardContent>
