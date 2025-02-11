@@ -1,11 +1,29 @@
 import { palleteV1 } from "@/assets/css/template";
-import { Box, Container, createTheme, Divider, Avatar, Chip, Grid2 as Grid, Rating, Typography, Button, IconButton, ThemeProvider, Stack } from "@mui/material";
+import { Box, Container, createTheme, Divider, Avatar, Chip, Grid2 as Grid, Rating, Typography, Button, IconButton, ThemeProvider, Stack, AppBar, Toolbar, Tabs, Tab, Pagination, Card, CardContent, CardMedia } from "@mui/material";
 import { withRouter } from "next/router";
 import Image from "next/image";
 import { QuantityEditor, SelectChip } from "@/components";
-import { Favorite, FavoriteBorderOutlined, MoreVert, Star, ThumbUp } from "@mui/icons-material";
+import { Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
+import Link from "next/link";
 
 const { Component } = require("react");
+
+const dummy_review = Array.from({ length: 34 }, (_, i) => ({
+    id: i + 1,
+    name: `User ${i + 1}`,
+    message: "This is a great product.",
+    rating: Math.floor(Math.random() * 5) + 1,
+    date: '12-05-2025',
+    love: 1,
+}));
+
+const products = Array.from({ length: 500 }, (_, i) => ({
+    id: i + 1,
+    name: `Product ${i + 1}`,
+    description: "This is a great product.",
+    price: `$${(29.99 + i).toFixed(2)}`,
+    image: "https://unsplash.com/photos/three-white-plastic-bottles-under-white-cottons-xtRL02ZuZxE"
+}));
 
 class Product extends Component{
     constructor(props) {
@@ -15,7 +33,26 @@ class Product extends Component{
                 id: null,
                 name: null
             },
-            favorite: false
+            favorite: false,
+            appBar: 'description',
+            reviewPagination: {
+                offer: 1,
+                limit: 5,
+                length: 34,
+                visibleItem: dummy_review.slice(0, 5)
+            },
+            otherItemFromStore: {
+                offer: 1,
+                limit: 12,
+                length: 12,
+                visibleItem: products.slice(0, 12)
+            },
+            allItem: {
+                offer: 1,
+                lenght: 36,
+                length: 36,
+                visibleItem: products.slice(0, 36)
+            }
         }
     }
 
@@ -33,6 +70,17 @@ class Product extends Component{
     theme = () => createTheme({
         palette: {
             ...palleteV1.palette
+        },
+        components: {
+            MuiAppBar: {
+                styleOverrides: {
+                    root: {
+                        background: 'none',
+                        color: 'black',
+                        boxShadow: 'none',
+                    }
+                }
+            }
         }
     })
 
@@ -52,52 +100,86 @@ class Product extends Component{
                 <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
                     <Grid container columnSpacing={4}>
                         <Grid size="auto">
-                            <Image width={400} height={400}/>
+                            <Image width={320} height={320} src={'/assets/skeleton/product.jpg'}/>
                         </Grid>
                         <Grid size="grow">
                             <Box sx={{width: '100%'}}>
-                            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                <Typography variant="h4">{query.name}</Typography>
-                                <div style={{display: 'flex', alignItems: 'center'}}>
-                                    <IconButton onClick={() => this.handleFavorite()}>
-                                        {favorite ? <Favorite color="pink"/> : <FavoriteBorderOutlined color="pink"/>}
-                                    </IconButton>
-                                    <Typography variant="subtitle1">(90)</Typography>
-                                </div>
-                            </Box>
-                            <Box
-                                sx={{
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                }}
-                            >
-                                <div>
-                                    <Rating
-                                        defaultValue={2.5}
-                                        readOnly
-                                    />
-                                </div>
-                                <Divider flexItem orientation="vertical" variant="middle" sx={{
-                                    marginInline: 2
-                                }} />
-                                <p>
-                                    Terjual 100
-                                </p>
-                            </Box>
-                            <Typography variant="h4" sx={{fontWeight: 600, marginTop: 2}}>
-                                Rp. 100.000
-                            </Typography>
-                            <Divider sx={{marginY: 4}}/>
-                            <Box sx={{
-                                '*': {
-                                    marginBottom: 1
-                                }
-                            }}>
-                                <Typography variant="subtitle2">Kondisi: <b>Baru</b></Typography>
-                                <Typography variant="subtitle2">Min. Pembelian: <b>1</b> Buah</Typography>
-                                <Typography variant="subtitle2">Kategori: <b>Benda</b></Typography>
-                                <Typography variant="subtitle2">Berat benda: <b>1</b> Gram</Typography>
-                            </Box>
+                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                    <Typography variant="h5">{query.name}</Typography>
+                                    <Stack direction="row" spacing={2}>
+                                        <div style={{display: 'flex', alignItems: 'center'}}>
+                                            <IconButton onClick={() => this.handleFavorite()}>
+                                                {favorite ? <Favorite color="pink"/> : <FavoriteBorderOutlined color="pink"/>}
+                                            </IconButton>
+                                            <Typography variant="subtitle1">(90)</Typography>
+                                        </div>
+                                        <IconButton>
+                                            <Share/>
+                                        </IconButton>
+                                    </Stack>
+                                </Box>
+                                <Box
+                                    sx={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                    }}
+                                >
+                                    <div>
+                                        <Rating
+                                            defaultValue={2.5}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <Divider flexItem orientation="vertical" variant="middle" sx={{
+                                        marginInline: 2
+                                    }} />
+                                    <p>
+                                        Terjual 100
+                                    </p>
+                                </Box>
+                                <Typography variant="h5" sx={{fontWeight: 600, marginTop: 2}}>
+                                    Rp. 100.000
+                                </Typography>
+                                <Divider sx={{marginY: 4}}/>
+                                <Box sx={{
+                                    '*': {
+                                        marginBottom: 1
+                                    }
+                                }}>
+                                    <Typography variant="subtitle2">Kondisi: <b>Baru</b></Typography>
+                                    <Typography variant="subtitle2">Min. Pembelian: <b>1</b> Buah</Typography>
+                                    <Typography variant="subtitle2">Kategori: <b>Benda</b></Typography>
+                                    <Typography variant="subtitle2">Berat benda: <b>1</b> Gram</Typography>
+                                </Box>
+                                <Divider sx={{marginY: 4}}/>
+                                <Grid container columnSpacing={2} >
+                                    <Grid>
+                                        <Avatar/>
+                                    </Grid>
+                                    <Grid>
+                                        <Typography variant="h6">
+                                            Toko
+                                        </Typography>
+                                        <Rating defaultValue={4} readOnly/>
+                                        <Typography variant="subtitle2">
+                                            Aktif 1 menit yang lalu
+                                        </Typography>
+                                    </Grid>
+                                    <Grid>
+                                        <Grid container direction={'column'} spacing={1}>
+                                            <Grid>
+                                                <Button variant="outlined" sx={{width: 100}}>
+                                                    Follow
+                                                </Button>
+                                            </Grid>
+                                            <Grid>
+                                                <Button variant="contained" sx={{width: 100}}>
+                                                    Chat
+                                                </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
                             </Box>
                         </Grid>
                     </Grid>
@@ -159,22 +241,24 @@ class Product extends Component{
 
         return(
             <Container maxWidth="xl" sx={{marginBottom: 6}}>
-                <Box sx={{border: 1, borderColor: 'gray', p: 2, borderRadius: 2}}>
-                    <Typography variant="h5" sx={{fontWeight: 600}}>Deskripsi Produk</Typography>
-                    <Divider/>
-                    <Box>
-                        {dummy_text}
-                        {dummy_text}
-                        {dummy_text}
-                        {dummy_text}
-                        {dummy_text}
-                    </Box>
+                <Box sx={{
+                    maxHeight: '60vh',
+                    overflowY: 'auto'
+                }}>
+                    {dummy_text}
+                    {dummy_text}
+                    {dummy_text}
+                    {dummy_text}
+                    {dummy_text}
                 </Box>
             </Container>
         )
     }
 
     renderReviewProduct = () => {
+        const {reviewPagination} = this.state
+        const {offer, limit, visibleItem, length} = reviewPagination
+
         const  dummy_rating = [
             {label: 5, value: 12},
             {label: 4, value: 10},
@@ -184,126 +268,145 @@ class Product extends Component{
         ]
 
         return(
-            <Container maxWidth="xl" sx={{marginBottom: 6}}>
-                <Box sx={{border: 1, borderColor: 'gray', p: 2, borderRadius: 2}}>
-                    <Typography variant="h5" sx={{fontWeight: 600}}>Ulasan Produk</Typography>
-                    <Divider/>
-                    <Container maxWidth="lg" sx={{p: 2, marginBottom: 4}}>
-                        <Box sx={{border:1 ,borderRadius: 1, borderColor: '#ababab', py:2, px:4, display: 'flex', alignItems: 'center', justifyContent: 'space-around'}}>
-                            <Grid container columnSpacing={4}>
-                                <Grid container direction={"column"} size={'auto'} rowSpacing={1} sx={{alignItems: 'center'}}>
-                                    <Grid>
-                                        <Box sx={{display: 'flex', alignItems: 'center', '*': {marginRight: 2}}}>
-                                            <Star fontSize="large"/>
-                                            <Typography variant="h4">
-                                                4.8 / 5.0
-                                            </Typography>
-                                        </Box>
-                                    </Grid>
-                                    <Grid>
-                                        <Rating
-                                            defaultValue={4.8}
-                                            readOnly
-                                            precision={0.1}
-                                        />
-                                    </Grid>
-                                    <Grid>
-                                        <Stack
-                                            direction="row"
-                                            divider={<Divider orientation="vertical" flexItem />}
-                                            spacing={2}
-                                        >
-                                            <Typography variant="subtitle1">
-                                                100 Rating
-                                            </Typography>
-                                            <Typography variant="subtitle1">
-                                                85 Ulasan
-                                            </Typography>
-                                        </Stack>
-                                    </Grid>
+            <Container maxWidth="xl">
+                <Container maxWidth="lg" sx={{p: 2, marginBottom: 4}}>
+                    <Box sx={{border:1 ,borderRadius: 1, borderColor: '#ababab', py:2, px:4, display: 'flex', alignItems: 'center', justifyContent: 'space-around'}}>
+                        <Grid container columnSpacing={4}>
+                            <Grid container direction={"column"} size={'auto'} rowSpacing={1} sx={{alignItems: 'center'}}>
+                                <Grid>
+                                    <Box sx={{display: 'flex', alignItems: 'center', '*': {marginRight: 2}}}>
+                                        <Star fontSize="large"/>
+                                        <Typography variant="h4">
+                                            4.8 / 5.0
+                                        </Typography>
+                                    </Box>
                                 </Grid>
-                                <Grid size={'auto'}>
-                                    <Grid direction={'row'} columns={3}>
-                                        {dummy_rating.map((val, index) => (
-                                            <Grid size={1} key={index}>
-                                                <Box sx={{display: 'flex', alignItems: 'center'}}>
-                                                    <Rating readOnly defaultValue={val.label}/>
-                                                    <Typography variant="h6" sx={{marginLeft: 1}}>{val.value}</Typography>
-                                                </Box>
-                                            </Grid>
-                                        ))}
-                                    </Grid>
+                                <Grid>
+                                    <Rating
+                                        defaultValue={4.8}
+                                        readOnly
+                                        precision={0.1}
+                                    />
                                 </Grid>
-                            </Grid>
-                            <Divider variant="middle" orientation="vartical" flexItem/>
-                            <Grid>
-                                <Container maxWidth="sm">
-                                    <Typography variant="h6" sx={{fontWeight: 600}}>Filter Ulasan</Typography>
-                                    <Stack 
-                                        direction={'row'} 
-                                        useFlexGap
-                                        sx={{ flexWrap: 'wrap' }}
-                                        spacing={1}
+                                <Grid>
+                                    <Stack
+                                        direction="row"
+                                        divider={<Divider orientation="vertical" flexItem />}
+                                        spacing={2}
                                     >
-                                        <Chip label="Semua" variant={ 1 == 1 ? "contained" : "outlined"} onClick={() => console.log()} />
-                                        <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>5 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>4 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>3 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>2 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>1 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={'Dengan Media'} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={'Pengiriman Cepat'} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={'Pelayanan Terbaik'} variant="outlined" onClick={() => console.log()} />
-                                        <Chip label={'Sesuai Deskripsi'} variant="outlined" onClick={() => console.log()} />
+                                        <Typography variant="subtitle1">
+                                            100 Rating
+                                        </Typography>
+                                        <Typography variant="subtitle1">
+                                            85 Ulasan
+                                        </Typography>
                                     </Stack>
-                                </Container>
+                                </Grid>
+                            </Grid>
+                            <Grid size={'auto'}>
+                                <Grid direction={'row'} columns={3}>
+                                    {dummy_rating.map((val, index) => (
+                                        <Grid size={1} key={index}>
+                                            <Box sx={{display: 'flex', alignItems: 'center'}}>
+                                                <Rating readOnly defaultValue={val.label}/>
+                                                <Typography variant="h6" sx={{marginLeft: 1}}>{val.value}</Typography>
+                                            </Box>
+                                        </Grid>
+                                    ))}
+                                </Grid>
+                            </Grid>
+                        </Grid>
+                        <Divider variant="middle" orientation="vartical" flexItem/>
+                        <Grid>
+                            <Container maxWidth="sm">
+                                <Typography variant="h6" sx={{fontWeight: 600}}>Filter Ulasan</Typography>
+                                <Stack 
+                                    direction={'row'} 
+                                    useFlexGap
+                                    sx={{ flexWrap: 'wrap' }}
+                                    spacing={1}
+                                >
+                                    <Chip label="Semua" variant={ 1 == 1 ? "contained" : "outlined"} onClick={() => console.log()} />
+                                    <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>5 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>4 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>3 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>2 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={<Typography variant="subtitle1" sx={{display: 'flex', alignItems: 'center'}}>1 <Star fontSize="small"/></Typography>} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={'Dengan Media'} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={'Pengiriman Cepat'} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={'Pelayanan Terbaik'} variant="outlined" onClick={() => console.log()} />
+                                    <Chip label={'Sesuai Deskripsi'} variant="outlined" onClick={() => console.log()} />
+                                </Stack>
+                            </Container>
+                        </Grid>
+                    </Box>
+                </Container>
+                {visibleItem.map((val) => 
+                <Container key={val.id} sx={{marginBottom: 4}}>
+                    <Box sx={{marginBottom: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                        <Box>
+                            <Grid container columnSpacing={2}>
+                                <Grid>
+                                    <Avatar {...this.handleSplitCharacter(val.name)}/>
+                                </Grid>
+                                <Grid>
+                                    <Typography variant="subtitle1">{val.name}</Typography>
+                                    <Rating readOnly defaultValue={5} size="small"/>
+                                </Grid>
                             </Grid>
                         </Box>
-                    </Container>
-                    <Container>
-                        <Box sx={{marginBottom: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                            <Box>
-                                <Grid container columnSpacing={2}>
-                                    <Grid>
-                                        <Avatar {...this.handleSplitCharacter('Azrian Hanif')}/>
-                                    </Grid>
-                                    <Grid>
-                                        <Typography variant="subtitle1">Azrian Hanif</Typography>
-                                        <Rating readOnly defaultValue={5} size="small"/>
-                                    </Grid>
-                                </Grid>
-                            </Box>
-                            <Box>
-                                <Stack 
-                                    direction="row" 
-                                    spacing={2} sx={{
-                                        // justifyContent: "center",
-                                        alignItems: "center",
-                                    }}
-                                >
-                                    <Typography variant="subtitle1">
-                                        5 Bulan lalu
-                                    </Typography>
-                                    <IconButton>
-                                        <MoreVert/>
-                                    </IconButton>
-                                </Stack>
-                            </Box>
+                        <Box>
+                            <Stack 
+                                direction="row" 
+                                spacing={2} sx={{
+                                    // justifyContent: "center",
+                                    alignItems: "center",
+                                }}
+                            >
+                                <Typography variant="subtitle1">
+                                    {val.date}
+                                </Typography>
+                                <IconButton>
+                                    <MoreVert/>
+                                </IconButton>
+                            </Stack>
                         </Box>
-                        <Box sx={{marginBottom: 2}}>
-                            <Typography variant="body1">Keren sekali saya suka</Typography>
-                        </Box>
-                        <Box sx={{display: 'flex', alignItems: 'center'}}>
-                            <IconButton>
-                                <ThumbUp/>
-                            </IconButton>
-                            <Typography variant="subtitle1" sx={{marginRight: 1}}>5</Typography>
-                            <Typography variant="subtitle1">Disukai</Typography>
-                        </Box>
-                    </Container>
-                </Box>
+                    </Box>
+                    <Box sx={{marginBottom: 2}}>
+                        <Typography variant="body1">{val.message}</Typography>
+                    </Box>
+                    <Box sx={{display: 'flex', alignItems: 'center'}}>
+                        <IconButton>
+                            <ThumbUp/>
+                        </IconButton>
+                        <Typography variant="subtitle1" sx={{marginRight: 1}}>{val.love}</Typography>
+                        <Typography variant="subtitle1">Disukai</Typography>
+                    </Box>
+                    <Divider/>
+                </Container>
+                )}
+                <Pagination
+                    count={Math.ceil(length / limit)}
+                    page={offer}
+                    onChange={this.handlePagenationReview}
+                    color="primary"
+                    sx={{ display: "flex", justifyContent: "center", marginTop: 4 }}
+                />
             </Container>
         )
+    }
+
+    handlePagenationReview = (event, value) => {
+        const {limit} = this.state.reviewPagination
+        const startIndex = (value-1) * limit
+
+        this.setState({
+            reviewPagination: {
+                ...this.state.reviewPagination,
+                offer: value,
+                visibleItem: dummy_review.slice(startIndex, startIndex + limit),
+            }
+        })
     }
 
     handleRandomColor = (string) => {
@@ -335,15 +438,28 @@ class Product extends Component{
         }
     }
 
-    renderAllProduct = () => {
+    handleChangeAppBar = (event, newValue) => {
+        this.setState({
+            appBar: newValue
+        })
+    }
+
+    renderViewProductStore = () => {
+        const {offer, limit, visibleItem, length} = this.state.otherItemFromStore
+
         return (
-            <Container sx={{marginTop: 6}}>
-                <Typography variant="h4" gutterBottom className={playfair.className}>
-                    Jelajahi Produk Hari Ini
-                </Typography>
+            <Box>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <Typography variant="h4" gutterBottom>
+                        Produk dari toko kami
+                    </Typography>
+                    <Button variant="text" sx={{textTransform: 'lowercase'}}>
+                        Lihat semua
+                    </Button>
+                </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
-                    {visibleProducts.map((product) => (
-                        <Grid item key={product.id} xs={12} sm={6} md={4}>
+                    {visibleItem.map((product) => (
+                        <Grid item key={product.id} size={{xs:3, sm:2}}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
@@ -369,11 +485,58 @@ class Product extends Component{
                         </Grid>
                     ))}
                 </Grid>
-            </Container>
+            </Box>
+        )
+    }
+
+    renderAllProduct = () => {
+        const {offer, limit, visibleItem, length} = this.state.allItem
+
+        return (
+            <Box>
+                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                    <Typography variant="h4" gutterBottom>
+                        Produk yang mungkin disukai
+                    </Typography>
+                    <Button variant="text" sx={{textTransform: 'lowercase'}}>
+                        Lihat semua
+                    </Button>
+                </div>
+                <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
+                    {visibleItem.map((product) => (
+                        <Grid item key={product.id} size={{xs:3, sm:2}}>
+                            <Link href={{
+                                pathname: `/p/${product.name}`,
+                                query: {id: product.id}
+                            }}>
+                                <Card sx={{textDecoration: 'none'}}>
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={product.image}
+                                        alt={product.name}
+                                    />
+                                    <CardContent>
+                                        <Typography variant="h6">{product.name}</Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                        {product.description}
+                                        </Typography>
+                                        <Typography variant="h6" color="primary">
+                                        {product.price}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        </Grid>
+                    ))}
+                </Grid>
+            </Box>
         )
     }
 
     render() {
+        const {appBar} = this.state
+
         return(
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
@@ -385,8 +548,26 @@ class Product extends Component{
                             {this.renderAddTrolley()}
                         </Grid>
                     </Grid>
-                    {this.renderDescriptionProduct()}
-                    {this.renderReviewProduct()}
+                    <Container maxWidth="xl">
+                        <Box sx={{border: '1px solid gray', borderRadius: 2, p:2}}>
+                            <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
+                                <Tabs value={appBar} onChange={this.handleChangeAppBar} aria-label="tabel panel product">
+                                    <Tab label="Description" value="description"/>
+                                    <Tab label="Review" value="review"/>
+                                </Tabs>
+                            </Box>
+                            {
+                                appBar === 'description' ? this.renderDescriptionProduct() :
+                                appBar === 'review' ? this.renderReviewProduct() : ''
+                            }
+                        </Box>
+                    </Container>
+                    <Container maxWidth="xl" sx={{marginY: 4}}>
+                        {this.renderViewProductStore()}
+                    </Container>
+                    <Container maxWidth="xl" sx={{marginY: 4}}>
+                        {this.renderAllProduct()}
+                    </Container>
                 </Container>
             </ThemeProvider>
         )
