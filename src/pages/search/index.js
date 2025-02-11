@@ -62,7 +62,7 @@ class Search extends Component {
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={10}>
                     {visibleProducts.map((product) => (
-                        <Grid item key={product.id} size={2}>
+                        <Grid item key={product.id} size={{xs:3, sm:2}}>
                             <Card>
                             <CardMedia
                                 component="img"
