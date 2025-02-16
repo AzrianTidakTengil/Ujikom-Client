@@ -20,21 +20,6 @@
     background-color: none;
 }
 
-.item {
-    width: 30%;
-    display: flex;
-    align-items: center;
-    justify-content: end;
-}
-
-.item * {
-    margin-right: 0.5rem;
-}
-
-.item:nth-child(0){
-    border-right: 2px solid #ececec;
-}
-
 .listItem * {
     font-weight: 400;
     margin-bottom: 0.5rem;
