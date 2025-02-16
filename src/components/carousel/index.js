@@ -27,7 +27,7 @@ const Carousel = () => {
   };
 
   return (
-    <Box position="relative" fullWidth margin="auto">
+    <Box position="relative" margin="auto">
       <Slider ref={sliderRef} {...settings}>
         {images.map((img, index) => (
           <Card key={index}>
