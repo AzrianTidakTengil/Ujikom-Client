@@ -1,6 +1,6 @@
 'use client'
 
-import { Box, Button, createTheme, Divider, IconButton, Modal, ThemeProvider } from "@mui/material";
+import { Box, Button, createTheme, Divider, IconButton, Modal, ThemeProvider, Backdrop, CircularProgress } from "@mui/material";
 import { buttonPrimary, container, input, mainItem } from "./theme";
 import { useState, Component } from "react";
 import styles from './style.module.css'
@@ -9,12 +9,17 @@ import { Input, InputEmail, InputPassword } from "../input";
 import { Poppins } from "next/font/google";
 import { palleteV1 } from "@/assets/css/template";
 import Link from "next/link";
-import LoginLib from "@/lib/auth";
+import { connect } from "react-redux";
+import { login } from "@/store/auth";
 
 const poppins = Poppins({
   subsets: ['latin'],
   weight: ['300', '500'],
   style: ['normal']
+})
+
+const theme = createTheme({
+  ...palleteV1
 })
 
 class Auth extends Component {
@@ -24,25 +29,17 @@ class Auth extends Component {
       open: false,
       email: '',
       password: '',
-      errorMessage: null
+      errorMessage: null,
     }
   }
-  
-  theme = () => createTheme({
-    ...palleteV1
-  })
 
   handleSubmit = (e) => {
     e.preventDefault()
     const {email, password, errorMessage} = this.state
-    const {post, isLoading, data} = LoginLib.getState()
-
-    if (isLoading) {
-      console.log(isLoading)
-    }
-
     if (!errorMessage) {
-      post({user: email, password})
+      this.props.login({user: email, password})
+    } else {
+      console.log('cannot')
     }
   }
 
@@ -70,10 +67,9 @@ class Auth extends Component {
 
   render() {
     const {open} = this.state
-    const {post, isLoading} = LoginLib.getState()
     
     return(
-      <ThemeProvider theme={this.theme()}>
+      <ThemeProvider theme={theme}>
         <Button variant="outlined" onClick={this.handleModal} color="white" sx={{marginRight: 1}}>Login</Button>
         <Modal 
         open={open} 
@@ -94,7 +90,7 @@ class Auth extends Component {
                 <InputEmail name="email" type="text" label="Email" style={input} onBlur={(event) => this.handleInput(event)}/>
                 <InputPassword name="password" type="password" label="Password" style={input} blur={(event) => this.handleInput(event)}/>
                 <p>Forgot Password</p>
-                <Button variant="contained" color="success" sx={{width: '85%', marginTop: 6}} type="submit" loading={isLoading}>
+                <Button variant="contained" color="success" sx={{width: '85%', marginTop: 6}} type="submit">
                     Submit
                 </Button>
               </form>
@@ -103,9 +99,25 @@ class Auth extends Component {
               </div>
           </Box>
         </Modal>
+                  <Backdrop
+                    sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.modal + 100 })}
+                    open={this.props.isLoading}
+                  >
+                    <CircularProgress color="inherit" />
+                  </Backdrop>
       </ThemeProvider>
     )
   }
 }
 
-export default Auth
+const mapStateToProps = (state) => ({
+  isLoading: state.auth.isLoading,
+  error: state.auth.error,
+  data: state.auth.data,
+})
+
+const mapDispatchToProps = {
+  login
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Auth)
