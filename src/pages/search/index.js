@@ -1,18 +1,25 @@
 import { Component } from 'react';
-import { Container, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem } from '@mui/material';
+import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider } from '@mui/material';
 import { Playfair_Display, Poppins } from "next/font/google";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useRouter, withRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
-import { ExpandMore, Filter, FilterAlt, SearchOff, SearchOutlined } from '@mui/icons-material';
+import { ExpandMore, Filter, FilterAlt, SearchOff, SearchOutlined, Star } from '@mui/icons-material';
 import { InputText } from '@/components/input';
+import { palleteV1 } from '@/assets/css/template';
+import Link from 'next/link';
 
 const products = Array.from({ length: 500 }, (_, i) => ({
     id: i + 1,
     name: `Product ${i + 1}`,
-    description: "This is a great product.",
-    price: `$${(29.99 + i).toFixed(2)}`,
-    image: "https://via.placeholder.com/150"
+    address: `Bandung`,
+    price: new Intl.NumberFormat('id-ID', {
+        style: "currency",
+        currency: "IDR"
+    }).format(1000 * i),
+    image: "https://via.placeholder.com/150",
+    rating: Math.floor(Math.random() * 5) + 1,
+    sold: Math.floor(Math.random() * 100) + 1,
 }));
 
 class Search extends Component {
@@ -25,6 +32,12 @@ class Search extends Component {
             visibleProducts: products.slice(0, 50)
         }
     }
+
+    theme = () => createTheme({
+        palette: {
+            ...palleteV1.palette
+        }
+    })
 
     UNSAFE_componentWillReceiveProps(nextProps) {
         const {keyword} = nextProps.router.query
@@ -62,24 +75,42 @@ class Search extends Component {
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={10}>
                     {visibleProducts.map((product) => (
-                        <Grid item key={product.id} size={{xs:3, sm:2}}>
-                            <Card>
-                            <CardMedia
-                                component="img"
-                                height="140"
-                                image={product.image}
-                                alt={product.name}
-                            />
-                            <CardContent>
-                                <Typography variant="h6">{product.name}</Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                {product.description}
-                                </Typography>
-                                <Typography variant="h6" color="primary">
-                                {product.price}
-                                </Typography>
-                            </CardContent>
-                            </Card>
+                       <Grid key={product.id} size={2}>
+                            <Link href={{
+                                pathname: `/p/${product.name}`,
+                                query: {id: product.id}
+                                }}
+                                style={{textDecoration: 'none'}}
+                            >
+                                <Card sx={{textDecoration: 'none'}}>
+                                    <CardMedia
+                                        component="img"
+                                        height="140"
+                                        image={product.image}
+                                        alt={product.name}
+                                    />
+                                    <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
+                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                        <Typography variant="subtitle1" fontWeight={600}>
+                                        {product.price}
+                                        </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                        {product.address}
+                                        </Typography>
+                                        <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
+                                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                                <Star fontSize='small' color='yellow'/>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {product.rating}
+                                                </Typography>
+                                            </div>
+                                            <Typography variant='body2' color='textSecondary'>
+                                                {product.sold} terjual
+                                            </Typography>
+                                        </Stack>
+                                    </CardContent>
+                                </Card>
+                            </Link>
                         </Grid>
                     ))}
                 </Grid>
@@ -161,16 +192,18 @@ class Search extends Component {
 
     render() {
         return(
-            <Container maxWidth="xl">
-                <Grid container columnSpacing={3}>
-                    <Grid item size={2.5}>
-                        {this.renderFilter()}
+            <ThemeProvider theme={this.theme}>
+                <Container maxWidth="xl">
+                    <Grid container columnSpacing={3}>
+                        <Grid size={2.5}>
+                            {this.renderFilter()}
+                        </Grid>
+                        <Grid size="grow">
+                            {this.renderProducts()}
+                        </Grid>
                     </Grid>
-                    <Grid item size="grow">
-                        {this.renderProducts()}
-                    </Grid>
-                </Grid>
-            </Container>
+                </Container>
+            </ThemeProvider>
         )
     }
 }
