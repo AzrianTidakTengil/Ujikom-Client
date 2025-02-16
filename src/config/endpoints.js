@@ -46,5 +46,8 @@ export default {
             UPDATE: '/store/label/update',
         }
     },
-    TEST: '/test'
+    TEST: '/test',
+    USER: {
+        GET: '/user'
+    }
 }
