@@ -15,19 +15,19 @@ class Footer extends Component{
             <Box component="footer" sx={{ bgcolor: "#333", color: "white", py: 3, mt: 5,  width: "100%" }}>
             <Container maxWidth="xl">
                 <Grid container spacing={4} justifyContent="space-around">
-                <Grid item xs={12} sm={4}>
+                <Grid xs={12} sm={4}>
                     <Typography variant="h6">Help</Typography>
                     <Typography variant="body2">Customer Support</Typography>
                     <Typography variant="body2">FAQs</Typography>
                     <Typography variant="body2">Contact Us</Typography>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid xs={12} sm={4}>
                     <Typography variant="h6">About the Company</Typography>
                     <Typography variant="body2">Our Story</Typography>
                     <Typography variant="body2">Careers</Typography>
                     <Typography variant="body2">Press</Typography>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid xs={12} sm={4}>
                     <Typography variant="h6">Follow Us</Typography>
                     <IconButton
                     href="https://www.instagram.com/yourprofile"
