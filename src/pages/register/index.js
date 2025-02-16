@@ -118,12 +118,12 @@ class Register extends React.Component{
             <>
                 <div className={styles.Box_title} style={{width: '85%'}}>
                     <Grid2 container spacing={2}>
-                        <Grid2 item xs={3}>
+                        <Grid2 xs={3}>
                             <IconButton onClick={() => this.handleBackBox()}>
                                 <ArrowBackIosNew/>
                             </IconButton>
                         </Grid2>
-                        <Grid2 item xs sx={{marginLeft: '1rem'}}>
+                        <Grid2 xs sx={{marginLeft: '1rem'}}>
                             <h2>Kode Verifikasi</h2>
                         </Grid2>
                     </Grid2>
