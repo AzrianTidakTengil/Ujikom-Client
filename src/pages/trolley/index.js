@@ -1,24 +1,198 @@
-import React from "react";
+import React, { Component } from 'react';
+import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme } from '@mui/material';
+import { Add, Remove, Delete, Star } from '@mui/icons-material';
+import { QuantityEditor } from '@/components';
+import Link from 'next/link';
+import { palleteV1 } from '@/assets/css/template';
 
-class Trolley extends React.Component {
-    constructor(props) {
-        super(props)
+const products = Array.from({ length: 500 }, (_, i) => ({
+  id: i + 1,
+  name: `Product ${i + 1}`,
+  address: `Bandung`,
+  price: new Intl.NumberFormat('id-ID', {
+      style: "currency",
+      currency: "IDR"
+  }).format(1000 * i),
+  image: "https://via.placeholder.com/150",
+  rating: Math.floor(Math.random() * 5) + 1,
+  sold: Math.floor(Math.random() * 100) + 1,
+}));
 
-        this.state = {
-
-        }
+class Trolley extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      cart: [
+        { id: 1, name: 'Product 1', price: 10, quantity: 2, image: 'https://via.placeholder.com/100' },
+        { id: 2, name: 'Product 2', price: 20, quantity: 1, image: 'https://via.placeholder.com/100' },
+        { id: 3, name: 'Product 3', price: 15, quantity: 3, image: 'https://via.placeholder.com/100' },
+      ],
+      allItem: {
+        offer: 1,
+        lenght: 36,
+        length: 36,
+        visibleItem: products.slice(0, 36)
+      }
     }
+  }
 
-    render() {
-        return (
-            <>
-                <h1>
-                    My Trolley
-                </h1>
-            </>
+  theme = () => createTheme({
+    palette: {
+      ...palleteV1.palette
+    }
+  })
+
+  renderTrolley = () => {
+    const { cart } = this.state;
+
+    return (
+      <Grid container spacing={2}>
+        {cart.map((item) => (
+          <Grid size={12} key={item.id}>
+            <Card sx={{p: 4}}>
+              <Grid container>
+                <Grid size={3}>
+                  <CardMedia
+                    component="img"
+                    height="100"
+                    image={item.image}
+                    alt={item.name}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <CardContent>
+                    <Typography variant="h6">{item.name}</Typography>
+                    <Typography variant="body2">Price: ${item.price}</Typography>
+                  </CardContent>
+                </Grid>
+                <Grid size={3} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                    <Box sx={{marginBottom: 2}}>
+                      <Stack
+                        direction="row"
+                        divider={<Divider orientation="vertical" flexItem />}
+                        spacing={2}
+                      >
+                        <QuantityEditor 
+                        initialQuantity={1}
+                        min={1}
+                        max={100}
+                        />
+                        <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
+                            <Delete />
+                        </IconButton>
+                      </Stack>
+                    </Box>
+                    <Typography variant='h6'>Rp. 12000</Typography>
+                </Grid>
+              </Grid>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    )
+  }
+
+  handleIncrease = (id) => {
+    this.setState(prevState => ({
+      cart: prevState.cart.map(item => 
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    }));
+  };
+
+  handleDecrease = (id, quantity) => {
+    if (quantity > 1) {
+      this.setState(prevState => ({
+        cart: prevState.cart.map(item => 
+          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
         )
+      }));
     }
+  };
 
+  handleRemove = (id) => {
+    this.setState(prevState => ({
+      cart: prevState.cart.filter(item => item.id !== id)
+    }));
+  };
+
+  renderAllProduct = () => {
+    const {offer, limit, visibleItem, length} = this.state.allItem
+
+    return (
+      <Box>
+        <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+            <Typography variant="h4" gutterBottom>
+                Produk yang mungkin disukai
+            </Typography>
+            <Button variant="text" sx={{textTransform: 'lowercase'}}>
+                Lihat semua
+            </Button>
+        </div>
+        <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
+            {visibleItem.map((product) => (
+                <Grid key={product.id} size={2}>
+                    <Link href={{
+                        pathname: `/p/${product.name}`,
+                        query: {id: product.id}
+                        }}
+                        style={{textDecoration: 'none'}}
+                    >
+                        <Card sx={{textDecoration: 'none'}}>
+                            <CardMedia
+                                component="img"
+                                height="140"
+                                image={product.image}
+                                alt={product.name}
+                            />
+                            <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
+                                <Typography variant="subtitle1">{product.name}</Typography>
+                                <Typography variant="subtitle1" fontWeight={600}>
+                                {product.price}
+                                </Typography>
+                                <Typography variant="body2" color="textSecondary">
+                                {product.address}
+                                </Typography>
+                                <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
+                                    <div style={{display: 'flex', alignItems: 'center'}}>
+                                        <Star fontSize='small' color='yellow'/>
+                                        <Typography variant="body2" color="textSecondary">
+                                            {product.rating}
+                                        </Typography>
+                                    </div>
+                                    <Typography variant='body2' color='textSecondary'>
+                                        {product.sold} terjual
+                                    </Typography>
+                                </Stack>
+                            </CardContent>
+                        </Card>
+                    </Link>
+                </Grid>
+            ))}
+        </Grid>
+    </Box>
+    )
+  }
+
+  render() {
+    const { cart } = this.state;
+
+    return (
+      <ThemeProvider theme={this.theme}>
+        <Container sx={{marginBottom: 4}}>
+          <Typography variant="h4" gutterBottom>Keranjang</Typography>
+          {cart.length === 0 ? (
+            <Typography variant="h6">Your trolley is empty.</Typography>
+          ) : 
+            this.renderTrolley()
+          }
+        </Container>
+        <Container>
+          {this.renderAllProduct()}
+        </Container>
+      </ThemeProvider>
+    );
+  }
 }
 
-export default Trolley
+export default Trolley;
