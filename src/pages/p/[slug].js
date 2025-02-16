@@ -20,9 +20,14 @@ const dummy_review = Array.from({ length: 34 }, (_, i) => ({
 const products = Array.from({ length: 500 }, (_, i) => ({
     id: i + 1,
     name: `Product ${i + 1}`,
-    description: "This is a great product.",
-    price: `$${(29.99 + i).toFixed(2)}`,
-    image: "https://unsplash.com/photos/three-white-plastic-bottles-under-white-cottons-xtRL02ZuZxE"
+    address: `Bandung`,
+    price: new Intl.NumberFormat('id-ID', {
+        style: "currency",
+        currency: "IDR"
+    }).format(1000 * i),
+    image: "https://via.placeholder.com/150",
+    rating: Math.floor(Math.random() * 5) + 1,
+    sold: Math.floor(Math.random() * 100) + 1,
 }));
 
 class Product extends Component{
@@ -459,11 +464,13 @@ class Product extends Component{
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
                     {visibleItem.map((product) => (
-                        <Grid item key={product.id} size={{xs:3, sm:2}}>
+                        <Grid key={product.id} size={2}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
-                            }}>
+                                }}
+                                style={{textDecoration: 'none'}}
+                            >
                                 <Card sx={{textDecoration: 'none'}}>
                                     <CardMedia
                                         component="img"
@@ -471,14 +478,25 @@ class Product extends Component{
                                         image={product.image}
                                         alt={product.name}
                                     />
-                                    <CardContent>
-                                        <Typography variant="h6">{product.name}</Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                        {product.description}
-                                        </Typography>
-                                        <Typography variant="h6" color="primary">
+                                    <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
+                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                        <Typography variant="subtitle1" fontWeight={600}>
                                         {product.price}
                                         </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                        {product.address}
+                                        </Typography>
+                                        <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
+                                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                                <Star fontSize='small' color='yellow'/>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {product.rating}
+                                                </Typography>
+                                            </div>
+                                            <Typography variant='body2' color='textSecondary'>
+                                                {product.sold} terjual
+                                            </Typography>
+                                        </Stack>
                                     </CardContent>
                                 </Card>
                             </Link>
@@ -504,11 +522,13 @@ class Product extends Component{
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
                     {visibleItem.map((product) => (
-                        <Grid item key={product.id} size={{xs:3, sm:2}}>
+                        <Grid key={product.id} size={2}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
-                            }}>
+                                }}
+                                style={{textDecoration: 'none'}}
+                            >
                                 <Card sx={{textDecoration: 'none'}}>
                                     <CardMedia
                                         component="img"
@@ -516,14 +536,25 @@ class Product extends Component{
                                         image={product.image}
                                         alt={product.name}
                                     />
-                                    <CardContent>
-                                        <Typography variant="h6">{product.name}</Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                        {product.description}
-                                        </Typography>
-                                        <Typography variant="h6" color="primary">
+                                    <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
+                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                        <Typography variant="subtitle1" fontWeight={600}>
                                         {product.price}
                                         </Typography>
+                                        <Typography variant="body2" color="textSecondary">
+                                        {product.address}
+                                        </Typography>
+                                        <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
+                                            <div style={{display: 'flex', alignItems: 'center'}}>
+                                                <Star fontSize='small' color='yellow'/>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {product.rating}
+                                                </Typography>
+                                            </div>
+                                            <Typography variant='body2' color='textSecondary'>
+                                                {product.sold} terjual
+                                            </Typography>
+                                        </Stack>
                                     </CardContent>
                                 </Card>
                             </Link>
