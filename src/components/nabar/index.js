@@ -8,17 +8,25 @@ import {
   TextField,
   ThemeProvider,
   Toolbar,
-  Button
+  Button,
+  Backdrop,
+  CircularProgress,
+  Avatar,
+  IconButton,
+  Grid2 as Grid
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { SearchOutlined } from "@mui/icons-material";
+import { LocalGroceryStoreOutlined, MailLockOutlined, MailOutlineOutlined, SearchOutlined } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
 import { containerModal, mainItem } from "./theme";
 import Link from "next/link";
-
+import { connect } from "react-redux";
+import { login } from "@/store/auth";
+import { getUser } from "@/store/user";
+import Cookie from 'js-cookie'
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -27,10 +35,17 @@ class Navbar extends React.Component {
     this.state = {
       showModal: false,
       disableInput: false,
+      user: {
+        username: '',
+        firstname: '',
+        lastname: '',
+        email: '',
+        telephone: ''
+      }
     }
   }
   
-  theme = () => createTheme({
+  theme = (outerTheme) => createTheme({
     palette: {
       ...palleteV1.palette,
     },
@@ -76,6 +91,25 @@ class Navbar extends React.Component {
     }
   }
 
+  UNSAFE_componentWillMount() {
+    this.props.getUser()
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    const {auth, user} = nextProps
+    if (user.isSuccess) {
+      this.setState({
+        user: {
+          username: user.username,
+          firstname: user.firstname,
+          lastname: user.lastname,
+          email: user.email,
+          telephone: user.telephone
+        }
+      })
+    }
+  }
+
   handleFocus() {
     const {showModal} = this.state
     
@@ -96,8 +130,38 @@ class Navbar extends React.Component {
     console.log(val)
   }
 
+  handleRandomColor = (string) => {
+      let hash = 0;
+      let i;
+
+      /* eslint-disable no-bitwise */
+      for (i = 0; i < string.length; i += 1) {
+          hash = string.charCodeAt(i) + ((hash << 5) - hash);
+      }
+
+      let color = '#';
+
+      for (i = 0; i < 3; i += 1) {
+          const value = (hash >> (i * 8)) & 0xff;
+          color += `00${value.toString(16)}`.slice(-2);
+      }
+      /* eslint-enable no-bitwise */
+
+      return color;
+  }
+
+  handleSplitCharacter = (value) => {
+      return {
+          sx: {
+              bgcolor: this.handleRandomColor(value),
+            },
+          children: `${value.split(' ')[0][0]}${value.split(' ')[1][0]}`,
+      }
+  }
+
   render() {
-    const {showModal} = this.state
+    const {showModal, user} = this.state
+    const {auth} = this.props
     const dummy_search = [
       {
         id: 1,
@@ -115,7 +179,7 @@ class Navbar extends React.Component {
     ]
 
     return (
-      <ThemeProvider theme={this.theme()}>
+      <ThemeProvider theme={this.theme}>
         <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Link href='/'><h1 className={styles.title}>Popping</h1></Link>
@@ -133,11 +197,34 @@ class Navbar extends React.Component {
               onChange={(event) => this.handleChange(event.target.value)}
               onClick={() => this.handleFocus()}
             />
-            <div className={styles.item}>
+            <div>
+              {user.username ? 
+              <Grid container direction={'row'} spacing={2}>
+                <Grid>
+                  <Link href={'/trolley'}>
+                    <IconButton>
+                      <LocalGroceryStoreOutlined/>
+                    </IconButton>
+                  </Link>
+                </Grid>
+                <Grid>
+                <IconButton>
+                    <MailOutlineOutlined />
+                  </IconButton>
+                </Grid>
+                <Grid>
+                  <Link href={'/profile'} style={{textDecoration: 'none'}}>
+                    <div style={{cursor: 'pointer'}}>
+                      <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
+                    </div>
+                  </Link>
+                </Grid>
+              </Grid> 
+              : 
               <div>
                 <Auth/>
                 <Link href="/register"><Button variant="contained" color="white">Register</Button></Link>
-              </div>
+              </div>}
             </div>
           </Toolbar>
         </AppBar>
@@ -151,11 +238,12 @@ class Navbar extends React.Component {
                 sx={mainItem}
               >
                   <div className={styles.listItem}>
-                    {dummy_search.map((val) => <Link 
+                    {dummy_search.map((val, index) => <Link 
                     href={{
                       pathname: '/search',
                       query: {keyword: val.name}
                     }}
+                    key={index}
                     scroll={true}
                     prefetch={true}
                     onClick={() => this.handleOutFocus()}
@@ -170,4 +258,25 @@ class Navbar extends React.Component {
   }
 }
 
-export default Navbar
+const mapStateToProps = (state) => ({
+  auth: {
+    isLoading: state.auth.isLoading,
+    error: state.auth.error,
+    data: state.auth.data,
+  },
+  user: {
+    isLoading: state.user.isLoading,
+    isSuccess: state.user.isSuccess,
+    username: state.user.user.username,
+    firstname: state.user.user.firstname,
+    lastname: state.user.user.lastname,
+    email: state.user.user.email,
+    telephone: state.user.user.telephone
+  }
+})
+
+const mapDispatchToProps = {
+  getUser
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Navbar)
