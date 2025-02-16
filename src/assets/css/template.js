@@ -10,6 +10,9 @@ export const palleteV1 = createTheme({
         },
         pink: {
             main: '#ff66cc'
+        },
+        yellow: {
+            main: '#ffd700'
         }
     }
 })
