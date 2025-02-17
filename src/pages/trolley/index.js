@@ -145,9 +145,9 @@ class Trolley extends Component {
                 Lihat semua
             </Button>
         </div>
-        <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
+        <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={12} sx={{marginTop: 4}}>
             {visibleItem.map((product) => (
-                <Grid key={product.id} size={2}>
+                <Grid key={product.id} size={{xs: 6, md: 3}}>
                     <Link href={{
                         pathname: `/p/${product.name}`,
                         query: {id: product.id}
