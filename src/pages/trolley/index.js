@@ -23,9 +23,9 @@ class Trolley extends Component {
     super(props)
     this.state = {
       cart: [
-        { id: 1, name: 'Product 1', price: 10, quantity: 2, image: 'https://via.placeholder.com/100' },
-        { id: 2, name: 'Product 2', price: 20, quantity: 1, image: 'https://via.placeholder.com/100' },
-        { id: 3, name: 'Product 3', price: 15, quantity: 3, image: 'https://via.placeholder.com/100' },
+        { id: 1, name: 'Product 1', price: 1000, quantity: 2, image: 'https://via.placeholder.com/100' },
+        { id: 2, name: 'Product 2', price: 2000, quantity: 1, image: 'https://via.placeholder.com/100' },
+        { id: 3, name: 'Product 3', price: 1500, quantity: 3, image: 'https://via.placeholder.com/100' },
       ],
       allItem: {
         offer: 1,
@@ -75,7 +75,13 @@ class Trolley extends Component {
                     <Grid size={5}>
                       <CardContent>
                         <Typography variant="h6">{item.name}</Typography>
-                        <Typography variant="body2">Price: ${item.price}</Typography>
+                        <Typography variant="body2">{
+                          new Intl.NumberFormat('id-ID', {
+                              style: "currency",
+                              currency: "IDR"
+                          }).format(item.price)
+                          }
+                        </Typography>
                       </CardContent>
                     </Grid>
                     <Grid size={3} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
@@ -86,16 +92,25 @@ class Trolley extends Component {
                             spacing={2}
                           >
                             <QuantityEditor 
-                            initialQuantity={1}
+                            name={item.id}
+                            initialQuantity={item.quantity}
                             min={1}
                             max={100}
+                            onChange={this.handleChangeQuantity}
                             />
                             <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
                                 <Delete />
                             </IconButton>
                           </Stack>
                         </Box>
-                        <Typography variant='h6'>Rp. 12000</Typography>
+                        <Typography variant='h6'>
+                          {
+                            new Intl.NumberFormat('id-ID', {
+                                style: "currency",
+                                currency: "IDR"
+                            }).format(item.price * item.quantity)
+                          }
+                        </Typography>
                     </Grid>
                   </Grid>
                 </Card>
@@ -107,23 +122,9 @@ class Trolley extends Component {
     )
   }
 
-  handleIncrease = (id) => {
-    this.setState(prevState => ({
-      cart: prevState.cart.map(item => 
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    }));
-  };
+  handleChangeQuantity = (name, value) => {
 
-  handleDecrease = (id, quantity) => {
-    if (quantity > 1) {
-      this.setState(prevState => ({
-        cart: prevState.cart.map(item => 
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
-      }));
-    }
-  };
+  }
 
   handleRemove = (id) => {
     this.setState(prevState => ({
