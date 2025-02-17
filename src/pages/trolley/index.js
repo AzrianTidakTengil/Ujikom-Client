@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme } from '@mui/material';
-import { Add, Remove, Delete, Star } from '@mui/icons-material';
+import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { Add, Remove, Delete, Star, CheckBox } from '@mui/icons-material';
 import { QuantityEditor } from '@/components';
 import Link from 'next/link';
 import { palleteV1 } from '@/assets/css/template';
@@ -47,7 +47,12 @@ class Trolley extends Component {
 
     return (
       <Box>
-        <Typography variant="h4" gutterBottom>Keranjang</Typography>
+        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <Typography variant="h4" gutterBottom>Keranjang</Typography>
+          <FormGroup>
+            <FormControlLabel control={<Checkbox/>} label="Pilih Semua"/>
+          </FormGroup>
+        </Box>
         {cart.length === 0 ? (
           <Typography variant="h6">Tidak ada produk di keranjang</Typography>
         ) : (
@@ -56,6 +61,9 @@ class Trolley extends Component {
               <Grid size={12} key={item.id}>
                 <Card sx={{p: 4}}>
                   <Grid container>
+                    <Grid size={1}>
+                      <CheckBox/>
+                    </Grid>
                     <Grid size={3}>
                       <CardMedia
                         component="img"
@@ -64,7 +72,7 @@ class Trolley extends Component {
                         alt={item.name}
                       />
                     </Grid>
-                    <Grid size={6}>
+                    <Grid size={5}>
                       <CardContent>
                         <Typography variant="h6">{item.name}</Typography>
                         <Typography variant="body2">Price: ${item.price}</Typography>
