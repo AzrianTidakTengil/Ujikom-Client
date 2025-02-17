@@ -14,8 +14,8 @@ const products = Array.from({ length: 500 }, (_, i) => ({
       currency: "IDR"
   }).format(1000 * i),
   image: "https://via.placeholder.com/150",
-  rating: Math.floor(Math.random() * 5) + 1,
-  sold: Math.floor(Math.random() * 100) + 1,
+  rating: '5',
+  sold: '100',
 }));
 
 class Trolley extends Component {
@@ -43,52 +43,59 @@ class Trolley extends Component {
   })
 
   renderTrolley = () => {
-    const { cart } = this.state;
+    const { cart } = this.state
 
     return (
-      <Grid container spacing={2}>
-        {cart.map((item) => (
-          <Grid size={12} key={item.id}>
-            <Card sx={{p: 4}}>
-              <Grid container>
-                <Grid size={3}>
-                  <CardMedia
-                    component="img"
-                    height="100"
-                    image={item.image}
-                    alt={item.name}
-                  />
-                </Grid>
-                <Grid size={6}>
-                  <CardContent>
-                    <Typography variant="h6">{item.name}</Typography>
-                    <Typography variant="body2">Price: ${item.price}</Typography>
-                  </CardContent>
-                </Grid>
-                <Grid size={3} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                    <Box sx={{marginBottom: 2}}>
-                      <Stack
-                        direction="row"
-                        divider={<Divider orientation="vertical" flexItem />}
-                        spacing={2}
-                      >
-                        <QuantityEditor 
-                        initialQuantity={1}
-                        min={1}
-                        max={100}
-                        />
-                        <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
-                            <Delete />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-                    <Typography variant='h6'>Rp. 12000</Typography>
-                </Grid>
+      <Box>
+        <Typography variant="h4" gutterBottom>Keranjang</Typography>
+        {cart.length === 0 ? (
+          <Typography variant="h6">Tidak ada produk di keranjang</Typography>
+        ) : (
+          <Grid container spacing={2}>
+            {cart.map((item) => (
+              <Grid size={12} key={item.id}>
+                <Card sx={{p: 4}}>
+                  <Grid container>
+                    <Grid size={3}>
+                      <CardMedia
+                        component="img"
+                        height="100"
+                        image={item.image}
+                        alt={item.name}
+                      />
+                    </Grid>
+                    <Grid size={6}>
+                      <CardContent>
+                        <Typography variant="h6">{item.name}</Typography>
+                        <Typography variant="body2">Price: ${item.price}</Typography>
+                      </CardContent>
+                    </Grid>
+                    <Grid size={3} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                        <Box sx={{marginBottom: 2}}>
+                          <Stack
+                            direction="row"
+                            divider={<Divider orientation="vertical" flexItem />}
+                            spacing={2}
+                          >
+                            <QuantityEditor 
+                            initialQuantity={1}
+                            min={1}
+                            max={100}
+                            />
+                            <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
+                                <Delete />
+                            </IconButton>
+                          </Stack>
+                        </Box>
+                        <Typography variant='h6'>Rp. 12000</Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
               </Grid>
-            </Card>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        )}
+      </Box>
     )
   }
 
@@ -180,12 +187,7 @@ class Trolley extends Component {
     return (
       <ThemeProvider theme={this.theme}>
         <Container sx={{marginBottom: 4}}>
-          <Typography variant="h4" gutterBottom>Keranjang</Typography>
-          {cart.length === 0 ? (
-            <Typography variant="h6">Your trolley is empty.</Typography>
-          ) : 
-            this.renderTrolley()
-          }
+          {this.renderTrolley()}
         </Container>
         <Container>
           {this.renderAllProduct()}
