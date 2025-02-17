@@ -2,14 +2,14 @@ import React, { useState } from "react";
 import { IconButton, TextField, Box } from "@mui/material";
 import { Add, Remove } from "@mui/icons-material";
 
-const QuantityEditor = ({ initialQuantity = 1, min = 1, max = 10, onChange }) => {
+const QuantityEditor = ({ initialQuantity = 1, min = 1, max = 10, onChange, name = '' }) => {
   const [quantity, setQuantity] = useState(initialQuantity);
 
   const handleIncrease = () => {
     if (quantity < max) {
       const newQuantity = quantity + 1;
       setQuantity(newQuantity);
-      onChange && onChange(newQuantity);
+      onChange && onChange(name, newQuantity);
     }
   };
 
@@ -17,7 +17,7 @@ const QuantityEditor = ({ initialQuantity = 1, min = 1, max = 10, onChange }) =>
     if (quantity > min) {
       const newQuantity = quantity - 1;
       setQuantity(newQuantity);
-      onChange && onChange(newQuantity);
+      onChange && onChange(name, newQuantity);
     }
   };
 
