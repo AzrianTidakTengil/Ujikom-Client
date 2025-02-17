@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme } from '@mui/material';
-import { Add, Remove, Delete, Star } from '@mui/icons-material';
+import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { Add, Remove, Delete, Star, CheckBox } from '@mui/icons-material';
 import { QuantityEditor } from '@/components';
 import Link from 'next/link';
 import { palleteV1 } from '@/assets/css/template';
@@ -14,8 +14,8 @@ const products = Array.from({ length: 500 }, (_, i) => ({
       currency: "IDR"
   }).format(1000 * i),
   image: "https://via.placeholder.com/150",
-  rating: Math.floor(Math.random() * 5) + 1,
-  sold: Math.floor(Math.random() * 100) + 1,
+  rating: '5',
+  sold: '100',
 }));
 
 class Trolley extends Component {
@@ -23,9 +23,9 @@ class Trolley extends Component {
     super(props)
     this.state = {
       cart: [
-        { id: 1, name: 'Product 1', price: 10, quantity: 2, image: 'https://via.placeholder.com/100' },
-        { id: 2, name: 'Product 2', price: 20, quantity: 1, image: 'https://via.placeholder.com/100' },
-        { id: 3, name: 'Product 3', price: 15, quantity: 3, image: 'https://via.placeholder.com/100' },
+        { id: 1, name: 'Product 1', price: 1000, quantity: 2, image: 'https://via.placeholder.com/100' },
+        { id: 2, name: 'Product 2', price: 2000, quantity: 1, image: 'https://via.placeholder.com/100' },
+        { id: 3, name: 'Product 3', price: 1500, quantity: 3, image: 'https://via.placeholder.com/100' },
       ],
       allItem: {
         offer: 1,
@@ -43,72 +43,88 @@ class Trolley extends Component {
   })
 
   renderTrolley = () => {
-    const { cart } = this.state;
+    const { cart } = this.state
 
     return (
-      <Grid container spacing={2}>
-        {cart.map((item) => (
-          <Grid size={12} key={item.id}>
-            <Card sx={{p: 4}}>
-              <Grid container>
-                <Grid size={3}>
-                  <CardMedia
-                    component="img"
-                    height="100"
-                    image={item.image}
-                    alt={item.name}
-                  />
-                </Grid>
-                <Grid size={6}>
-                  <CardContent>
-                    <Typography variant="h6">{item.name}</Typography>
-                    <Typography variant="body2">Price: ${item.price}</Typography>
-                  </CardContent>
-                </Grid>
-                <Grid size={3} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
-                    <Box sx={{marginBottom: 2}}>
-                      <Stack
-                        direction="row"
-                        divider={<Divider orientation="vertical" flexItem />}
-                        spacing={2}
-                      >
-                        <QuantityEditor 
-                        initialQuantity={1}
-                        min={1}
-                        max={100}
-                        />
-                        <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
-                            <Delete />
-                        </IconButton>
-                      </Stack>
-                    </Box>
-                    <Typography variant='h6'>Rp. 12000</Typography>
-                </Grid>
+      <Box>
+        <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+          <Typography variant="h4" gutterBottom>Keranjang</Typography>
+          <FormGroup>
+            <FormControlLabel control={<Checkbox/>} label="Pilih Semua"/>
+          </FormGroup>
+        </Box>
+        {cart.length === 0 ? (
+          <Typography variant="h6">Tidak ada produk di keranjang</Typography>
+        ) : (
+          <Grid container spacing={2}>
+            {cart.map((item) => (
+              <Grid size={12} key={item.id}>
+                <Card sx={{p: 4}}>
+                  <Grid container>
+                    <Grid size={1}>
+                      <CheckBox/>
+                    </Grid>
+                    <Grid size={3}>
+                      <CardMedia
+                        component="img"
+                        height="100"
+                        image={item.image}
+                        alt={item.name}
+                      />
+                    </Grid>
+                    <Grid size={5}>
+                      <CardContent>
+                        <Typography variant="h6">{item.name}</Typography>
+                        <Typography variant="body2">{
+                          new Intl.NumberFormat('id-ID', {
+                              style: "currency",
+                              currency: "IDR"
+                          }).format(item.price)
+                          }
+                        </Typography>
+                      </CardContent>
+                    </Grid>
+                    <Grid size={3} sx={{display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'}}>
+                        <Box sx={{marginBottom: 2}}>
+                          <Stack
+                            direction="row"
+                            divider={<Divider orientation="vertical" flexItem />}
+                            spacing={2}
+                          >
+                            <QuantityEditor 
+                            name={item.id}
+                            initialQuantity={item.quantity}
+                            min={1}
+                            max={100}
+                            onChange={this.handleChangeQuantity}
+                            />
+                            <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
+                                <Delete />
+                            </IconButton>
+                          </Stack>
+                        </Box>
+                        <Typography variant='h6'>
+                          {
+                            new Intl.NumberFormat('id-ID', {
+                                style: "currency",
+                                currency: "IDR"
+                            }).format(item.price * item.quantity)
+                          }
+                        </Typography>
+                    </Grid>
+                  </Grid>
+                </Card>
               </Grid>
-            </Card>
+            ))}
           </Grid>
-        ))}
-      </Grid>
+        )}
+      </Box>
     )
   }
 
-  handleIncrease = (id) => {
-    this.setState(prevState => ({
-      cart: prevState.cart.map(item => 
-        item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    }));
-  };
+  handleChangeQuantity = (name, value) => {
 
-  handleDecrease = (id, quantity) => {
-    if (quantity > 1) {
-      this.setState(prevState => ({
-        cart: prevState.cart.map(item => 
-          item.id === id ? { ...item, quantity: item.quantity - 1 } : item
-        )
-      }));
-    }
-  };
+  }
 
   handleRemove = (id) => {
     this.setState(prevState => ({
@@ -180,12 +196,7 @@ class Trolley extends Component {
     return (
       <ThemeProvider theme={this.theme}>
         <Container sx={{marginBottom: 4}}>
-          <Typography variant="h4" gutterBottom>Keranjang</Typography>
-          {cart.length === 0 ? (
-            <Typography variant="h6">Your trolley is empty.</Typography>
-          ) : 
-            this.renderTrolley()
-          }
+          {this.renderTrolley()}
         </Container>
         <Container>
           {this.renderAllProduct()}
