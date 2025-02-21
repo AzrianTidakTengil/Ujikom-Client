@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme, FormGroup, FormControlLabel, Checkbox } from '@mui/material';
+import { Container, Typography, Card, CardContent, CardMedia, Button, IconButton, Grid2 as Grid, Box, Stack, Divider, ThemeProvider, createTheme, FormGroup, FormControlLabel, Checkbox, AppBar } from '@mui/material';
 import { Add, Remove, Delete, Star, CheckBox } from '@mui/icons-material';
 import { QuantityEditor } from '@/components';
 import Link from 'next/link';
@@ -26,6 +26,9 @@ class Trolley extends Component {
         { id: 1, name: 'Product 1', price: 1000, quantity: 2, image: 'https://via.placeholder.com/100' },
         { id: 2, name: 'Product 2', price: 2000, quantity: 1, image: 'https://via.placeholder.com/100' },
         { id: 3, name: 'Product 3', price: 1500, quantity: 3, image: 'https://via.placeholder.com/100' },
+        { id: 4, name: 'Product 3', price: 1500, quantity: 3, image: 'https://via.placeholder.com/100' },
+        { id: 5, name: 'Product 3', price: 1500, quantity: 3, image: 'https://via.placeholder.com/100' },
+        { id: 6, name: 'Product 3', price: 1500, quantity: 3, image: 'https://via.placeholder.com/100' },
       ],
       allItem: {
         offer: 1,
@@ -62,7 +65,9 @@ class Trolley extends Component {
                 <Card sx={{p: 4}}>
                   <Grid container>
                     <Grid size={1}>
-                      <CheckBox/>
+                    <FormGroup>
+                      <FormControlLabel control={<Checkbox/>}/>
+                    </FormGroup>
                     </Grid>
                     <Grid size={3}>
                       <CardMedia
@@ -201,6 +206,51 @@ class Trolley extends Component {
         <Container>
           {this.renderAllProduct()}
         </Container>
+        <AppBar position="fixed" sx={{ top: 'auto', bottom: 0, p:2 }}>
+          <Grid container>
+            <Grid size={6}>
+              <Stack direction={'row'} spacing={3} divider={<Divider orientation='vertical' flexItem/>}>
+                <FormGroup>
+                  <FormControlLabel control={<Checkbox color='white'/>} label="Pilih Semua"/>
+                </FormGroup>
+                <FormGroup>
+                  <FormControlLabel control={<IconButton color='white'><Delete/></IconButton>} label="Hapus Semua"/>
+                </FormGroup>
+              </Stack>
+            </Grid>
+            <Grid 
+              container
+              size={6} 
+              direction="row"
+                sx={{
+                  justifyContent: "end",
+                  alignItems: "center",
+                }}
+              spacing={4}
+            >
+              <Grid>
+                <Typography variant='subtitle1'>
+                  Subtotal Harga:
+                </Typography>
+              </Grid>
+              <Grid>
+              <Typography variant='h5' fontWeight={600}>
+                {
+                  new Intl.NumberFormat('id-ID', {
+                    style: "currency",
+                    currency: "IDR"
+                  }).format(100000)
+                }
+              </Typography>
+              </Grid>
+              <Grid>
+              <Button variant='contained' color='success'>
+                CheckOut
+              </Button>
+              </Grid>
+            </Grid>
+          </Grid>
+        </AppBar>
       </ThemeProvider>
     );
   }
