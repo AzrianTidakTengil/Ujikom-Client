@@ -1,8 +1,9 @@
 import { endpoints, apiServiceV1 } from "@/config";
 
-export const ALl = () => {
-    return apiServiceV1.get(
-        endpoints.PRODUCTS.ALL
+export const ALl = (params) => {
+    return apiServiceV1.post(
+        endpoints.PRODUCTS.ALL,
+        params
     )
 }
 
