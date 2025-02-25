@@ -1,6 +1,6 @@
 import { Carousel } from '@/components';
 import { Component } from 'react';
-import { Container, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Button, Pagination, Stack, Divider, createTheme, ThemeProvider } from '@mui/material';
+import { Container, Typography, Paper, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Button, Pagination, Stack, Divider, createTheme, ThemeProvider } from '@mui/material';
 import { Playfair_Display, Poppins } from "next/font/google";
 import Link from 'next/link';
 import { 
@@ -17,22 +17,10 @@ import {
     BusinessCenter 
 } from '@mui/icons-material';
 import { palleteV1 } from '@/assets/css/template';
+import { connect } from 'react-redux';
+import { getAll } from '@/store/products';
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
-
-const products = Array.from({ length: 500 }, (_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    address: `Bandung`,
-    price: new Intl.NumberFormat('id-ID', {
-        style: "currency",
-        currency: "IDR"
-    }).format(1000 * i),
-    image: "https://unsplash.com/photos/pancakes-with-strawberries-and-blueberries-on-top-yxZSAjyToP4",
-    rating: 1,
-    // rating: Math.floor(Math.random() * 5) + 1,
-    sold: 12,
-}));
 
 const theme = createTheme({
     palette: {
@@ -45,7 +33,27 @@ class Main extends Component {
         this.state = {
             offeringProduct: 1,
             limitProduct: 48,
-            visibleProducts: products.slice(0, 48)
+            totalItems: 0,
+            products: []
+        }
+    }
+
+    UNSAFE_componentWillMount() {
+        const {offeringProduct, limitProduct} = this.state
+        this.props.getAll({
+            limit: limitProduct,
+            offset: offeringProduct
+        })
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const {products} = nextProps
+
+        if (products.isSuccess) {
+            this.setState({
+                products: products.allProduct,
+                totalItems: products.totalItems
+            })
         }
     }
 
@@ -87,7 +95,8 @@ class Main extends Component {
     }
 
     renderProducts = () => {
-        const {visibleProducts, offeringProduct, limitProduct} = this.state
+        const {products, offeringProduct, limitProduct, totalItems} = this.state
+        const {isLoading} = this.props.products
 
         return(
             <Container sx={{marginTop: 6}}>
@@ -95,38 +104,57 @@ class Main extends Component {
                     Jelajahi Produk Hari Ini
                 </Typography>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
-                    {visibleProducts.map((product) => (
-                        <Grid key={product.id} size={2}>
+                    {products.map((product) => (
+                        <Grid key={product.id} size={3}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
                                 }}
                                 style={{textDecoration: 'none'}}
                             >
-                                <Card sx={{textDecoration: 'none'}}>
-                                    <CardMedia
+                                <Card sx={{textDecoration: 'none', minHeight: '14rem'}}>
+                                    {/* <CardMedia
                                         component="img"
                                         height="140"
                                         image={product.image}
                                         alt={product.name}
-                                    />
+                                    /> */}
+                                    <Paper sx={{p:3}}>
+
+                                    </Paper>
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
-                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                        <Typography 
+                                            variant="subtitle1"
+                                            sx={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                display: "-webkit-box",
+                                            }}
+                                        >
+                                            {product.name}
+                                        </Typography>
                                         <Typography variant="subtitle1" fontWeight={600}>
-                                        {product.price}
+                                        {
+                                            new Intl.NumberFormat('id-ID', {
+                                                style: "currency",
+                                                currency: "IDR"
+                                            }).format(product.price)
+                                        }
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
-                                        {product.address}
+                                        {product.productToOwner.ownerToStore.name}
                                         </Typography>
                                         <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
                                             <div style={{display: 'flex', alignItems: 'center'}}>
                                                 <Star fontSize='small' color='yellow'/>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    {product.rating}
+                                                    4
                                                 </Typography>
                                             </div>
                                             <Typography variant='body2' color='textSecondary'>
-                                                {product.sold} terjual
+                                                100 terjual
                                             </Typography>
                                         </Stack>
                                     </CardContent>
@@ -136,7 +164,7 @@ class Main extends Component {
                     ))}
                 </Grid>
                 <Pagination
-                    count={Math.ceil(products.length / limitProduct)}
+                    count={Math.ceil(totalItems / limitProduct)}
                     page={offeringProduct}
                     onChange={this.handlePageChange}
                     color="primary"
@@ -147,13 +175,16 @@ class Main extends Component {
     }
 
     handlePageChange = (event, value) => {
-        const {limitProduct} = this.state
+        const {limitProduct, offeringProduct} = this.state
         const startIndex = (value - 1) * limitProduct
 
-        this.setState({
-            offeringProduct: value,
-            visibleProducts: products.slice(startIndex, startIndex + limitProduct)
-        });
+        console.log(value)
+        console.log(startIndex + limitProduct)
+
+        this.props.getAll({
+            limit: startIndex + limitProduct,
+            offset: value
+        })
     };
 
     render() {
@@ -170,4 +201,18 @@ class Main extends Component {
     }
 }
 
-export default Main
+const mapStateToProps = (state) => ({
+    products: {
+        isLoading: state.product.isLoading,
+        isSuccess: state.product.isSuccess,
+        allProduct: state.product.show,
+        error: state.product.error,
+        totalItems: state.product.totalItems,
+    }
+})
+
+const mapDispatchToProps = {
+    getAll
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (Main)
