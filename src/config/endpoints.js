@@ -6,6 +6,7 @@ export default {
     PRODUCTS: {
         ALL: '/items',
         GET: '/item',
+        FIND: '/item/find',
         CREATE: '/item/create',
         UPDATE: '/item/update',
         DELETE: '/item/delete',
