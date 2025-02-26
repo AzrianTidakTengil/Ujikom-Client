@@ -8,7 +8,7 @@ export const ALl = (params) => {
 }
 
 export const One = (params) => {
-    return apiServiceV1.get(
+    return apiServiceV1.post(
         endpoints.PRODUCTS.GET,
         params
     )
