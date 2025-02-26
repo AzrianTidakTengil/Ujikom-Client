@@ -1,10 +1,13 @@
 import { palleteV1 } from "@/assets/css/template";
-import { Box, Container, createTheme, Divider, Avatar, Chip, Grid2 as Grid, Rating, Typography, Button, IconButton, ThemeProvider, Stack, AppBar, Toolbar, Tabs, Tab, Pagination, Card, CardContent, CardMedia } from "@mui/material";
+import { Box, Container, Paper, createTheme, Divider, Avatar, Chip, Grid2 as Grid, Rating, Typography, Button, IconButton, ThemeProvider, Stack, AppBar, Toolbar, Tabs, Tab, Pagination, Card, CardContent, CardMedia } from "@mui/material";
 import { withRouter } from "next/router";
 import Image from "next/image";
 import { QuantityEditor, SelectChip } from "@/components";
 import { Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
 import Link from "next/link";
+import { connect } from "react-redux";
+import { getAll, getOne } from "@/store/products";
+import { insertItem } from "@/store/trolley";
 
 const { Component } = require("react");
 
@@ -12,7 +15,7 @@ const dummy_review = Array.from({ length: 34 }, (_, i) => ({
     id: i + 1,
     name: `User ${i + 1}`,
     message: "This is a great product.",
-    rating: Math.floor(Math.random() * 5) + 1,
+    // rating: Math.floor(Math.random() * 5) + 1,
     date: '12-05-2025',
     love: 1,
 }));
@@ -26,20 +29,28 @@ const products = Array.from({ length: 500 }, (_, i) => ({
         currency: "IDR"
     }).format(1000 * i),
     image: "https://via.placeholder.com/150",
-    rating: Math.floor(Math.random() * 5) + 1,
-    sold: Math.floor(Math.random() * 100) + 1,
+    // rating: Math.floor(Math.random() * 5) + 1,
+    // sold: Math.floor(Math.random() * 100) + 1,
 }));
 
 class Product extends Component{
     constructor(props) {
         super(props)
         this.state = {
-            query: {
-                id: null,
-                name: null
-            },
             favorite: false,
             appBar: 'description',
+            product: {
+                id: null,
+                name: '',
+                description: '',
+                price: 0,
+                stock: 0,
+                shop: {
+                    id: null,
+                    name: '',
+                    address: ''
+                }
+            },
             reviewPagination: {
                 offer: 1,
                 limit: 5,
@@ -53,23 +64,53 @@ class Product extends Component{
                 visibleItem: products.slice(0, 12)
             },
             allItem: {
-                offer: 1,
-                lenght: 36,
+                offset: 1,
+                limit: 36,
                 length: 36,
-                visibleItem: products.slice(0, 36)
-            }
+                products: []
+            },
+            quantityEditor: 1,
         }
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {query} = nextProps.router
-        
-        this.setState({
-            query: {
-                ...this.state.query,
-                name: query.slug
-            }
+    UNSAFE_componentWillMount() {
+        const {allItem} = this.state
+        this.props.getAll({
+            limit: allItem.limit,
+            offset: allItem.offset
         })
+        this.props.getOne({id: this.props.router.query.id})
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const {query, id} = nextProps.router
+        const {products} = nextProps
+
+        if (products.isSuccess) {
+            this.setState({
+                allItem: {
+                    ...this.state.allItem,
+                    products: products.allProduct
+                }
+            })
+        }
+
+        if (products.item.isSuccess) {
+            this.setState({
+                product: {
+                    id: products.item.product.id,
+                    name: products.item.product.name,
+                    description: products.item.product.description,
+                    price: products.item.product.price,
+                    stock: products.item.product.price,
+                    shop: {
+                        id: products.item.product.shop.id,
+                        name: products.item.product.shop.name,
+                        address: products.item.product.shop.address
+                    }
+                }
+            })
+        }
     }
 
     theme = () => createTheme({
@@ -98,7 +139,8 @@ class Product extends Component{
     }
 
     renderProduct = () => {
-        const {query, favorite} = this.state
+        const {query, favorite, product} = this.state
+        const {id, name, description, price, stock, shop} = product
 
         return(
             <Container>
@@ -110,7 +152,7 @@ class Product extends Component{
                         <Grid size="grow">
                             <Box sx={{width: '100%'}}>
                                 <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <Typography variant="h5">{query.name}</Typography>
+                                    <Typography variant="h5">{name}</Typography>
                                     <Stack direction="row" spacing={2}>
                                         <div style={{display: 'flex', alignItems: 'center'}}>
                                             <IconButton onClick={() => this.handleFavorite()}>
@@ -143,7 +185,12 @@ class Product extends Component{
                                     </p>
                                 </Box>
                                 <Typography variant="h5" sx={{fontWeight: 600, marginTop: 2}}>
-                                    Rp. 100.000
+                                    {
+                                        new Intl.NumberFormat('id-ID', {
+                                            style: "currency",
+                                            currency: "IDR"
+                                        }).format(price)
+                                    }
                                 </Typography>
                                 <Divider sx={{marginY: 4}}/>
                                 <Box sx={{
@@ -163,7 +210,7 @@ class Product extends Component{
                                     </Grid>
                                     <Grid>
                                         <Typography variant="h6">
-                                            Toko
+                                            {shop.name}
                                         </Typography>
                                         <Rating defaultValue={4} readOnly/>
                                         <Typography variant="subtitle2">
@@ -194,6 +241,9 @@ class Product extends Component{
     }
 
     renderAddTrolley = () => {
+        const {query, favorite, product, quantityEditor} = this.state
+        const {id, name, description, price, stock, shop} = product
+
         const dummy_color = [
             {id: 0, name: 'green'},
             {id: 1, name: 'blue'},
@@ -210,12 +260,13 @@ class Product extends Component{
                             <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
                             <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
                                 <QuantityEditor
-                                    initialQuantity={1}
+                                    initialQuantity={quantityEditor}
                                     min={1}
-                                    max={100}
+                                    max={stock}
+                                    onChange={(name, value) => {this.setState({quantityEditor: value})}}
                                 />
                                 <Typography variant="subtitle1" sx={{marginLeft: 2}}>
-                                    Total Stok: 120
+                                    Total Stok: {stock}
                                 </Typography>
                             </Box>
                         </Box>
@@ -231,9 +282,16 @@ class Product extends Component{
                         </Box> */}
                         <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2}}>
                             <Typography variant="subtitle1" sx={{fontWeight: 500}}>Subtotal</Typography>
-                            <Typography variant="h6" sx={{fontWeight: 600}}>Rp. 100.000</Typography>
+                            <Typography variant="h6" sx={{fontWeight: 600}}>
+                                {
+                                    new Intl.NumberFormat('id-ID', {
+                                        style: "currency",
+                                        currency: "IDR"
+                                    }).format(price * quantityEditor) 
+                                }
+                            </Typography>
                         </Box>
-                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}}>Tambah Ke Keranjang</Button>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
                         <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
                     </Box>
                 </Box>
@@ -241,20 +299,31 @@ class Product extends Component{
         )
     }
 
+    handleInsertItemToTrolley = () => {
+        const {product, quantityEditor} = this.state
+
+        this.props.insertItem({
+            products: [
+                {
+                    id: product.id,
+                    items: quantityEditor
+                }
+            ]
+        })
+    }
+
     renderDescriptionProduct = () => {
-        const dummy_text = <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        const {query, favorite, product} = this.state
+        const {id, name, description, price, stock, shop} = product
 
         return(
             <Container maxWidth="xl" sx={{marginBottom: 6}}>
                 <Box sx={{
                     maxHeight: '60vh',
-                    overflowY: 'auto'
+                    overflowY: 'auto',
+                    p: 2
                 }}>
-                    {dummy_text}
-                    {dummy_text}
-                    {dummy_text}
-                    {dummy_text}
-                    {dummy_text}
+                    {description}
                 </Box>
             </Container>
         )
@@ -490,11 +559,11 @@ class Product extends Component{
                                             <div style={{display: 'flex', alignItems: 'center'}}>
                                                 <Star fontSize='small' color='yellow'/>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    {product.rating}
+                                                    4
                                                 </Typography>
                                             </div>
                                             <Typography variant='body2' color='textSecondary'>
-                                                {product.sold} terjual
+                                                100 terjual
                                             </Typography>
                                         </Stack>
                                     </CardContent>
@@ -508,7 +577,7 @@ class Product extends Component{
     }
 
     renderAllProduct = () => {
-        const {offer, limit, visibleItem, length} = this.state.allItem
+        const {offset, limit, products} = this.state.allItem
 
         return (
             <Box>
@@ -521,8 +590,8 @@ class Product extends Component{
                     </Button>
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
-                    {visibleItem.map((product) => (
-                        <Grid key={product.id} size={2}>
+                    {products.map((product) => (
+                        <Grid key={product.id} size={3}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
@@ -530,29 +599,31 @@ class Product extends Component{
                                 style={{textDecoration: 'none'}}
                             >
                                 <Card sx={{textDecoration: 'none'}}>
-                                    <CardMedia
-                                        component="img"
-                                        height="140"
-                                        image={product.image}
-                                        alt={product.name}
-                                    />
+                                    <Paper sx={{p:3}}>
+
+                                    </Paper>
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
                                         <Typography variant="subtitle1">{product.name}</Typography>
                                         <Typography variant="subtitle1" fontWeight={600}>
-                                        {product.price}
+                                        {
+                                            new Intl.NumberFormat('id-ID', {
+                                                style: "currency",
+                                                currency: "IDR"
+                                            }).format(product.price)
+                                        }
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
-                                        {product.address}
+                                        {product.productToOwner.ownerToStore.name}
                                         </Typography>
                                         <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
                                             <div style={{display: 'flex', alignItems: 'center'}}>
                                                 <Star fontSize='small' color='yellow'/>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    {product.rating}
+                                                    4
                                                 </Typography>
                                             </div>
                                             <Typography variant='body2' color='textSecondary'>
-                                                {product.sold} terjual
+                                                100 terjual
                                             </Typography>
                                         </Stack>
                                     </CardContent>
@@ -605,4 +676,21 @@ class Product extends Component{
     }
 }
 
-export default withRouter(Product)
+const mapStateToProps = (state) => ({
+    products: {
+        isLoading: state.product.isLoading,
+        isSuccess: state.product.isSuccess,
+        allProduct: state.product.show,
+        error: state.product.error,
+        item: state.product.data,
+        totalItems: state.product.totalItems,
+    }
+})
+
+const mapDispatchToProps = {
+    getAll,
+    getOne,
+    insertItem
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Product))
