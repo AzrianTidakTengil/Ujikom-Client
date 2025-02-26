@@ -26,7 +26,6 @@ import Link from "next/link";
 import { connect } from "react-redux";
 import { login } from "@/store/auth";
 import { getUser } from "@/store/user";
-import Cookie from 'js-cookie'
 
 class Navbar extends React.Component {
   constructor(props) {
