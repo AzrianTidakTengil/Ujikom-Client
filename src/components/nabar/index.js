@@ -13,7 +13,8 @@ import {
   CircularProgress,
   Avatar,
   IconButton,
-  Grid2 as Grid
+  Grid2 as Grid,
+  Badge
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
@@ -26,7 +27,7 @@ import Link from "next/link";
 import { connect } from "react-redux";
 import { login } from "@/store/auth";
 import { getUser } from "@/store/user";
-import Cookie from 'js-cookie'
+import { getAllItemTrolley } from "@/store/trolley";
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -41,7 +42,8 @@ class Navbar extends React.Component {
         lastname: '',
         email: '',
         telephone: ''
-      }
+      },
+      badgeTrolley: 0,
     }
   }
   
@@ -93,10 +95,11 @@ class Navbar extends React.Component {
 
   UNSAFE_componentWillMount() {
     this.props.getUser()
+    this.props.getAllItemTrolley()
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {auth, user} = nextProps
+    const {auth, user, trolley} = nextProps
     if (user.isSuccess) {
       this.setState({
         user: {
@@ -106,6 +109,11 @@ class Navbar extends React.Component {
           email: user.email,
           telephone: user.telephone
         }
+      })
+    }
+    if (trolley.isSuccess) {
+      this.setState({
+        badgeTrolley: trolley.data.length
       })
     }
   }
@@ -160,7 +168,7 @@ class Navbar extends React.Component {
   }
 
   render() {
-    const {showModal, user} = this.state
+    const {showModal, user, badgeTrolley} = this.state
     const {auth} = this.props
     const dummy_search = [
       {
@@ -177,6 +185,8 @@ class Navbar extends React.Component {
         name: 'mainan'
       },
     ]
+
+    console.log(badgeTrolley)
 
     return (
       <ThemeProvider theme={this.theme}>
@@ -203,7 +213,9 @@ class Navbar extends React.Component {
                 <Grid>
                   <Link href={'/trolley'}>
                     <IconButton>
-                      <LocalGroceryStoreOutlined/>
+                      <Badge badgeContent={badgeTrolley} color="secondary">
+                        <LocalGroceryStoreOutlined/>
+                      </Badge>
                     </IconButton>
                   </Link>
                 </Grid>
@@ -272,11 +284,16 @@ const mapStateToProps = (state) => ({
     lastname: state.user.user.lastname,
     email: state.user.user.email,
     telephone: state.user.user.telephone
+  },
+  trolley: {
+    isSuccess: state.trolley.isSucces,
+    data: state.trolley.data,
   }
 })
 
 const mapDispatchToProps = {
-  getUser
+  getUser,
+  getAllItemTrolley
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Navbar)
