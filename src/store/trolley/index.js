@@ -43,8 +43,8 @@ export const trolleySlice = createSlice({
                 state.isSucces = false
             })
             .addCase(getAllItemTrolley.fulfilled, (state, action) => {
-                state.isLoading = true
-                state.isSucces = false
+                state.isLoading = false
+                state.isSucces = true
                 state.data = action.payload.data
             }).addCase(getAllItemTrolley.rejected, (state, action) => {
                 state.isLoading = false
