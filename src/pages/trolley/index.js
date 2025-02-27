@@ -5,7 +5,7 @@ import { QuantityEditor } from '@/components';
 import Link from 'next/link';
 import { palleteV1 } from '@/assets/css/template';
 import { connect } from 'react-redux';
-import { getAllItemTrolley } from '@/store/trolley';
+import { getAllItemTrolley, updateItem } from '@/store/trolley';
 import { getAll } from '@/store/products';
 
 class Trolley extends Component {
@@ -195,7 +195,7 @@ class Trolley extends Component {
   }
 
   handleChangeQuantity = (name, value) => {
-    
+    this.props.updateItem({id: name, items: value})
   }
 
   handleRemove = (id) => {
@@ -343,7 +343,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   getAllItemTrolley,
-  getAll
+  getAll,
+  updateItem
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (Trolley);
