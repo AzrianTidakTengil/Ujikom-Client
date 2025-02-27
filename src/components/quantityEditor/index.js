@@ -26,7 +26,7 @@ const QuantityEditor = ({ initialQuantity = 1, min = 1, max = 10, onChange, name
     if (isNaN(value)) value = min;
     value = Math.max(min, Math.min(max, value));
     setQuantity(value);
-    onChange && onChange(value);
+    onChange && onChange(name, value);
   };
 
   return (
