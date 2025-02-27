@@ -7,6 +7,13 @@ export const insert = (params) => {
     )
 }
 
+export const updateItems = (params) => {
+    return apiServiceV1.put(
+        endpoints.TROLLEY.UPDATE,
+        params
+    )
+}
+
 export const list = () => {
     return apiServiceV1.get(
         endpoints.TROLLEY.GET
