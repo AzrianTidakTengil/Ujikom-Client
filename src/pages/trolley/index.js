@@ -205,6 +205,10 @@ class Trolley extends Component {
   }
 
   handleChangeQuantity = (name, value) => {
+    this.setState((prevState) => ({
+      cart: prevState.cart.map((val) => val.id === name ? {...val, quantity: value} : val)
+    }))    
+
     this.props.updateItem({id: name, items: value})
   }
 
