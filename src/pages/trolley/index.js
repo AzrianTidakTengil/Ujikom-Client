@@ -42,11 +42,21 @@ class Trolley extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     const {trolley, products} = nextProps
-    const {allItem} = this.state
+    const {allItem, cart} = this.state
 
     if (trolley.isSuccess) {
+      const cartItem = []
+      trolley.data.map((val) => {
+        cartItem.push({
+          id: val.id,
+          quantity: val.items,
+          name: val.trolleyToProduct.name,
+          price: val.trolleyToProduct.price,
+          stock: val.trolleyToProduct.stock
+        })
+      }) 
       this.setState({
-        cart: trolley.data
+        cart: cartItem
       })
     }
 
@@ -95,12 +105,12 @@ class Trolley extends Component {
                     </Grid>
                     <Grid size={5}>
                       <CardContent>
-                        <Typography variant="h6">{item.trolleyToProduct.name}</Typography>
+                        <Typography variant="h6">{item.name}</Typography>
                         <Typography variant="body2">{
                           new Intl.NumberFormat('id-ID', {
                               style: "currency",
                               currency: "IDR"
-                          }).format(item.trolleyToProduct.price)
+                          }).format(item.price)
                           }
                         </Typography>
                       </CardContent>
@@ -116,7 +126,7 @@ class Trolley extends Component {
                             name={item.id}
                             initialQuantity={item.items}
                             min={1}
-                            max={item.trolleyToProduct.stock}
+                            max={item.stock}
                             onChange={this.handleChangeQuantity}
                             />
                             <IconButton color="secondary" onClick={() => this.handleRemove(item.id)}>
@@ -129,7 +139,7 @@ class Trolley extends Component {
                             new Intl.NumberFormat('id-ID', {
                                 style: "currency",
                                 currency: "IDR"
-                            }).format(item.trolleyToProduct.price * item.items)
+                            }).format(item.price * item.quantity)
                           }
                         </Typography>
                     </Grid>
@@ -172,7 +182,7 @@ class Trolley extends Component {
     const {cart, subTotalPrice, selectedItems} = this.state
 
     const cartBySelected = cart.filter((x) => selectedItems.includes(`${x.id}`))
-    const res = cartBySelected.reduce((acc, val) => acc + (val.items * val.trolleyToProduct.price), 0)
+    const res = cartBySelected.reduce((acc, val) => acc + (val.quantity * val.price), 0)
 
     return res
   }
@@ -195,6 +205,10 @@ class Trolley extends Component {
   }
 
   handleChangeQuantity = (name, value) => {
+    this.setState((prevState) => ({
+      cart: prevState.cart.map((val) => val.id === name ? {...val, quantity: value} : val)
+    }))    
+
     this.props.updateItem({id: name, items: value})
   }
 
