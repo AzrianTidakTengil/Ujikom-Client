@@ -6,6 +6,11 @@ export const insertItem = createAsyncThunk('trolleySlice/insertItem',  async (pa
     return response.data
 })
 
+export const updateItem = createAsyncThunk('trolleySlice/updateItem', async (params) => {
+    const response = await Trolley.updateItems(params)
+    return response.data
+})
+
 export const getAllItemTrolley = createAsyncThunk('trolleySlice/getAllItemTrolley', async (params) => {
     const response = await Trolley.list()
     return response.data
@@ -48,6 +53,9 @@ export const trolleySlice = createSlice({
                 state.data = action.payload.data
             }).addCase(getAllItemTrolley.rejected, (state, action) => {
                 state.isLoading = false
+                state.error = action.error.message
+            })
+            .addCase(updateItem.rejected, (state, action) => {
                 state.error = action.error.message
             })
     }
