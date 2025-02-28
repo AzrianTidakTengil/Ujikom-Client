@@ -6,3 +6,10 @@ export const create = (params) => {
         params
     )
 }
+
+export const getOne = (params) => {
+    return apiServiceV1.post(
+        endpoints.TRANSACTION.GET,
+        params
+    )
+}
