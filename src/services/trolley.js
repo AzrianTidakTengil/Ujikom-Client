@@ -19,3 +19,10 @@ export const list = () => {
         endpoints.TROLLEY.GET
     )
 }
+
+export const find = (params) => {
+    return apiServiceV1.post(
+        endpoints.TROLLEY.FIND,
+        params
+    )
+}
