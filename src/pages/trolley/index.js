@@ -7,6 +7,8 @@ import { palleteV1 } from '@/assets/css/template';
 import { connect } from 'react-redux';
 import { getAllItemTrolley, updateItem } from '@/store/trolley';
 import { getAll } from '@/store/products';
+import { createTransaction } from '@/store/transaction';
+import { withRouter } from 'next/router';
 
 class Trolley extends Component {
   constructor(props) {
@@ -41,7 +43,7 @@ class Trolley extends Component {
 
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {trolley, products} = nextProps
+    const {trolley, products, transaction} = nextProps
     const {allItem, cart} = this.state
 
     if (trolley.isSuccess) {
@@ -67,6 +69,10 @@ class Trolley extends Component {
           products: products.allProduct
         }
       })
+    }
+
+    if (transaction.isSuccess) {
+      console.log(transaction.data)
     }
   }
 
@@ -278,6 +284,15 @@ class Trolley extends Component {
     )
   }
 
+  handleCheckOut = () => {
+    const {selectedItems} = this.state
+    const {router} = this.props
+
+    router.push({
+      pathname: '/checkout'
+    })
+  }
+
   render() {
     const { cart, selectedItems } = this.state;
 
@@ -327,7 +342,7 @@ class Trolley extends Component {
               </Typography>
               </Grid>
               <Grid>
-              <Button variant='contained' color='success'>
+              <Button variant='contained' color='success' onClick={this.handleCheckOut}>
                 CheckOut
               </Button>
               </Grid>
@@ -352,13 +367,20 @@ const mapStateToProps = (state) => ({
     error: state.product.error,
     totalItems: state.product.totalItems,
   },
-  selectedItems: []
+  selectedItems: [],
+  transaction: {
+    isLoading: state.transaction.isLoading,
+    isSuccess: state.transaction.isSuccess,
+    error: state.transaction.error,
+    data: state.transaction.data
+  }
 })
 
 const mapDispatchToProps = {
   getAllItemTrolley,
   getAll,
-  updateItem
+  updateItem,
+  createTransaction
 }
 
-export default connect(mapStateToProps, mapDispatchToProps) (Trolley);
+export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Trolley));
