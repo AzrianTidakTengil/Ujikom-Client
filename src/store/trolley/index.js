@@ -20,14 +20,20 @@ const initialState = {
     isLoading: false,
     isSucces: false,
     error: null,
-    data: []
+    data: [],
+    itemsCheckout: []
 }
 
 export const trolleySlice = createSlice({
     name: 'trolley',
     initialState,
     reducers: {
-
+        insertCheckout: (state, action) => {
+            state.itemsCheckout = action.payload.map((val) => parseInt(val))
+        },
+        clearItemsCheckout: (state) => {
+            state.itemsCheckout = []
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -60,5 +66,7 @@ export const trolleySlice = createSlice({
             })
     }
 })
+
+export const {insertCheckout, clearItemsCheckout} = trolleySlice.actions
 
 export default trolleySlice.reducer
