@@ -16,6 +16,11 @@ export const getAllItemTrolley = createAsyncThunk('trolleySlice/getAllItemTrolle
     return response.data
 })
 
+export const findTrolley = createAsyncThunk('trolletSlice/findTrolley', async (params) => {
+    const response = await Trolley.find(params)
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     isSucces: false,
@@ -62,6 +67,19 @@ export const trolleySlice = createSlice({
                 state.error = action.error.message
             })
             .addCase(updateItem.rejected, (state, action) => {
+                state.error = action.error.message
+            })
+            .addCase(findTrolley.pending, (state) => {
+                state.isLoading = true
+                state.isSucces = false
+            })
+            .addCase(findTrolley.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSucces = true
+                state.data = action.payload.data
+            })
+            .addCase(findTrolley.rejected, (state, action) => {
+                state.isLoading = false
                 state.error = action.error.message
             })
     }
