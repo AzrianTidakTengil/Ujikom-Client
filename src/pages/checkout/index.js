@@ -1,7 +1,10 @@
 import { palleteV1 } from "@/assets/css/template";
 import { Close, LocationOn } from "@mui/icons-material";
 import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import { withRouter } from "next/router";
 import React, {Component} from "react";
+import { connect } from "react-redux";
+import { find as findTrolley } from "@/services/trolley";
 
 class CheckOut extends Component {
     constructor(props) {
@@ -384,4 +387,16 @@ class CheckOut extends Component {
     }
 }
 
-export default CheckOut
+const mapStateToProps = (state) => ({
+    trolley: {
+        isSuccess: state.trolley.isSucces,
+        isLoading: state.trolley.isLoading,
+        data: state.trolley.data
+    }
+})
+
+const mapDispatchToProps = {
+    findTrolley
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
