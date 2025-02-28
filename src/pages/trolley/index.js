@@ -9,6 +9,7 @@ import { getAllItemTrolley, updateItem } from '@/store/trolley';
 import { getAll } from '@/store/products';
 import { createTransaction } from '@/store/transaction';
 import { withRouter } from 'next/router';
+import { insertCheckout, clearItemsCheckout } from '@/store/trolley';
 
 class Trolley extends Component {
   constructor(props) {
@@ -286,8 +287,9 @@ class Trolley extends Component {
 
   handleCheckOut = () => {
     const {selectedItems} = this.state
-    const {router} = this.props
+    const {router, trolley} = this.props
 
+    this.props.insertCheckout(selectedItems)
     router.push({
       pathname: '/checkout'
     })
@@ -358,7 +360,8 @@ const mapStateToProps = (state) => ({
   trolley: {
     isSuccess: state.trolley.isSucces,
     isLoading: state.trolley.isLoading,
-    data: state.trolley.data
+    data: state.trolley.data,
+    itemsCheckout: state.trolley.itemsCheckout
   },
   products: {
     isLoading: state.product.isLoading,
@@ -380,7 +383,9 @@ const mapDispatchToProps = {
   getAllItemTrolley,
   getAll,
   updateItem,
-  createTransaction
+  createTransaction,
+  insertCheckout,
+  clearItemsCheckout
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Trolley));
