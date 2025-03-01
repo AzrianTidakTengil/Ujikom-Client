@@ -4,47 +4,14 @@ import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, G
 import { withRouter } from "next/router";
 import React, {Component} from "react";
 import { connect } from "react-redux";
-import { find as findTrolley } from "@/services/trolley";
+import { findTrolley } from "@/store/trolley";
+import { createTransaction } from "@/store/transaction";
 
 class CheckOut extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            products: [
-                {
-                    id: 0,
-                    name: 'Makanan Bayi',
-                    shop: 'Bintang Jaya Sempurna',
-                    quantity: 1,
-                    price: 10000,
-                    variant: [
-                        'anggur',
-                        '10ml'
-                    ],
-                    image: null
-                },
-                {
-                    id: 1,
-                    name: 'Kopi enak',
-                    shop: 'Luwak',
-                    quantity: 10,
-                    price: 5000,
-                    variant: null,
-                    image: null
-                },
-                {
-                    id: 2,
-                    name: 'Celana super elastis',
-                    shop: 'Raja Bahan',
-                    quantity: 1,
-                    price: 900000,
-                    variant: [
-                        'M',
-                        'Biru'
-                    ],
-                    image: null
-                }
-            ],
+            products: [],
             address: [
                 {
                     id: 0,
@@ -82,6 +49,53 @@ class CheckOut extends Component {
             ...palleteV1.palette
         }
     })
+
+    UNSAFE_componentWillMount() {
+        const {router, trolley} = this.props
+
+        if (trolley.itemsCheckout) {
+            this.props.findTrolley({
+                id: trolley.itemsCheckout
+            })
+        } else {
+            router.push({
+                pathname: '/trolley'
+            })
+        }
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const {trolley, transaction, router} = this.props
+
+        if (trolley.isSuccess) {
+            const cart = []
+            trolley.checkout.map((val) => {
+                cart.push({
+                    id: val.id,
+                    quantity: val.items,
+                    product: {
+                        id: val.trolleyToProduct.id,
+                        name: val.trolleyToProduct.name,
+                        price: val.trolleyToProduct.price,
+                        stock: val.trolleyToProduct.stock
+                    },
+                    store: {
+                        id: val.trolleyToProduct.productToOwner.ownerToStore.id,
+                        name: val.trolleyToProduct.productToOwner.ownerToStore.name
+                    }
+                })
+            })
+            this.setState({
+                products: cart
+            })
+        }
+
+        if (transaction.isSuccess) {
+            // router.push({
+            //     pathname: '/transaction'
+            // })
+        }
+    }
 
     renderAddress = () => {
         const {address, activateAddress} = this.state
@@ -210,29 +224,29 @@ class CheckOut extends Component {
     }
 
     renderItemCheckout = (data, index = 0) => {
-        const {id, name, shop, quantity, price, variant, image} = data
+        const {id, product, store, quantity,} = data
 
         return (
             <Box>
                 <Paper sx={{p: 2}}>
-                    <Typography variant="h5">Produk {index + 1}</Typography>
+                    <Typography variant="h5" color="gray">Produk {index + 1}</Typography>
                     <Divider sx={{marginY: 1}}/>
-                    <Typography variant="h6" fontWeight={600} sx={{marginY: 1}}>{shop}</Typography>
+                    <Typography variant="h6" fontWeight={600} sx={{marginY: 1}}>{store.name}</Typography>
                     <Grid container spacing={4}>
                         <Grid size={1.5}>
                             <Paper>No Image</Paper>
                         </Grid>
                         <Grid size={10.5} sx={{display: 'flex', justifyContent: 'space-between'}}>
                             <Box>
-                                <Typography variant="subtitle1">{name}</Typography>
-                                <Typography variant="subtitle1">{variant}</Typography>
+                                <Typography variant="subtitle1">{product.name}</Typography>
+                                <Typography variant="subtitle1"></Typography>
                             </Box>
                             <Typography variant="subtitl1" fontWeight={600}>
                                 {`${quantity} x ${
                                     new Intl.NumberFormat('id-ID', {
                                         style: "currency",
                                         currency: "IDR"
-                                    }).format(price)
+                                    }).format(product.price * quantity)
                                 }`}
                             </Typography>
                         </Grid>
@@ -245,6 +259,10 @@ class CheckOut extends Component {
     renderFinishCheckout = () => {
         const {methodPayment, products} = this.state
 
+        const subTotalProduct = products.reduce((acc, val) => acc + (val.product.price * val.quantity), 0)
+        const subTotalShipment = products.reduce((acc, val) => acc + (val.product.price * val.quantity * 0.01), 0)
+        const total = subTotalProduct + subTotalShipment + 2000
+
         return (
             <Box>
                 <Paper sx={{p: 2}}>
@@ -255,7 +273,7 @@ class CheckOut extends Component {
                                 <RadioGroup
                                     onChange={this.handleChangeMethodPayment}
                                 >
-                                    <FormControlLabel value="qris" control={<Radio />} label="Qris"/>
+                                    <FormControlLabel value="qris" control={<Radio />} label="Qris" disabled={total > 2000000 ? true : false}/>
                                     <FormControlLabel value="bank_transfer" control={<Radio />} label="Transfer Bank"/>
                                     <FormControlLabel value="cstore" control={<Radio />} label="Mitra Agen"/>
                                 </RadioGroup>
@@ -311,7 +329,7 @@ class CheckOut extends Component {
                                 new Intl.NumberFormat('id-ID', {
                                     style: "currency",
                                     currency: "IDR"
-                                }).format(products.reduce((acc, val) => acc + (val.price * val.quantity), 0))
+                                }).format(subTotalProduct)
                             }</Typography>
                         </Box>
                         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginY: 1}}>
@@ -320,7 +338,7 @@ class CheckOut extends Component {
                                 new Intl.NumberFormat('id-ID', {
                                     style: "currency",
                                     currency: "IDR"
-                                }).format(products.reduce((acc, val) => acc + (val.price * val.quantity * 0.01), 0))
+                                }).format(subTotalShipment)
                             }</Typography>
                         </Box>
                         <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginY: 1}}>
@@ -338,11 +356,11 @@ class CheckOut extends Component {
                                 new Intl.NumberFormat('id-ID', {
                                     style: "currency",
                                     currency: "IDR"
-                                }).format(971600)
+                                }).format(total)
                             }</Typography>
                         </Paper>
                         <Box sx={{display: 'flex', justifyContent: 'end', marginTop: 2}}>
-                            <Button variant="contained" color="success" disabled={!methodPayment}>Konfirmasi</Button>
+                            <Button variant="contained" color="success" disabled={!methodPayment} onClick={this.handleSubmitCreateTransaction} loading={this.props.transaction.isLoading}>Konfirmasi</Button>
                         </Box>
                     </Box>
                 </Paper>
@@ -355,6 +373,19 @@ class CheckOut extends Component {
 
         this.setState({
             methodPayment: value
+        })
+    }
+
+    handleSubmitCreateTransaction = () => {
+        const {products, methodPayment} = this.state
+
+        this.props.createTransaction({
+            label: '1',
+            items: products.map((val) => val.id),
+            coupon_payment: 0,
+            coupon_fare: 0,
+            insurance: 0,
+            method_payment: methodPayment
         })
     }
 
@@ -374,7 +405,7 @@ class CheckOut extends Component {
                     {this.renderAddress()}
                 </Container>
                 {products.map((val, index) => (
-                    <Container key={index} sx={{marginY: 2}}>
+                    <Container key={val.id} sx={{marginY: 2}}>
                         {this.renderItemCheckout(val, index)}
                     </Container>
                 ))}
@@ -391,12 +422,19 @@ const mapStateToProps = (state) => ({
     trolley: {
         isSuccess: state.trolley.isSucces,
         isLoading: state.trolley.isLoading,
-        data: state.trolley.data
+        checkout: state.trolley.checkout,
+        itemsCheckout: state.trolley.itemsCheckout
+    },
+    transaction: {
+        isLoading: state.transaction.isLoading,
+        isSuccess: state.transaction.isSuccess,
+        data: state.transaction.data
     }
 })
 
 const mapDispatchToProps = {
-    findTrolley
+    findTrolley,
+    createTransaction
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
