@@ -26,6 +26,7 @@ const initialState = {
     isSucces: false,
     error: null,
     data: [],
+    checkout: [],
     itemsCheckout: []
 }
 
@@ -76,7 +77,7 @@ export const trolleySlice = createSlice({
             .addCase(findTrolley.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSucces = true
-                state.data = action.payload.data
+                state.checkout = action.payload.data.trolley
             })
             .addCase(findTrolley.rejected, (state, action) => {
                 state.isLoading = false
