@@ -4,8 +4,10 @@ import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, G
 import { withRouter } from "next/router";
 import React, {Component} from "react";
 import { connect } from "react-redux";
-import { findTrolley } from "@/store/trolley";
-import { createTransaction } from "@/store/transaction";
+import { findTrolley, clearItemsCheckout } from "@/store/trolley";
+import { createTransaction, clearState } from "@/store/transaction";
+import CryptoJS from "crypto-js";
+import { Transaction } from "@/services";
 
 class CheckOut extends Component {
     constructor(props) {
@@ -40,7 +42,11 @@ class CheckOut extends Component {
             ],
             activateAddress: 0,
             isOpenModalChangeAddress: false,
-            methodPayment: ''
+            methodPayment: '',
+            subtype: {
+                bank: '',
+                store: ''
+            }
         }
     }
 
@@ -52,6 +58,7 @@ class CheckOut extends Component {
 
     UNSAFE_componentWillMount() {
         const {router, trolley} = this.props
+        this.props.clearState()
 
         if (trolley.itemsCheckout) {
             this.props.findTrolley({
@@ -90,11 +97,13 @@ class CheckOut extends Component {
             })
         }
 
-        if (transaction.isSuccess) {
-            // router.push({
-            //     pathname: '/transaction'
-            // })
-        }
+        // if (transaction.isSuccess) {
+        //     console.log(transaction.data)
+        //     // router.push({
+        //     //     pathname: `/t/${transaction.data.data.transaction.id}`
+        //     // })
+        //     // this.props.clearState()
+        // }
     }
 
     renderAddress = () => {
@@ -285,7 +294,8 @@ class CheckOut extends Component {
                                     <Typography variant="h6">Pilih Bank</Typography>
                                     <FormControl>
                                         <RadioGroup
-                                            // onChange={this.handleChangeMethodPayment}
+                                            onChange={this.handeleChangeSubtype}
+                                            name="bank"
                                         >
                                             <FormControlLabel value="permata" control={<Radio />} label="Permata Virtual Account"/>
                                             <FormControlLabel value="bca" control={<Radio />} label="BCA Virtual Account"/>
@@ -301,7 +311,8 @@ class CheckOut extends Component {
                                     <Typography variant="h6">Pilih Mitra Agen</Typography>
                                     <FormControl>
                                         <RadioGroup
-                                            // onChange={this.handleChangeMethodPayment}
+                                            onChange={this.handeleChangeSubtype}
+                                            name="store"
                                         >
                                             <FormControlLabel value="alfamart" control={<Radio />} label="Alfamart"/>
                                             <FormControlLabel value="indomaret" control={<Radio />} label="Indomaret"/>
@@ -376,17 +387,62 @@ class CheckOut extends Component {
         })
     }
 
-    handleSubmitCreateTransaction = () => {
-        const {products, methodPayment} = this.state
+    handeleChangeSubtype = (event) => {
+        const {value, name} = event.target
 
-        this.props.createTransaction({
-            label: '1',
-            items: products.map((val) => val.id),
-            coupon_payment: 0,
-            coupon_fare: 0,
-            insurance: 0,
-            method_payment: methodPayment
-        })
+        if (name === 'bank') {
+            this.setState({
+                subtype: {
+                    ...this.state.subtype,
+                    bank: value
+                }
+            })
+        } else if (name === 'store') {
+            this.setState({
+                subtype: {
+                    ...this.state.subtype,
+                    store: value
+                }
+            })
+        }
+    }
+
+    handleSubmitCreateTransaction = () => {
+        const {products, methodPayment, subtype} = this.state
+        const {transaction} = this.props
+
+        const type = subtype.bank ? {bank: subtype.bank} : subtype.store ? {store: subtype.store} : {}
+
+        if (subtype.bank === 'echannel') {
+            Transaction.create({
+                label: '1',
+                items: products.map((val) => val.id),
+                coupon_payment: 0,
+                coupon_fare: 0,
+                insurance: 0,
+                method_payment: subtype.bank,
+            }).then(({data}) => {
+                this.props.router.push({
+                    pathname: `/t/${data.data.transaction.id}`
+                })
+                this.props.clearItemsCheckout()
+            })
+        } else {
+            Transaction.create({
+                label: '1',
+                items: products.map((val) => val.id),
+                coupon_payment: 0,
+                coupon_fare: 0,
+                insurance: 0,
+                method_payment: methodPayment,
+                ...type
+            }).then(({data}) => {
+                this.props.router.push({
+                    pathname: `/t/${data.data.transaction.id}`
+                })
+                this.props.clearItemsCheckout()
+            })
+        }
     }
 
     render() {
@@ -434,7 +490,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
     findTrolley,
-    createTransaction
+    createTransaction,
+    clearState,
+    clearItemsCheckout
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
