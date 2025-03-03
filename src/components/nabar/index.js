@@ -186,7 +186,6 @@ class Navbar extends React.Component {
       },
     ]
 
-    console.log(badgeTrolley)
 
     return (
       <ThemeProvider theme={this.theme}>
