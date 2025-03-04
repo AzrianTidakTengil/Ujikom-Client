@@ -4,6 +4,7 @@ import userReducer from './user'
 import productReducer from './products'
 import trolleyReducer from './trolley'
 import transactionReducer from './transaction'
+import addressReducer from './address'
 
 const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
         user: userReducer,
         product: productReducer,
         trolley: trolleyReducer,
-        transaction: transactionReducer
+        transaction: transactionReducer,
+        address: addressReducer
     },
 })
 
