@@ -50,6 +50,14 @@ export default {
     },
     TEST: '/test',
     USER: {
-        GET: '/user'
+        GET: '/user',
+        ADDRESS: {
+            ONE: '/user/address',
+            ALL: '/user/addresses',
+            FIND: '/user/address/find',
+            CREATE: '/user/address/create',
+            UPDATE: '/user/address/update',
+            DELETE: '/user/address/delete',
+        }
     }
 }
