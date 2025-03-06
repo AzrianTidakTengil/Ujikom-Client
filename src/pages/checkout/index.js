@@ -3,22 +3,11 @@ import { Close, LocationOn } from "@mui/icons-material";
 import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material";
 import { withRouter } from "next/router";
 import React, {Component} from "react";
-<<<<<<< Updated upstream
-import { connect } from "react-redux";
-import { findTrolley, clearItemsCheckout } from "@/store/trolley";
-import { createTransaction, clearState } from "@/store/transaction";
-import CryptoJS from "crypto-js";
-import { Transaction } from "@/services";
-=======
-<<<<<<< Updated upstream
-=======
 import { connect } from "react-redux";
 import { findTrolley, clearItemsCheckout } from "@/store/trolley";
 import { createTransaction } from "@/store/transaction";
 import CryptoJS from "crypto-js";
 import { Transaction } from "@/services";
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 
 class CheckOut extends Component {
     constructor(props) {
@@ -67,16 +56,8 @@ class CheckOut extends Component {
         }
     })
 
-<<<<<<< Updated upstream
     UNSAFE_componentWillMount() {
         const {router, trolley} = this.props
-        this.props.clearState()
-=======
-<<<<<<< Updated upstream
-=======
-    UNSAFE_componentWillMount() {
-        const {router, trolley} = this.props
->>>>>>> Stashed changes
 
         if (trolley.itemsCheckout) {
             this.props.findTrolley({
@@ -120,17 +101,10 @@ class CheckOut extends Component {
         //     // router.push({
         //     //     pathname: `/t/${transaction.data.data.transaction.id}`
         //     // })
-<<<<<<< Updated upstream
         //     // this.props.clearState()
         // }
     }
 
-=======
-        // }
-    }
-
->>>>>>> Stashed changes
->>>>>>> Stashed changes
     renderAddress = () => {
         const {address, activateAddress} = this.state
 
@@ -499,17 +473,11 @@ class CheckOut extends Component {
     }
 }
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
-export default CheckOut
-=======
->>>>>>> Stashed changes
 const mapStateToProps = (state) => ({
     trolley: {
         isSuccess: state.trolley.isSucces,
         isLoading: state.trolley.isLoading,
-        checkout: state.trolley.checkout,
+        checkout: state.trolley.data,
         itemsCheckout: state.trolley.itemsCheckout
     },
     transaction: {
@@ -522,16 +490,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
     findTrolley,
     createTransaction,
-<<<<<<< Updated upstream
-    clearState,
     clearItemsCheckout
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
-=======
-    clearItemsCheckout
-}
-
-export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
->>>>>>> Stashed changes
->>>>>>> Stashed changes
