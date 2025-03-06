@@ -13,3 +13,17 @@ export const getOne = (params) => {
         params
     )
 }
+
+export const getAll = (params) => {
+    return apiServiceV1.post(
+        endpoints.TRANSACTION.ALL,
+        params
+    )
+}
+
+export const find = (params) => {
+    return apiServiceV1.post(
+        endpoints.TRANSACTION.FIND,
+        params
+    )
+}
