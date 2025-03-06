@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { Close, LocationOn } from "@mui/icons-material";
-import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio } from "@mui/material";
+import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio, TextField, InputAdornment, CircularProgress, Chip } from "@mui/material";
 import { withRouter } from "next/router";
 import React, {Component} from "react";
 import { connect } from "react-redux";
@@ -8,38 +8,16 @@ import { findTrolley, clearItemsCheckout } from "@/store/trolley";
 import { createTransaction } from "@/store/transaction";
 import CryptoJS from "crypto-js";
 import { Transaction } from "@/services";
+import { getAll as getAllAddress, find, getOne } from "@/store/address";
+import { SearchOutlined } from "@mui/icons-material";
 
 class CheckOut extends Component {
     constructor(props) {
         super(props)
         this.state = {
             products: [],
-            address: [
-                {
-                    id: 0,
-                    label: 'Rumah',
-                    city: 'Bandung', 
-                    detail: 'Jln Pasirluyu no 7',
-                    postalCode: '421024',
-                    moreInformation: 'Gerbang Warna merah/jingga'
-                },
-                {
-                    id: 2,
-                    label: 'Kantor',
-                    city: 'Bandung', 
-                    detail: 'Jln Bekerja no 7',
-                    postalCode: '421024',
-                    moreInformation: 'Deket'
-                },
-                {
-                    id: 3,
-                    label: 'Kakek',
-                    city: 'Bandung', 
-                    detail: 'Jln Hari Tua no 7',
-                    postalCode: '421024',
-                    moreInformation: null
-                }
-            ],
+            addresses: [],
+            address: {},
             activateAddress: 0,
             isOpenModalChangeAddress: false,
             methodPayment: '',
@@ -58,20 +36,17 @@ class CheckOut extends Component {
 
     UNSAFE_componentWillMount() {
         const {router, trolley} = this.props
+        this.props.getOne()
 
         if (trolley.itemsCheckout) {
             this.props.findTrolley({
                 id: trolley.itemsCheckout
             })
-        } else {
-            router.push({
-                pathname: '/trolley'
-            })
         }
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        const {trolley, transaction, router} = this.props
+        const {trolley, transaction, router, address} = this.props
 
         if (trolley.isSuccess) {
             const cart = []
@@ -96,19 +71,18 @@ class CheckOut extends Component {
             })
         }
 
-        // if (transaction.isSuccess) {
-        //     console.log(transaction.data)
-        //     // router.push({
-        //     //     pathname: `/t/${transaction.data.data.transaction.id}`
-        //     // })
-        //     // this.props.clearState()
-        // }
+        if (address.isSuccess) {
+            this.setState({
+                addresses: address.list.data,
+                address: address.address.data
+            })
+        }
     }
 
     renderAddress = () => {
         const {address, activateAddress} = this.state
 
-        const {label, city, detail, moreInformation, postalCode} = address[activateAddress]
+        // const {label, city, detail, moreInformation, postalCode} = address[activateAddress]
 
         return(
             <Box>
@@ -116,21 +90,21 @@ class CheckOut extends Component {
                 <Typography variant="h6" fontWeight={600} sx={{marginBottom: 2}}>Alamat pengiriman</Typography>
                     <Stack direction={'row'} spacing={1} sx={{marginBottom: 2}}>
                         <LocationOn color="success"/>
-                        <Typography variant="subtitle1">{label}</Typography>
+                        <Typography variant="subtitle1">{address.name}</Typography>
                         <Typography variant="subtitle1">|</Typography>
-                        <Typography variant="subtitle1">Azrian</Typography>
+                        <Typography variant="subtitle1">{address.receiver}</Typography>
                     </Stack>
                     <Grid container>
                         <Grid size={11}>
                             <Typography variant="subtitle2">
-                                {`${detail}${moreInformation ? ` (${moreInformation})` : ''}, ${city}, ${postalCode}`}
+                            {`${address.address}, ${address.district}, ${address.city}, ${address.province}, ${address.postal_code} ${address.notes ? `(${address.notes})` : ''}`}
                             </Typography>
-                        </Grid>
+                    </Grid>
                         <Grid size={1}>
                             <Button variant="outlined" onClick={this.handleChangeModalAddress}>
                                 Ganti
-                            </Button>
-                        </Grid>
+                        </Button>
+                    </Grid>
                     </Grid>
                 </Paper>
             </Box>
@@ -138,13 +112,20 @@ class CheckOut extends Component {
     }
 
     handleChangeModalAddress = () => {
+        const {isOpenModalChangeAddress} = this.state
+
+        if (!isOpenModalChangeAddress) {
+            this.props.getAllAddress()
+        }
+
         this.setState({
             isOpenModalChangeAddress: !this.state.isOpenModalChangeAddress
         })
     }
 
     renderModalChangeAddress = () => {
-        const {isOpenModalChangeAddress, address, activateAddress} = this.state
+        const {isOpenModalChangeAddress, addresses, activateAddress} = this.state
+        const {address} = this.props
 
         return(
             <Modal
@@ -152,7 +133,6 @@ class CheckOut extends Component {
                 onClose={this.handleChangeModalAddress}
                 sx={{
                     width: '100%',
-                    height: '100vh',
                     display: 'flex',
                     justifyContent: 'center',
                     alignItems: 'center',
@@ -160,70 +140,118 @@ class CheckOut extends Component {
             >
                 <Container 
                     maxWidth="md"
-                    sx={{
-                        position: 'absolute',
-                        top: '10%',
-                    }}
                 >
                     <Box
                         sx={{
                             borderRadius: 2,
                             border: '1px solid #ababab',
                             bgcolor: '#fff',
-                            p: 2
+                            p: 2,
+                            height: 500
+                            // height: '75vh',
                         }}
                     >
-                        <Grid container sx={{marginBottom: 1}}>
-                            <Grid size={1}></Grid>
-                            <Grid size={10} sx={{display:'flex', justifyContent: 'center'}}>
-                                <Typography variant="h5">
-                                    Daftar Alamat
-                                </Typography>
+                        <Grid container spacing={2}>
+                            <Grid size={9}>
+                            <TextField
+                                fullWidth
+                                size="small"
+                                hiddenLabel
+                                slotProps={{ input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                    <SearchOutlined/>
+                                    </InputAdornment>
+                                )
+                                }}}
+                                onChange={this.handleChangeSearchAddress}
+                            />
                             </Grid>
-                            <Grid size={1}>
-                                <IconButton onClick={this.handleChangeModalAddress}>
-                                    <Close/>
-                                </IconButton>
+                            <Grid 
+                            size={3}
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center'
+                            }}
+                            >
+                            <Button variant="contained" fullWidth>
+                                Tambah Alamat
+                            </Button>
                             </Grid>
                         </Grid>
-                        <Divider sx={{marginBottom: 2}}/>
-                        <Button variant="contained" fullWidth sx={{marginBottom: 1}}>Tambah Alamat Baru</Button>
-                        <Box>
-                            {address.map((val) => (
-                                <Paper 
-                                    key={val.id}
-                                    sx={{
-                                        p: 2,
-                                        marginY: 2
-                                    }}
+                        <Divider sx={{marginY: 2}}/>
+                        <Box
+                            sx={{
+                                height: 400,
+                                overflow: 'auto'
+                            }}
+                        >
+                        {
+                            address.isLoading ? (
+                                <CircularProgress sx={{marginTop: 2}}/>
+                            ) : addresses.map((val) => (
+                                <Paper
+                                key={val.id}
+                                sx={{
+                                    marginY: 2,
+                                    p: 2
+                                }}
                                 >
-                                    <Grid container>
-                                        <Grid size={10}>
-                                            <Stack direction={'row'} spacing={1} sx={{marginBottom: 2}}>
-                                                <LocationOn color="success"/>
-                                                <Typography variant="subtitle1">{val.label}</Typography>
-                                                <Typography variant="subtitle1">|</Typography>
-                                                <Typography variant="subtitle1">Azrian</Typography>
-                                            </Stack>
-                                            <Typography variant="subtitle2">
-                                                {`${val.detail}${val.moreInformation ? ` (${val.moreInformation})` : ''}, ${val.city}, ${val.postalCode}`}
-                                            </Typography>
-                                        </Grid>
-                                        <Grid 
-                                            size={2}
-                                            sx={{
-                                                display: 'flex',
-                                                justifyContent: 'center',
-                                                alignItems: 'center'
-                                            }}
-                                        >
-                                            <Button color="success" variant={'outlined'} disabled={activateAddress === val.id ? true : false}>
-                                                Pilih
-                                            </Button>
-                                        </Grid>
+                                <Grid container>
+                                    <Grid size={10}>
+                                    <Stack
+                                        sx={{marginY: 2}}
+                                        direction="row"
+                                        alignItems={'center'}
+                                        divider={<Divider orientation="vertical" flexItem />}
+                                        spacing={2} 
+                                    >
+                                        <Typography variant="body1" fontWeight={600}>{val.receiver}</Typography>
+                                        <Typography variant="body1">{val.name}</Typography>
+                                        {
+                                        val.selectedAddressUser ? (
+                                            <Chip label="Dipilih" color="success"/>
+                                        ) : ''
+                                        }
+                                        {
+                                        val.defaultAddressUser ? (
+                                            <Chip label="Utama" />
+                                        ) : ''
+                                        }
+                                    </Stack>
+                                    <Typography variant="body1" sx={{marginY: 2}} textAlign={'left'}>{val.telephone}</Typography>
+                                    <Typography variant="body1" sx={{marginY: 2}} textAlign={'left'}>{`${val.address}, ${val.district}, ${val.city}, ${val.province}, ${val.postal_code} ${val.notes ? `(${val.notes})` : ''}`}</Typography>
                                     </Grid>
+                                    <Grid 
+                                    size={2}
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        flexDirection: 'column'
+                                    }}
+                                    >
+                                    {
+                                        !val.selectedAddressUser ? (
+                                        <Button variant="contained" color="success">
+                                            Pilih
+                                        </Button>
+                                        ) : ''
+                                    }
+                                    {
+                                        !val.defaultAddressUser ? (
+                                        <Button variant="outlined" color="success" sx={{marginTop: 2}}>
+                                            Jadikan Utama
+                                        </Button>
+                                        ) : ''
+                                    }
+                                    <Button variant="outlined" color="success" sx={{marginTop: 2}}>
+                                        Edit
+                                    </Button>
+                                    </Grid>
+                                </Grid>
                                 </Paper>
-                            ))}
+                            ))
+                        }
                         </Box>
                     </Box>
                 </Container>
@@ -477,20 +505,30 @@ const mapStateToProps = (state) => ({
     trolley: {
         isSuccess: state.trolley.isSucces,
         isLoading: state.trolley.isLoading,
-        checkout: state.trolley.data,
+        checkout: state.trolley.checkout,
         itemsCheckout: state.trolley.itemsCheckout
     },
     transaction: {
         isLoading: state.transaction.isLoading,
         isSuccess: state.transaction.isSuccess,
         data: state.transaction.data
-    }
+    },
+    address: {
+        isLoading: state.address.isLoading,
+        isSuccess: state.address.isSuccess,
+        list: state.address.list,
+        address: state.address.address,
+        error: state.address.list,
+      }
 })
 
 const mapDispatchToProps = {
     findTrolley,
     createTransaction,
-    clearItemsCheckout
+    clearItemsCheckout,
+    getAllAddress,
+    find,
+    getOne
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
