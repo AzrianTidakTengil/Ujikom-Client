@@ -21,6 +21,8 @@ export default {
     },
     TRANSACTION: {
         GET: '/transaction',
+        ALL: '/transactions',
+        FIND: '/transactions/find',
         CREATE: '/transaction/create',
         DELETE: '/transaction/delete',
     },
