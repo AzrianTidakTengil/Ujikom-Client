@@ -4,6 +4,8 @@ import Layout from "./layout";
 import Carousel from "./carousel";
 import QuantityEditor from "./quantityEditor";
 import SelectChip from "./selectchip";
+import DateRangePicker from "./daterangepicker";
+import Dropdown from "./dropdown";
 
 export {
     Auth,
@@ -11,5 +13,7 @@ export {
     Layout,
     Carousel,
     QuantityEditor,
-    SelectChip
+    SelectChip,
+    DateRangePicker,
+    Dropdown
 }
