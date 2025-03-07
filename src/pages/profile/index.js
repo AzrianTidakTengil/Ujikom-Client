@@ -3,6 +3,9 @@ import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Butt
 import { connect } from "react-redux";
 import { SearchOutlined } from "@mui/icons-material";
 import { getAll as getAllAddress, find } from "@/store/address";
+import { getAllTransaction, findTransaction } from "@/store/transaction";
+import { DateRangePicker, Dropdown } from "@/components";
+import dayjs from "dayjs";
 
 class Profile extends Component {
   constructor(props) {
@@ -17,7 +20,12 @@ class Profile extends Component {
         telephone: "",
       },
       renderTabs: 'address',
-      addresses: []
+      addresses: [],
+      transaction: {
+        limit: 10,
+        offset: 0,
+        data: []
+      }
     };
   }
 
@@ -26,7 +34,7 @@ class Profile extends Component {
   }
 
   UNSAFE_componentWillReceiveProps() {
-    const {user, address} = this.props
+    const {user, address, transaction} = this.props
 
     if (user.isSuccess) {
       this.setState({
@@ -43,6 +51,15 @@ class Profile extends Component {
     if (address.isSuccess) {
       this.setState({
         addresses: address.list.data
+      })
+    }
+
+    if (transaction.isSuccess) {
+      this.setState({
+        transaction: {
+          ...this.state.transaction,
+          data: transaction.list.data
+        }
       })
     }
   }
@@ -166,14 +183,200 @@ class Profile extends Component {
   }
 
   renderTransaction = () => {
-    return (
-      <Box>
+    const {data, offset, limit} = this.state.transaction
+    const {transaction} = this.props
 
+    const optionFilter = [
+      {
+        label: 'Berhasil',
+        value: 'berhasil'
+      },
+      {
+        label: 'Diantar',
+        value: 'diantar'
+      },
+      {
+        label: 'Menunggu',
+        value: 'menunggu'
+      },
+      {
+        label: 'Dibatalkan',
+        value: 'dibatalkan'
+      },
+    ]
+
+    return (
+      <Box
+        sx={{
+          paddingY: 2
+        }}
+      >
+        <Grid container spacing={2}>
+          <Grid size={4.5}>
+            <TextField
+              fullWidth
+              size="small"
+              hiddenLabel
+              slotProps={{ input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchOutlined/>
+                  </InputAdornment>
+                )
+              }}}
+              onChange={this.handleChangeSearchAddress}
+            />
+          </Grid>
+          <Grid size={4.5}>
+              <DateRangePicker/>
+          </Grid>
+          <Grid size={3}>
+              <Dropdown
+                label={'Status'}
+                options={optionFilter}
+                size="small"
+              />
+          </Grid>
+        </Grid>
+        <Box
+          sx={{
+            minHeight: '30rem'
+          }}
+        >
+          {
+            transaction.isLoading ? (
+              <CircularProgress sx={{marginY: 20}}/>
+            ) : 
+            data.map((val) => (
+              <Paper
+                key={val.id}
+                sx={{
+                  p: 2,
+                  marginY: 2
+                }}
+              >
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'end'
+                  }}
+                >
+                  <Stack
+                    direction="row"
+                    // divider={<Divider orientation="vertical" flexItem />}
+                    spacing={2}  
+                  >
+                    <Chip label={this.handleTitlePayment({method: val.payment_type, type: val.subtype})}/>
+                    <Chip label={dayjs(val.createdAt).format('dddd, DD-MM-YYYY')}/>
+                    <Chip label="pending" color="primary"/>
+                  </Stack>
+                </Box>
+                <Divider sx={{marginY: 2}}/>
+                {
+                  val.transactionToTrolley.map((trolley, index) => (
+                    <>
+                      <Grid container direction={'row'} spacing={2} sx={{marginY: 2}}>
+                        <Grid size={3}>
+                          <Paper sx={{p:2}}>
+                            Image
+                          </Paper>
+                        </Grid>
+                        <Grid size={6} textAlign={'left'}>
+                          <Typography variant="h6">{trolley.trolleyToProduct.name}</Typography>
+                          <Typography variant="body1">x{trolley.items}</Typography>
+                        </Grid>
+                        <Grid size={3} textAlign={'right'}>
+                          <Typography variant="h6" fontWeight={500}>
+                            {
+                              new Intl.NumberFormat('id-ID', {
+                                  style: "currency",
+                                  currency: "IDR"
+                              }).format(trolley.trolleyToProduct.price)
+                            }
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                      {
+                        (val.transactionToTrolley.length - 1) !== index ? (
+                          <Divider/>
+                        ) : ''
+                      }
+                    </>
+                  ))
+                }
+                <Divider sx={{marginBottom: 2}}/>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'end'
+                  }}
+                >
+                  <Typography variant="body1" sx={{marginRight: 2}}>Total Harga:</Typography>
+                  <Typography variant="h6">
+                  {
+                    new Intl.NumberFormat('id-ID', {
+                        style: "currency",
+                        currency: "IDR"
+                    }).format(val.total_price)
+                  }
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'end',
+                    marginTop: 2
+                  }}
+                >
+                  <Button variant="outlined" sx={{marginRight: 2}}>Ulas</Button>
+                  <Button variant="contained">Beli Lagi</Button>
+                </Box>
+              </Paper>
+            ))
+          }
+        </Box>
       </Box>
     )
   }
 
+  handleTitlePayment = (val) => {
+    const {method, type} = val
+        
+    if (method === 'qris') {
+        return 'QR code by Qris'
+    } else if (method === 'bank_transfer') {
+        if (type === 'permata') {
+            return 'Permata Virtual Account'
+        } else if (type === 'bni') {
+            return 'BNI Virtual Account'
+        } else if (type === 'bri') {
+            return 'BRI Virtual Account'
+        } else if (type === 'cimb') {
+            return 'CIMB Virtual Account'
+        } else if (type === 'bca') {
+          return 'BCA Virtual Account'
+        }
+    } else if (method === 'echannel') {
+        return 'Mandiri Bill Payment'
+    } else if (method === 'cstore') {
+        if (type === 'alfamart') {
+            return 'Alfamart'
+        } else if (type === 'indomaret') {
+            return 'Indomaret'
+        }
+    }
+  }
+
   handleChangeValueTab = (event, newValue) => {
+    const {transaction} = this.state
+
+    if (newValue === 'transaction') {
+      this.props.getAllTransaction({limit: transaction.limit, offset: transaction.offset})
+    }
+
     this.setState({
       renderTabs: newValue
     })
@@ -257,7 +460,7 @@ class Profile extends Component {
             </Box>
             {
               renderTabs === 'address' ? this.renderMoreAddress() :
-              renderTabs === 'transaction' ? this.renderTransaction :
+              renderTabs === 'transaction' ? this.renderTransaction() :
               ''
             }
           </Box>
@@ -283,12 +486,19 @@ const mapStateToProps = (state) => ({
     list: state.address.list,
     address: state.address.address,
     error: state.address.list,
+  },
+  transaction: {
+    isLoading: state.transaction.isLoading,
+    isSuccess: state.transaction.isSuccess,
+    list: state.transaction.list
   }
 })
 
 const mapDispatchToProps = {
   getAllAddress,
-  find
+  find,
+  getAllTransaction,
+  findTransaction
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
