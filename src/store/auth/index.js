@@ -22,6 +22,9 @@ export const authSlice = createSlice({
             state.token = ''
             state.error = null
             state.data = []
+
+            Cookie.remove('token')
+            window.location.reload()
         }
     },
     extraReducers: (builder) => {
