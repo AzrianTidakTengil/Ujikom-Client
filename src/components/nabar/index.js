@@ -14,20 +14,24 @@ import {
   Avatar,
   IconButton,
   Grid2 as Grid,
-  Badge
+  Badge,
+  Popover,
+  Stack,
+  Typography
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { LocalGroceryStoreOutlined, MailLockOutlined, MailOutlineOutlined, SearchOutlined } from "@mui/icons-material";
+import { AccountCircle, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
 import { containerModal, mainItem } from "./theme";
 import Link from "next/link";
 import { connect } from "react-redux";
-import { login } from "@/store/auth";
+import { login, logout} from "@/store/auth";
 import { getUser } from "@/store/user";
 import { getAllItemTrolley } from "@/store/trolley";
+import { withRouter } from "next/router";
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -44,6 +48,10 @@ class Navbar extends React.Component {
         telephone: ''
       },
       badgeTrolley: 0,
+      popover: {
+        id: null,
+        anchorEL: null
+      }
     }
   }
   
@@ -167,8 +175,38 @@ class Navbar extends React.Component {
       }
   }
 
+  handleOpenPopever = (event) => {
+    this.setState({
+      popover: {
+        ...this.state.popover,
+        anchorEL: event.currentTarget
+      }
+    })
+  }
+
+  handleClosePopever = () => {
+    this.setState({
+      popover: {
+        ...this.state.popover,
+        anchorEL: null
+      }
+    })
+  }
+
+  handlePush = (path) => {
+    const {router} = this.props
+
+    router.push({
+      pathname: path
+    })
+  }
+
+  handleLogOut = () => {
+    this.props.logout()
+  }
+
   render() {
-    const {showModal, user, badgeTrolley} = this.state
+    const {showModal, user, badgeTrolley, popover} = this.state
     const {auth} = this.props
     const dummy_search = [
       {
@@ -224,11 +262,40 @@ class Navbar extends React.Component {
                   </IconButton>
                 </Grid>
                 <Grid>
-                  <Link href={'/profile'} style={{textDecoration: 'none'}}>
-                    <div style={{cursor: 'pointer'}}>
-                      <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
-                    </div>
-                  </Link>
+                  <div style={{cursor: 'pointer'}} onClick={this.handleOpenPopever}>
+                    <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
+                  </div>
+                  <Popover
+                    open={Boolean(popover.anchorEL)}
+                    anchorEl={popover.anchorEL}
+                    onClose={this.handleClosePopever}
+                    anchorOrigin={{
+                      vertical: 'bottom',
+                      horizontal: 'right',
+                    }}
+                    transformOrigin={{
+                      vertical: 'top',
+                      horizontal: 'right',
+                    }}
+                  >
+                    <Box
+                      sx={{
+                        p: 2
+                      }}
+                    >
+                      <Stack
+                        divider={<Divider flexItem />}
+                        spacing={2}
+                      >
+                        <Button onClick={() => this.handlePush('/profile')} startIcon={<AccountCircle/>}>
+                          Profile
+                        </Button>
+                        <Button startIcon={<Logout/>} onClick={this.handleLogOut}>
+                          Log out
+                        </Button>
+                      </Stack>
+                    </Box>
+                  </Popover>
                 </Grid>
               </Grid> 
               : 
@@ -292,7 +359,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   getUser,
-  getAllItemTrolley
+  getAllItemTrolley,
+  logout
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Navbar)
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Navbar))
