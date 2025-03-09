@@ -42,6 +42,7 @@ export default {
         }
     },
     STORE: {
+        SELLER: '/seller',
         CREATE: '/store/create',
         UPDATE: '/store/update',
         LABEL: {
