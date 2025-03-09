@@ -9,6 +9,7 @@ import { palleteV1 } from "@/assets/css/template";
 import { connect } from "react-redux";
 import { logout } from "@/store/auth";
 import { getUser } from "@/store/user";
+import { getSeller } from "@/store/shop";
 
 const drawerWidth = 240;
 const miniDrawerWidth = 60;
@@ -31,6 +32,9 @@ class SellerLayout extends Component {
         email: '',
         telephone: ''
       },
+      seller: {
+        name: ''
+      }
     };
     this.theme = createTheme({
       palette: {
@@ -77,10 +81,11 @@ class SellerLayout extends Component {
 
   UNSAFE_componentWillMount() {
     this.props.getUser()
+    this.props.getSeller()
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {auth, user} = nextProps
+    const {seller, user} = nextProps
     if (user.isSuccess) {
       this.setState({
         user: {
@@ -89,6 +94,14 @@ class SellerLayout extends Component {
           lastname: user.lastname,
           email: user.email,
           telephone: user.telephone
+        }
+      })
+    }
+
+    if (seller.isSuccess) {
+      this.setState({
+        seller: {
+          name: seller.data.name
         }
       })
     }
@@ -262,20 +275,7 @@ class SellerLayout extends Component {
 
   render() {
     const { children } = this.props;
-    const { mobileOpen, drawerOpen, anchorEl, search, user } = this.state;
-
-    const drawer = (
-      <div>
-        <Toolbar />
-        <List>
-          {["Dashboard", "Orders", "Products", "Settings"].map((text) => (
-            <ListItem button key={text}>
-              <ListItemText primary={text} />
-            </ListItem>
-          ))}
-        </List>
-      </div>
-    );
+    const { mobileOpen, drawerOpen, anchorEl, search, user, seller } = this.state;
 
     return (
       <ThemeProvider theme={this.theme}>
@@ -320,9 +320,19 @@ class SellerLayout extends Component {
                 // onChange={(event) => this.handleChange(event.target.value)}
                 onClick={this.handleAnchorSearch}
               />
-              <Button onClick={this.handleAnchorAvatar}>
-                <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
-              </Button>
+              <Stack
+                direction="row"
+                divider={<Divider flexItem orientation="vertical"/>}
+                spacing={2}
+              >
+                <Button sx={{display: 'flex', alignItems: 'center'}} variant="text" color="white">
+                  <Avatar {...this.handleSplitCharacter(`${seller.name} shop`)} sizes="small"></Avatar>
+                  <Typography variant="subtitle2" color="black" sx={{marginLeft: 2}}>{seller.name}</Typography>
+                </Button>
+                <Button onClick={this.handleAnchorAvatar}>
+                  <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
+                </Button>
+              </Stack>
             </Toolbar>
             <Popover
               open={Boolean(anchorEl.search)}
@@ -425,11 +435,18 @@ const mapStateToProps = (state) => ({
     email: state.user.user.email,
     telephone: state.user.user.telephone
   },
+  seller: {
+    isLoading: state.shop.isLoading,
+    isSuccess: state.shop.isSuccess,
+    data: state.shop.seller,
+    error: state.shop.error
+  }
 })
 
 const mapDispatchToProps = {
   logout,
-  getUser
+  getUser,
+  getSeller
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(SellerLayout));
