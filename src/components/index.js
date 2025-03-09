@@ -6,6 +6,7 @@ import QuantityEditor from "./quantityEditor";
 import SelectChip from "./selectchip";
 import DateRangePicker from "./daterangepicker";
 import Dropdown from "./dropdown";
+import SellerLayout from "./sellerlayout";
 
 export {
     Auth,
@@ -15,5 +16,6 @@ export {
     QuantityEditor,
     SelectChip,
     DateRangePicker,
-    Dropdown
+    Dropdown,
+    SellerLayout
 }
