@@ -151,7 +151,7 @@ class Seller extends Component {
                     p: 2
                 }}
             >
-                
+                <Typography variant="h6" fontWeight={600}>Misi untuk menjadi terbaik</Typography>
             </Paper>
         )
     }
