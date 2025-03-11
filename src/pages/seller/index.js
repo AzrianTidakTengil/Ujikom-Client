@@ -292,12 +292,4 @@ class Seller extends Component {
     }
 }
 
-Seller.getLayout = (page) => {
-    return (
-        <SellerLayout>
-            {page}
-        </SellerLayout>
-    )
-}
-
 export default Seller
