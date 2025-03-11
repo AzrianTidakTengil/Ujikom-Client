@@ -1,10 +1,11 @@
-import { Layout } from "../components";
+import { Layout, SellerLayout } from "../components";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { Provider } from "react-redux";
 import store from "@/store";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 import '@/assets/css/global.css'
+import { useRouter } from "next/router";
 
 const font = Poppins({
   weight: '400',
@@ -12,10 +13,14 @@ const font = Poppins({
   subsets: ['latin']
 })
 
-
+const regex = {
+    seller: /seller/i
+}
 
 export default function MyApp({ Component, pageProps }) {
     const getLayout = Component.getLayout
+    const router = useRouter()
+    console.log(router)
     return (
         <Provider store={store}>
             <style jsx global>{`
@@ -24,7 +29,11 @@ export default function MyApp({ Component, pageProps }) {
                 }
             `}</style>
             {
-                getLayout ? (
+                regex.seller.test(router.route) ?
+                    <SellerLayout>
+                        <Component {...pageProps} />
+                    </SellerLayout>
+                : getLayout ? (
                     getLayout(<Component {...pageProps} />)
                 ) : (<Layout>
                     <Component {...pageProps} />
