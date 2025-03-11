@@ -1,7 +1,7 @@
 import { palleteV1 } from "@/assets/css/template";
 import { SellerLayout } from "@/components";
-import { Favorite, ShoppingCart, Visibility, VisibilityOff } from "@mui/icons-material";
-import { Container, createTheme, Paper, ThemeProvider, Grid2 as Grid, Typography, Box, IconButton, Stack, Divider, Button } from "@mui/material";
+import { Favorite, ShoppingCart, TravelExplore, Visibility, VisibilityOff } from "@mui/icons-material";
+import { Container, createTheme, Paper, ThemeProvider, Grid2 as Grid, Typography, Box, IconButton, Stack, Divider, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import { Component } from "react";
 
 const theme = createTheme()
@@ -157,6 +157,49 @@ class Seller extends Component {
     }
 
     renderTren = () => {
+        const dummy_product = [
+            {
+                name: 'Ayam goreng',
+                category: 'Dapur, Bahan makan'
+            },
+            {
+                name: 'Pemutih',
+                category: 'Pembersih, alat rumah tangga'
+            },
+            {
+                name: 'Beras Premium',
+                category: 'Dapur, Bahan makan'
+            },
+            {
+                name: 'Sabun Cuci Piring',
+                category: 'Pembersih, alat rumah tangga'
+            },
+            {
+                name: 'Minyak Goreng',
+                category: 'Dapur, Bahan makan'
+            },
+            {
+                name: 'Sikat WC',
+                category: 'Pembersih, alat rumah tangga'
+            },
+            {
+                name: 'Kopi Bubuk',
+                category: 'Minuman, Dapur'
+            },
+            {
+                name: 'Pasta Gigi',
+                category: 'Perawatan diri'
+            },
+            {
+                name: 'Shampoo',
+                category: 'Perawatan diri'
+            },
+            {
+                name: 'Detergen Bubuk',
+                category: 'Pembersih, alat rumah tangga'
+            }
+        ];
+
         return (
             <Paper
                 sx={{
@@ -169,8 +212,58 @@ class Seller extends Component {
                 >
                     Produk teramai
                 </Typography>
-                <Divider sx={{marginY: 2}}/>
-                
+                <TableContainer component={Paper} sx={{marginY: 2}}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>
+                                    <Typography variant="h6">No.</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="h6">Nama</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="h6">Kategori</Typography>
+                                </TableCell>
+                                <TableCell>
+                                    <Typography variant="h6">Aksi</Typography>
+                                </TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {
+                                dummy_product.map((val, index) => (
+                                    <TableRow key={val.name}>
+                                        <TableCell>
+                                            {index + 1}
+                                        </TableCell>
+                                        <TableCell>
+                                            {val.name}
+                                        </TableCell>
+                                        <TableCell>
+                                            {val.category}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Button variant="contained" color="primary" onClick={() => alert(`Visiting products in Tier ${val.name}`)} size="small">
+                                                <TravelExplore/>
+                                            </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            }
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'end'
+                    }}
+                >
+                    <Button variant="text">
+                        Lihat selengkapnya
+                    </Button>
+                </Box>
             </Paper>
         )
     }
