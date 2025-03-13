@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { TextField, Box, InputAdornment } from "@mui/material";
+import { TextField, Box, InputAdornment, Popover } from "@mui/material";
 import { CalendarMonth } from "@mui/icons-material";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -7,12 +7,14 @@ import { DateRangePicker as ReactDateRangePicker } from "react-date-range";
 import "react-date-range/dist/styles.css";
 import "react-date-range/dist/theme/default.css";
 import dayjs from "dayjs";
+import { input } from "../form/theme";
 
 class DateRangePicker extends Component {
   constructor(props) {
     super(props);
     this.state = {
       isShow: false,
+      inputRef: null,
       dateRange: [
         {
           startDate: new Date(),
@@ -24,21 +26,34 @@ class DateRangePicker extends Component {
   }
 
   handleDateChange = (ranges) => {
-    this.setState({ dateRange: [ranges.selection], isShow: false });
+    this.setState({ dateRange: [ranges.selection]});
     if (this.props.onDateChange) {
       this.props.onDateChange({
         startDate: dayjs(ranges.selection.startDate),
         endDate: dayjs(ranges.selection.endDate),
       });
     }
+
+    if (ranges.selection.endDate) {
+      this.handleClosePicker()
+    }
   };
 
-  togglePicker = () => {
-    this.setState((prevState) => ({ isShow: !prevState.isShow }));
+  handleOpenPicker = (event) => {
+    console.log(event.currentTarget)
+    this.setState({
+      inputRef: event.currentTarget
+    });
+  };
+
+  handleClosePicker = (event) => {
+    this.setState({
+      inputRef: null
+    });
   };
 
   render() {
-    const { isShow, dateRange } = this.state;
+    const { isShow, dateRange, inputRef } = this.state;
     const formattedDate = `${dayjs(dateRange[0].startDate).format("YYYY-MM-DD")} - ${dayjs(dateRange[0].endDate).format("YYYY-MM-DD")}`;
 
     return (
@@ -48,7 +63,7 @@ class DateRangePicker extends Component {
             fullWidth
             size="small"
             value={formattedDate}
-            onClick={this.togglePicker}
+            onClick={this.handleOpenPicker}
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
@@ -58,27 +73,28 @@ class DateRangePicker extends Component {
               readOnly: true,
             }}
           />
-          {isShow && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: "100%",
-                left: 0,
-                zIndex: 2500,
-                background: "white",
-                boxShadow: 3,
-              }}
-            >
-              <ReactDateRangePicker
-                ranges={dateRange}
-                onChange={this.handleDateChange}
-                showSelectionPreview={true}
-                moveRangeOnFirstSelection={false}
-                months={1}
-                direction="horizontal"
-              />
-            </Box>
-          )}
+          <Popover
+            open={Boolean(inputRef)}
+            anchorEl={inputRef}
+            onClose={this.handleClosePicker}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'center',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'center',
+            }}
+          >
+            <ReactDateRangePicker
+              ranges={dateRange}
+              onChange={this.handleDateChange}
+              showSelectionPreview={true}
+              moveRangeOnFirstSelection={false}
+              months={1}
+              direction="horizontal"
+            />
+          </Popover>
         </Box>
       </LocalizationProvider>
     );
