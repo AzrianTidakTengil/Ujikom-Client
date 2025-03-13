@@ -7,6 +7,7 @@ import SelectChip from "./selectchip";
 import DateRangePicker from "./daterangepicker";
 import Dropdown from "./dropdown";
 import SellerLayout from "./sellerlayout";
+import ImageInput from "./imageinput";
 
 export {
     Auth,
@@ -17,5 +18,6 @@ export {
     SelectChip,
     DateRangePicker,
     Dropdown,
-    SellerLayout
+    SellerLayout,
+    ImageInput,
 }
