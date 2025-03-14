@@ -8,6 +8,7 @@ import DateRangePicker from "./daterangepicker";
 import Dropdown from "./dropdown";
 import SellerLayout from "./sellerlayout";
 import ImageInput from "./imageinput";
+import TimePick from "./timepicker";
 
 export {
     Auth,
@@ -20,4 +21,5 @@ export {
     Dropdown,
     SellerLayout,
     ImageInput,
+    TimePick
 }
