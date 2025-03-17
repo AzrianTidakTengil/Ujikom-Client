@@ -103,8 +103,8 @@ export const shopSlice = createSlice({
                 state.isSuccess = false
             })
             .addCase(MyProductInTrolley.fulfilled, (state, action) => {
-                state.isLoading = true
-                state.isSuccess = false
+                state.isLoading = false
+                state.isSuccess = true
                 state.LengthProductInTrolley = action.payload.data.count
             })
             .addCase(MyProductInTrolley.rejected, (state, action) => {
