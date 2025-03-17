@@ -11,6 +11,8 @@ export default {
         UPDATE: '/item/update',
         DELETE: '/item/delete',
         MARK: '/item/mark',
+        POPULAR: '/item/popular',
+        STORE: '/item/store'
     },
     TROLLEY: {
         FIND: '/trolley/find',
@@ -49,7 +51,11 @@ export default {
             GET: '/store/label',
             CREATE: '/store/label/add',
             UPDATE: '/store/label/update',
-        }
+        },
+        BALANCE: '/store/balance',
+        INTROLLEY: '/store/introlley',
+        ORDER: '/store/order',
+        OPERATION: '/store/operation',
     },
     TEST: '/test',
     USER: {
