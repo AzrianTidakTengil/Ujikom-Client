@@ -1,8 +1,11 @@
 import { palleteV1 } from "@/assets/css/template";
 import { SellerLayout } from "@/components";
+import { BalanceInformation, getSeller, MyProductInTrolley, PopularAnalysisProduct } from "@/store/shop";
 import { Favorite, ShoppingCart, TravelExplore, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Container, createTheme, Paper, ThemeProvider, Grid2 as Grid, Typography, Box, IconButton, Stack, Divider, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
+import { withRouter } from "next/router";
 import { Component } from "react";
+import { connect } from "react-redux";
 
 const theme = createTheme()
 
@@ -10,12 +13,43 @@ class Seller extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            showBalance: false
+            showBalance: false,
+            balance: 0,
+            lengthInTrolley: 0,
+            product: []
+        }
+    }
+
+    UNSAFE_componentWillMount() {
+        this.props.BalanceInformation()
+        this.props.MyProductInTrolley()
+        this.props.PopularAnalysisProduct()
+    }
+
+    UNSAFE_componentWillReceiveProps() {
+        const {router, shop} = this.props
+        
+        if (shop.isSuccess && shop.popularProduct) {
+            this.setState({
+                product: shop.popularProduct
+            })
+        }
+
+        if (shop.isSuccess && shop.balance) {
+            this.setState({
+                balance: shop.balance
+            })
+        }
+
+        if (shop.isSuccess && shop.inTrolley) {
+            this.setState({
+                lengthInTrolley: shop.inTrolley
+            })
         }
     }
 
     renderBalance = () => {
-        const {showBalance} = this.state
+        const {showBalance, balance} = this.state
 
         return (
             <Paper
@@ -39,7 +73,7 @@ class Seller extends Component {
                         new Intl.NumberFormat('id-ID', {
                             style: "currency",
                             currency: "IDR"
-                        }).format(100000) 
+                        }).format(balance) 
                         :
                         `Rp ********`
                     }
@@ -67,14 +101,15 @@ class Seller extends Component {
                     >
                         <Button
                             variant="text"
+                            href="/seller/balance"
                         >
                             Tarik Saldo
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="text"
                         >
                             Riwayat
-                        </Button>
+                        </Button> */}
                     </Stack>
                 </Box>
             </Paper>
@@ -82,6 +117,8 @@ class Seller extends Component {
     }
 
     renderAnalysisShop = () => {
+        const {lengthInTrolley} = this.state
+
         return (
             <Paper
                 sx={{
@@ -105,10 +142,10 @@ class Seller extends Component {
                             }}
                         >
                             <ShoppingCart sx={{marginRight: 2}}/>
-                            <Typography variant="h6" fontWeight={600}>{`100`}</Typography>
+                            <Typography variant="h6" fontWeight={600}>{lengthInTrolley}</Typography>
                         </Box>
                     </Box>
-                    <Box>
+                    {/* <Box>
                         <Typography variant="h5" fontWeight={500}>Disukai</Typography>
                         <Box
                             sx={{
@@ -120,7 +157,7 @@ class Seller extends Component {
                             <Favorite sx={{marginRight: 2}}/>
                             <Typography variant="h6" fontWeight={600}>{`100`}</Typography>
                         </Box>
-                    </Box>
+                    </Box> */}
                 </Stack>
                 {/* <Box
                     sx={{
@@ -157,48 +194,7 @@ class Seller extends Component {
     }
 
     renderTren = () => {
-        const dummy_product = [
-            {
-                name: 'Ayam goreng',
-                category: 'Dapur, Bahan makan'
-            },
-            {
-                name: 'Pemutih',
-                category: 'Pembersih, alat rumah tangga'
-            },
-            {
-                name: 'Beras Premium',
-                category: 'Dapur, Bahan makan'
-            },
-            {
-                name: 'Sabun Cuci Piring',
-                category: 'Pembersih, alat rumah tangga'
-            },
-            {
-                name: 'Minyak Goreng',
-                category: 'Dapur, Bahan makan'
-            },
-            {
-                name: 'Sikat WC',
-                category: 'Pembersih, alat rumah tangga'
-            },
-            {
-                name: 'Kopi Bubuk',
-                category: 'Minuman, Dapur'
-            },
-            {
-                name: 'Pasta Gigi',
-                category: 'Perawatan diri'
-            },
-            {
-                name: 'Shampoo',
-                category: 'Perawatan diri'
-            },
-            {
-                name: 'Detergen Bubuk',
-                category: 'Pembersih, alat rumah tangga'
-            }
-        ];
+        const {product} = this.state
 
         return (
             <Paper
@@ -232,8 +228,8 @@ class Seller extends Component {
                         </TableHead>
                         <TableBody>
                             {
-                                dummy_product.map((val, index) => (
-                                    <TableRow key={val.name}>
+                                product.map((val, index) => (
+                                    <TableRow key={index}>
                                         <TableCell>
                                             {index + 1}
                                         </TableCell>
@@ -241,11 +237,11 @@ class Seller extends Component {
                                             {val.name}
                                         </TableCell>
                                         <TableCell>
-                                            {val.category}
+                                            {val.productToLabel.length !== 0 ? val.productToLabel.map((label) => `${label.name}, `) : '-'}
                                         </TableCell>
                                         <TableCell>
                                             <Button variant="contained" color="primary" onClick={() => alert(`Visiting products in Tier ${val.name}`)} size="small">
-                                                <TravelExplore/>
+                                                <Visibility/>
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -254,7 +250,7 @@ class Seller extends Component {
                         </TableBody>
                     </Table>
                 </TableContainer>
-                <Box
+                {/* <Box
                     sx={{
                         display: 'flex',
                         justifyContent: 'end'
@@ -263,7 +259,7 @@ class Seller extends Component {
                     <Button variant="text">
                         Lihat selengkapnya
                     </Button>
-                </Box>
+                </Box> */}
             </Paper>
         )
     }
@@ -292,4 +288,26 @@ class Seller extends Component {
     }
 }
 
-export default Seller
+const mapStateToProps = (state) => ({
+    shop: {
+        isLoading: state.shop.isLoading,
+        isSuccess: state.shop.isSuccess,
+        seller: state.shop.seller,
+        balance: state.shop.balanceInformation.balance,
+        transaction: state.shop.balanceInformation.history,
+        inTrolley: state.shop.LengthProductInTrolley,
+        order: state.shop.order,
+        product: state.shop.product,
+        popularProduct: state.shop.popularProduct,
+        error: state.shop.error
+    }
+})
+
+const mapDispatchToProps = {
+    getSeller,
+    BalanceInformation,
+    MyProductInTrolley,
+    PopularAnalysisProduct
+}
+
+export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Seller))
