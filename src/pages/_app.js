@@ -20,7 +20,7 @@ const regex = {
 export default function MyApp({ Component, pageProps }) {
     const getLayout = Component.getLayout
     const router = useRouter()
-    console.log(router)
+
     return (
         <Provider store={store}>
             <style jsx global>{`
