@@ -1,4 +1,4 @@
-import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop } from "@/services/shop";
+import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop } from "@/services/shop";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getSeller = createAsyncThunk('shopSlice/getSeller', async (params) => {
@@ -22,7 +22,7 @@ export const MyProductInTrolley = createAsyncThunk('shopSlice/MyProductInTrolley
 })
 
 export const Order = createAsyncThunk('shopSlice/Order', async (params) => {
-    const response = await Operaion()
+    const response = await OrderShop(params)
     return response.data
 })
 
@@ -45,7 +45,11 @@ const initialState = {
         history: []
     },
     LengthProductInTrolley: 0,
-    order: [],
+    orderTabel: {
+        data: [],
+        lenght: 0,
+    },
+    lengthOrderUnProccess: 0,
     product: [],
     lengthProduct: 0,
     popularProduct: [],
@@ -119,7 +123,9 @@ export const shopSlice = createSlice({
             .addCase(Order.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
-                state.order = action.payload.data
+                state.orderTabel.data = action.payload.transaction
+                state.orderTabel.lenght = action.payload.length_order_process
+                state.lengthOrderUnProccess = action.payload.length_order_process
             })
             .addCase(Order.rejected, (state, action) => {
                 state.isLoading = false
