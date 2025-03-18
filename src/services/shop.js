@@ -25,9 +25,10 @@ export const InTrolley = () => {
     )
 }
 
-export const Order = () => {
-    return apiServiceV1.get(
-        endpoints.STORE.ORDER
+export const Order = (params) => {
+    return apiServiceV1.post(
+        endpoints.STORE.ORDER,
+        params
     )
 }
 
