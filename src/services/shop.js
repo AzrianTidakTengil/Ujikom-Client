@@ -37,9 +37,10 @@ export const Operaion = () => {
     )
 }
 
-export const ProductShop = () => {
-    return apiServiceV1.get(
-        endpoints.PRODUCTS.STORE
+export const ProductShop = (params) => {
+    return apiServiceV1.post(
+        endpoints.PRODUCTS.STORE,
+        params
     )
 }
 
