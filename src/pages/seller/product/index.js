@@ -6,6 +6,7 @@ import { connect } from "react-redux"
 import { SellerLayout } from "@/components"
 import { DataGrid } from "@mui/x-data-grid"
 import { Delete, Edit, SearchOutlined } from "@mui/icons-material"
+import { MyProductShop } from "@/store/shop"
 
 
 class SellerProduct extends Component {
@@ -13,7 +14,12 @@ class SellerProduct extends Component {
         super(props)
         this.state = {
             category: "",
-            selectRow: []
+            selectRow: [],
+            product: [],
+            limit: 25,
+            offset: 0,
+            length: 0,
+            page: 0,
         }
         this.theme = createTheme({
             palette: {
@@ -22,12 +28,30 @@ class SellerProduct extends Component {
         })
     }
 
+    UNSAFE_componentWillMount() {
+        const {limit, offset} = this.state
+
+        this.props.MyProductShop({limit, offset})
+    }
+
+    UNSAFE_componentWillReceiveProps() {
+        const {shop} = this.props
+
+        if (shop.isSuccess && shop.lengthProduct) {
+            this.setState({
+                length: shop.lengthProduct,
+                product: shop.product
+            })
+        }
+    }
+
     handleSelectRow = (newRowSelectionModel) => {
         this.setState({ selectRow: newRowSelectionModel })
     }
 
     renderDataGrid = () => {
-        const {selectRow} = this.state
+        const {selectRow, product, limit, offset, length, page} = this.state
+        const {shop} = this.props
 
         const columns = [
             {
@@ -53,46 +77,34 @@ class SellerProduct extends Component {
                 field: 'action',
                 headerName: 'Aksi',
                 renderCell: (params) => (
-                    <IconButton size="small">
+                    <IconButton size="small" onClick={this.handlePushRouterEdit}>
                         <Edit fontSize="small"/>
                     </IconButton>
                 )
             }
         ]
 
-        const rows = [
-            {
-                id: 0,
-                name: 'Handphone',
-                price: 2000,
-                stock: 100,
-            },
-            {
-                id: 1,
-                name: 'Test 12',
-                price: 10000,
-                stock: 100,
-            },
-            {
-                id: 2,
-                name: 'asdasd',
-                price: 10000,
-                stock: 100,
-            },
-        ]
+        const rows = shop.product.map((p) => ({
+            id: p.id,
+            name: p.name,
+            price: new Intl.NumberFormat('id-ID', {
+                style: "currency",
+                currency: "IDR"
+            }).format(p.price),
+            stock: p.stock
+        }))
 
         return (
             <Box>
                 <DataGrid
                     rows={rows}
                     columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 25,
-                            },
-                        },
+                    paginationModel={{
+                        page: page,
+                        pageSize: limit,
                     }}
+                    rowCount={shop.lengthProduct}
+                    loading={shop.isLoading}
                     pageSizeOptions={[10, 25, 50, 100]}
                     checkboxSelection
                     columnVisibilityModel={{
@@ -100,9 +112,26 @@ class SellerProduct extends Component {
                     }}
                     onRowSelectionModelChange={this.handleSelectRow}
                     rowSelectionModel={selectRow}
+                    onPaginationModelChange={this.handleSetPageDataGrid}
+                    paginationMode="server"
                 />
             </Box>
         )
+    }
+
+    handlePushRouterEdit = () => {
+
+    }
+
+    handleSetPageDataGrid = ({page, pageSize}) => {
+        const {limit, offset} = this.state
+
+        this.props.MyProductShop({limit: pageSize, offset: limit * page})
+
+        this.setState({
+            page,
+            limit: pageSize
+        })
     }
 
     handleCategoryChange = (event) => {
@@ -207,11 +236,23 @@ class SellerProduct extends Component {
 }
 
 const mapStateToProps = (state) => ({
-
+    shop: {
+        isLoading: state.shop.isLoading,
+        isSuccess: state.shop.isSuccess,
+        seller: state.shop.seller,
+        balance: state.shop.balanceInformation.balance,
+        transaction: state.shop.balanceInformation.history,
+        inTrolley: state.shop.LengthProductInTrolley,
+        order: state.shop.order,
+        product: state.shop.product,
+        lengthProduct: state.shop.lengthProduct,
+        popularProduct: state.shop.popularProduct,
+        error: state.shop.error
+    }
 })
 
 const mapDispatchToProps = {
-
+    MyProductShop
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerProduct))
