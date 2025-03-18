@@ -27,7 +27,7 @@ export const Order = createAsyncThunk('shopSlice/Order', async (params) => {
 })
 
 export const MyProductShop = createAsyncThunk('shopSlice/MyProductShop', async (params) => {
-    const response = await ProductShop()
+    const response = await ProductShop(params)
     return response.data
 })
 
@@ -47,6 +47,7 @@ const initialState = {
     LengthProductInTrolley: 0,
     order: [],
     product: [],
+    lengthProduct: 0,
     popularProduct: [],
     error: null
 }
@@ -131,7 +132,8 @@ export const shopSlice = createSlice({
             .addCase(MyProductShop.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
-                state.product = action.payload.data
+                state.product = action.payload.data.product
+                state.lengthProduct = action.payload.data.length_product
             })
             .addCase(MyProductShop.rejected, (state, action) => {
                 state.isLoading = false
