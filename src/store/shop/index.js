@@ -1,4 +1,4 @@
-import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop } from "@/services/shop";
+import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop, HandleOrdering } from "@/services/shop";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 export const getSeller = createAsyncThunk('shopSlice/getSeller', async (params) => {
@@ -33,6 +33,11 @@ export const MyProductShop = createAsyncThunk('shopSlice/MyProductShop', async (
 
 export const PopularAnalysisProduct = createAsyncThunk('shopSlice/PopularAnalysisProduct', async (params) => {
     const response = await PopularAnalysis()
+    return response.data
+})
+
+export const HandleOrderTransaction = createAsyncThunk('shopSlice/HandleOrderTransaction', async (params) => {
+    const response = await HandleOrdering(params)
     return response.data
 })
 
@@ -157,6 +162,17 @@ export const shopSlice = createSlice({
             .addCase(PopularAnalysisProduct.rejected, (state, action) => {
                 state.isLoading = false
                 state.error = action.error.message
+            })
+            .addCase(HandleOrderTransaction.pending, (state) => {
+                state.isLoading = true
+                state.isSuccess = false
+            })
+            .addCase(HandleOrderTransaction.fulfilled, (state) => {
+                state.isLoading = false
+                state.isSuccess = true
+            })
+            .addCase(HandleOrderTransaction.rejected, (state) => {
+                state.isLoading = false
             })
     }
 })
