@@ -1,16 +1,21 @@
 import { palleteV1 } from "@/assets/css/template"
-import { Box, Container, createTheme, ThemeProvider, Typography, IconButton, Paper, Chip, Divider, Grid2 as Grid, TextField, InputAdornment, Stack, FormControl, InputLabel, Select, MenuItem } from "@mui/material"
+import { Box, Container, createTheme, ThemeProvider, Typography, IconButton, Paper, Chip, Divider, Grid2 as Grid, TextField, InputAdornment, Stack, FormControl, InputLabel, Select, MenuItem, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button } from "@mui/material"
 import { Edit, Visibility, SearchOutlined } from "@mui/icons-material"
 import { withRouter } from "next/router"
 import {Component} from "react"
 import { connect } from "react-redux"
 import { DataGrid } from "@mui/x-data-grid"
+import { Order } from "@/store/shop"
+import dayjs from "dayjs"
 
 class SellerOrder extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            status: 'all'
+            status: 'all',
+            limit: 25,
+            offset: 0,
+            page: 0,
         }
         this.theme = createTheme({
             palette: {
@@ -19,80 +24,19 @@ class SellerOrder extends Component {
         })
     }
 
-    renderDataGrid = () => {
+    UNSAFE_componentWillMount() {
+        const {limit, offset} = this.state
+
+        this.props.Order({limit, offset})
+    }
+
+    UNSAFE_componentWillReceiveProps() {
+        const {shop} = this.props
+    }
+
+    renderFilterMethodOrder = () => {
         const {status} = this.state
-
-        const columns = [
-            {
-                field: 'id',
-                headerName: 'Id',
-            },
-            {
-                field: 'name',
-                headerName: 'Nama',
-                width: 500,
-            },
-            {
-                field: 'price',
-                headerName: 'Harga',
-                width: 150,
-            },
-            {
-                field: 'stock',
-                headerName: 'Stok',
-                width: 150,
-            },
-            {
-                field: 'status',
-                headerName: 'Status',
-                width: 100,
-                renderCell: (params) => (
-                    <Chip 
-                        label={params.value}
-                        color={
-                            params.value === "pending" ? 'info' :
-                            params.value === "delivery" ? 'warning' :
-                            params.value === "success" ? 'success' :
-                            'default'
-                        }
-                    />
-                )
-            },
-            ,{
-                field: 'action',
-                headerName: 'Aksi',
-                width: 100,
-                renderCell: (params) => (
-                    <IconButton size="small">
-                        <Visibility fontSize="small"/>
-                    </IconButton>
-                )
-            }
-        ]
-
-        const rows = [
-            {
-                id: 0,
-                name: 'Handphone',
-                price: 2000,
-                stock: 100,
-                status: 'pending'
-            },
-            {
-                id: 1,
-                name: 'Test 12',
-                price: 10000,
-                stock: 100,
-                status: 'delivery'
-            },
-            {
-                id: 2,
-                name: 'asdasd',
-                price: 10000,
-                stock: 100,
-                status: 'success'
-            },
-        ]
+        const {shop} = this.props
 
         const statuses = [
             'all',
@@ -105,7 +49,7 @@ class SellerOrder extends Component {
             <Paper
                 sx={{
                     p: 2,
-                    marginY: 2
+                    marginBottom: 2
                 }}
             >
                 <Grid container>
@@ -146,25 +90,164 @@ class SellerOrder extends Component {
                         </FormControl>
                     </Grid>
                 </Grid>
-                <Divider sx={{marginY: 2}}/>
-                <DataGrid
-                    rows={rows}
-                    columns={columns}
-                    initialState={{
-                        pagination: {
-                            paginationModel: {
-                                pageSize: 25,
-                            },
-                        },
-                    }}
-                    pageSizeOptions={[10, 25, 50, 100]}
-                    // checkboxSelection
-                    columnVisibilityModel={{
-                        id: false,
-                    }}
-                />
             </Paper>
         )
+    }
+
+    renderDataGrid = () => {
+        const {status} = this.state
+        const {shop} = this.props
+
+        return (
+            <Paper
+                sx={{
+                    marginY: 2
+                }}
+                elevation={0}
+            >
+                {
+                    shop.order.length != 0 ?
+                        shop.order.map((order, index) => (
+                            <Paper
+                                key={index}
+                                sx={{
+                                    p: 2
+                                }}
+                                elevation={1}
+                            >
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'space-between'
+                                    }}
+                                >
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Pesanan: </Typography>
+                                        <Typography variant="h6">{order.transactionToShipment.shipmentToDelivery.deliveryToAddress.receiver}</Typography>
+                                    </Box>
+                                    <Stack
+                                        direction={'row'}
+                                        divider={<Divider flexItem orientation="vertical"/>}
+                                        spacing={2}
+                                    >
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Tanggal tenggat: </Typography>
+                                            <Typography variant="h6">{dayjs(new Date().setDate(new Date(order.transactionToShipment.end_date).getDate() - 2)).format('DD-MM-YYYY')}</Typography>
+                                        </Box>
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                alignItems: 'center'
+                                            }}
+                                        >
+                                            <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Status: </Typography>
+                                            <Chip {...this.handleAttributeChipStatus(order.transactionToPayment.status)}/>
+                                        </Box>
+                                    </Stack>
+                                </Box>
+                                <Divider sx={{marginY: 2}}/>
+                                <TableContainer component={Paper}>
+                                    <Table>
+                                        <TableHead>
+                                            <TableRow>
+                                                <TableCell>
+                                                    <Typography variant="h6">No.</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Nama</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Varian</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Kuantitas</Typography>
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Typography variant="h6">Catatan</Typography>
+                                                </TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {
+                                                order.transactionToTrolley.map((product, index) => (
+                                                    <TableRow key={index}>
+                                                        <TableCell>
+                                                            {index + 1}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {product.trolleyToProduct.name}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            -
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            {product.items}
+                                                        </TableCell>
+                                                        <TableCell>
+                                                            -
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))
+                                            }
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'end',
+                                        marginTop: 2
+                                    }}
+                                >
+                                    <Stack
+                                        spacing={2}
+                                        direction={'row'}
+                                        divider={<Divider orientation="vertical" flexItem />}
+                                    >
+                                        <Button
+                                            variant="text"
+                                        >
+                                            Tujuan pengiriman
+                                        </Button>
+                                        <Button
+                                            variant="text"
+                                        >
+                                            Lihat Selengkapnya
+                                        </Button>
+                                    </Stack>
+                                </Box>
+                            </Paper>
+                        ))
+                    : (
+                        <Paper
+                            sx={{
+                                p: 2
+                            }}
+                        >
+                            <Typography variant="h6" fontWeight={600} textAlign={'center'}>Tidak ada pesanan</Typography>
+                        </Paper>
+                    )
+                }
+            </Paper>
+        )
+    }
+
+    handleAttributeChipStatus = (status) => {
+        return {
+            label: status === 'settlement' ? 'proses' : status === 'delivery' ? 'diantar' : status === 'expired' ? 'kadaluarsa' : status === 'success' ? 'diterima' : 'menunggu',
+            color: status === 'settlement' ? 'primary' : status === 'delivery' ? 'warning' : status === 'expired' ? 'error' : status === 'success' ? 'success' : 'default',
+        }
     }
 
     handleFilterStatus = (event) => {
@@ -178,7 +261,8 @@ class SellerOrder extends Component {
         return (
             <ThemeProvider theme={this.theme}>
                 <Container>
-                    <Typography variant="h4" fontWeight={600}>Pesanan</Typography>
+                    <Typography variant="h4" fontWeight={600} sx={{marginBottom: 2}}>Pesanan</Typography>
+                    {this.renderFilterMethodOrder()}
                     {this.renderDataGrid()}
                 </Container>
             </ThemeProvider>
@@ -187,11 +271,25 @@ class SellerOrder extends Component {
 }
 
 const mapStateToProps = (state) => ({
-
+    shop: {
+        isLoading: state.shop.isLoading,
+        isSuccess: state.shop.isSuccess,
+        seller: state.shop.seller,
+        balance: state.shop.balanceInformation.balance,
+        transaction: state.shop.balanceInformation.history,
+        inTrolley: state.shop.LengthProductInTrolley,
+        order: state.shop.orderTabel.data,
+        lengthDataOrder: state.shop.orderTabel.lenght,
+        lengthDataOrderUnProcess: state.shop.lengthOrderUnProccess,
+        product: state.shop.product,
+        lengthProduct: state.shop.lengthProduct,
+        popularProduct: state.shop.popularProduct,
+        error: state.shop.error
+    }
 })
 
 const mapDispatchToProps = {
-
+    Order
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerOrder))
