@@ -50,3 +50,10 @@ export const PopularAnalysis = () => {
         endpoints.PRODUCTS.POPULAR
     )
 }
+
+export const HandleOrdering = (params) => {
+    return apiServiceV1.post(
+        endpoints.STORE.HANDLEORDER,
+        params
+    )
+}
