@@ -55,6 +55,7 @@ export default {
         BALANCE: '/store/balance',
         INTROLLEY: '/store/introlley',
         ORDER: '/store/order',
+        HANDLEORDER: '/store/order/handle',
         OPERATION: '/store/operation',
     },
     TEST: '/test',
