@@ -123,9 +123,9 @@ export const shopSlice = createSlice({
             .addCase(Order.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccess = true
-                state.orderTabel.data = action.payload.transaction
-                state.orderTabel.lenght = action.payload.length_order_process
-                state.lengthOrderUnProccess = action.payload.length_order_process
+                state.orderTabel.data = action.payload.data.transaction
+                state.orderTabel.lenght = action.payload.data.length_order_process
+                state.lengthOrderUnProccess = action.payload.data.length_order_process
             })
             .addCase(Order.rejected, (state, action) => {
                 state.isLoading = false
