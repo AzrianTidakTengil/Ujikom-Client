@@ -165,7 +165,7 @@ class SellerOrder extends Component {
                                             }}
                                         >
                                             <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Tanggal tenggat: </Typography>
-                                            <Typography variant="h6">{dayjs(new Date().setDate(new Date(order.transactionToShipment.end_date).getDate() - 2)).format('DD-MM-YYYY')}</Typography>
+                                            <Typography variant="h6">{this.handleDateByStatus(order.transactionToShipment.end_date, order.transactionToPayment.status)}</Typography>
                                         </Box>
                                         {/* <Box
                                             sx={{
@@ -302,6 +302,15 @@ class SellerOrder extends Component {
             id,
             status
         })
+    }
+
+    handleDateByStatus = (date, status) => {
+        switch(status) {
+            case 'settlement':
+                return dayjs(new Date().setDate(new Date(date).getDate() - 2)).format('DD-MM-YYYY')
+            default:
+                return dayjs(new Date().setDate(new Date(date).getDate())).format('DD-MM-YYYY')
+        }
     }
 
     render() {
