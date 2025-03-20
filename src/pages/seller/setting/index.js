@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { ImageInput, TimePick, TimePicker } from "@/components";
-import { getSeller } from "@/store/shop";
+import { getSeller, OperationShop } from "@/store/shop";
 import { ExpandMore } from '@mui/icons-material';
 import { Accordion, Box, createTheme, ThemeProvider, Typography, Grid2 as Grid, Paper, TextField, Button, AccordionSummary, AccordionDetails, Container, Stack, Divider, FormGroup, FormControlLabel, Switch, Autocomplete } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -32,6 +32,7 @@ class SellerSetting extends Component {
 
     UNSAFE_componentWillMount() {
         this.props.getSeller()
+        this.props.OperationShop()
     }
 
     UNSAFE_componentWillReceiveProps() {
@@ -377,7 +378,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-    getSeller
+    getSeller,
+    OperationShop
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerSetting))
