@@ -5,7 +5,7 @@ import { withRouter } from "next/router"
 import {Component} from "react"
 import { connect } from "react-redux"
 import { DataGrid } from "@mui/x-data-grid"
-import { Order } from "@/store/shop"
+import { HandleOrderTransaction, Order } from "@/store/shop"
 import dayjs from "dayjs"
 
 class SellerOrder extends Component {
@@ -83,7 +83,7 @@ class SellerOrder extends Component {
                             >
                                 {
                                     statuses.map((val) => (
-                                        <MenuItem value={val}>{val}</MenuItem>
+                                        <MenuItem value={val} key={val}>{val}</MenuItem>
                                     ))
                                 }
                             </Select>
@@ -206,7 +206,8 @@ class SellerOrder extends Component {
                                 <Box
                                     sx={{
                                         display: 'flex',
-                                        justifyContent: 'end',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
                                         marginTop: 2
                                     }}
                                 >
@@ -224,6 +225,26 @@ class SellerOrder extends Component {
                                             variant="text"
                                         >
                                             Lihat Selengkapnya
+                                        </Button>
+                                    </Stack>
+                                    <Stack
+                                        spacing={2}
+                                        direction={'row'}
+                                        divider={<Divider orientation="vertical" flexItem />}
+                                    >
+                                        <Button
+                                            variant="outlined"
+                                            color="error"
+                                            onClick={() => this.handleOrderingStatus(order.id, 'rejected')}
+                                        >
+                                            Tolak
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="success"
+                                            onClick={() => this.handleOrderingStatus(order.id, 'approved')}
+                                        >
+                                            Terima
                                         </Button>
                                     </Stack>
                                 </Box>
@@ -248,6 +269,13 @@ class SellerOrder extends Component {
             label: status === 'settlement' ? 'proses' : status === 'delivery' ? 'diantar' : status === 'expired' ? 'kadaluarsa' : status === 'success' ? 'diterima' : 'menunggu',
             color: status === 'settlement' ? 'primary' : status === 'delivery' ? 'warning' : status === 'expired' ? 'error' : status === 'success' ? 'success' : 'default',
         }
+    }
+
+    handleOrderingStatus = (id, status) => {
+        this.props.HandleOrderTransaction({
+            id,
+            status
+        })
     }
 
     handleFilterStatus = (event) => {
@@ -289,7 +317,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-    Order
+    Order,
+    HandleOrderTransaction
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerOrder))
