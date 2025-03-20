@@ -25,9 +25,9 @@ class SellerOrder extends Component {
     }
 
     UNSAFE_componentWillMount() {
-        const {limit, offset} = this.state
+        const {limit, offset, status} = this.state
 
-        this.props.Order({limit, offset})
+        this.props.Order({limit, offset, status})
     }
 
     UNSAFE_componentWillReceiveProps() {
@@ -96,8 +96,8 @@ class SellerOrder extends Component {
                                 value={status}
                             >
                                 {
-                                    statuses.map((val) => (
-                                        <MenuItem value={val.value} key={val} sx={{textTransform: 'capitalize'}}>{val.label}</MenuItem>
+                                    statuses.map((val, index) => (
+                                        <MenuItem value={val.value} key={index} sx={{textTransform: 'capitalize'}}>{val.label}</MenuItem>
                                     ))
                                 }
                             </Select>
@@ -159,7 +159,7 @@ class SellerOrder extends Component {
                                             <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Tanggal tenggat: </Typography>
                                             <Typography variant="h6">{dayjs(new Date().setDate(new Date(order.transactionToShipment.end_date).getDate() - 2)).format('DD-MM-YYYY')}</Typography>
                                         </Box>
-                                        <Box
+                                        {/* <Box
                                             sx={{
                                                 display: 'flex',
                                                 alignItems: 'center'
@@ -167,7 +167,7 @@ class SellerOrder extends Component {
                                         >
                                             <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Status: </Typography>
                                             <Chip {...this.handleAttributeChipStatus(order.transactionToPayment.status)}/>
-                                        </Box>
+                                        </Box> */}
                                     </Stack>
                                 </Box>
                                 <Divider sx={{marginY: 2}}/>
@@ -241,26 +241,30 @@ class SellerOrder extends Component {
                                             Lihat Selengkapnya
                                         </Button>
                                     </Stack>
-                                    <Stack
-                                        spacing={2}
-                                        direction={'row'}
-                                        divider={<Divider orientation="vertical" flexItem />}
-                                    >
-                                        <Button
-                                            variant="outlined"
-                                            color="error"
-                                            onClick={() => this.handleOrderingStatus(order.id, 'rejected')}
-                                        >
-                                            Tolak
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="success"
-                                            onClick={() => this.handleOrderingStatus(order.id, 'approved')}
-                                        >
-                                            Terima
-                                        </Button>
-                                    </Stack>
+                                    {
+                                        order.transactionToPayment.status === 'settlement' ? (
+                                            <Stack
+                                                spacing={2}
+                                                direction={'row'}
+                                                divider={<Divider orientation="vertical" flexItem />}
+                                            >
+                                                <Button
+                                                    variant="outlined"
+                                                    color="error"
+                                                    onClick={() => this.handleOrderingStatus(order.id, 'rejected')}
+                                                >
+                                                    Tolak
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    color="success"
+                                                    onClick={() => this.handleOrderingStatus(order.id, 'approved')}
+                                                >
+                                                    Terima
+                                                </Button>
+                                            </Stack>
+                                        ) : ''
+                                    }
                                 </Box>
                             </Paper>
                         ))
@@ -293,10 +297,11 @@ class SellerOrder extends Component {
     }
 
     handleFilterStatus = (event) => {
-        console.log(event.target.value)
+        const {limit, offset, status} = this.state
         this.setState({
             status: event.target.value
         })
+        this.props.Order({limit, offset, status: event.target.value})
     }
 
     render() {
