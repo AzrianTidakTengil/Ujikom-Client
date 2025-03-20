@@ -1,5 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { ImageInput, TimePick, TimePicker } from "@/components";
+import { getSeller } from "@/store/shop";
 import { ExpandMore } from '@mui/icons-material';
 import { Accordion, Box, createTheme, ThemeProvider, Typography, Grid2 as Grid, Paper, TextField, Button, AccordionSummary, AccordionDetails, Container, Stack, Divider, FormGroup, FormControlLabel, Switch, Autocomplete } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -29,8 +30,25 @@ class SellerSetting extends Component {
         })
     }
 
+    UNSAFE_componentWillMount() {
+        this.props.getSeller()
+    }
+
+    UNSAFE_componentWillReceiveProps() {
+        const {shop} = this.props
+
+        if (shop.isSuccess) {
+            this.setState({
+                information: {
+                    name: shop.seller.name,
+                    description: shop.seller.description
+                }
+            })
+        }
+    }
+
     renderInformation = () => {
-        const {form} = this.state
+        const {information} = this.state
 
         return (
             <Box
@@ -41,6 +59,7 @@ class SellerSetting extends Component {
                 <form>
                     <Grid container>
                         <Grid size={5}>
+                            <Typography variant="body1" textAlign={'center'} textTransform={'capitalize'} sx={{marginBottom: 2}}>Foto profile toko</Typography>
                             <ImageInput/>
                         </Grid>
                         <Grid size={7}>
@@ -53,6 +72,7 @@ class SellerSetting extends Component {
                                     sx={{
                                         marginY: 1
                                     }}
+                                    value={information.name}
                                 />
                             </Box>
                             <Box
@@ -67,6 +87,7 @@ class SellerSetting extends Component {
                                     }}
                                 >
                                     <TextField
+                                        value={information.description}
                                         name="description"
                                         maxLength={50000}
                                         fullWidth
@@ -85,7 +106,7 @@ class SellerSetting extends Component {
                                         fontSize="0.75rem"
                                         color="gray"
                                     >
-                                        {`${form.description.length} / 50000`}
+                                        {`${information.description.length} / 50000`}
                                     </Box>
                                 </Box>
                             </Box>
@@ -338,11 +359,25 @@ class SellerSetting extends Component {
 }
 
 const mapStateToProps = (state) => ({
-
+    shop: {
+        isLoading: state.shop.isLoading,
+        isSuccess: state.shop.isSuccess,
+        seller: state.shop.seller,
+        balance: state.shop.balanceInformation.balance,
+        transaction: state.shop.balanceInformation.history,
+        inTrolley: state.shop.LengthProductInTrolley,
+        order: state.shop.orderTabel.data,
+        lengthDataOrder: state.shop.orderTabel.lenght,
+        lengthDataOrderUnProcess: state.shop.lengthOrderUnProccess,
+        product: state.shop.product,
+        lengthProduct: state.shop.lengthProduct,
+        popularProduct: state.shop.popularProduct,
+        error: state.shop.error
+    }
 })
 
 const mapDispatchToProps = {
-
+    getSeller
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerSetting))
