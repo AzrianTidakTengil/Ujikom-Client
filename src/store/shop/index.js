@@ -41,6 +41,11 @@ export const HandleOrderTransaction = createAsyncThunk('shopSlice/HandleOrderTra
     return response.data
 })
 
+export const OperationShop = createAsyncThunk('shopSlice/OperationShop', async (params) => {
+    const response = await Operaion()
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     isSuccess: false,
@@ -58,6 +63,7 @@ const initialState = {
     product: [],
     lengthProduct: 0,
     popularProduct: [],
+    operation: [],
     error: null
 }
 
@@ -173,6 +179,19 @@ export const shopSlice = createSlice({
             })
             .addCase(HandleOrderTransaction.rejected, (state) => {
                 state.isLoading = false
+            })
+            .addCase(OperationShop.pending, (state) => {
+                state.isLoading = true,
+                state.isSuccess = false
+            })
+            .addCase(OperationShop.rejected, (state, action) => {
+                state.isLoading = false,
+                state.error = action.error.message
+            })
+            .addCase(OperationShop.fulfilled, (state, action) => {
+                state.isLoading = false,
+                state.isSuccess = true,
+                state.operation = action.payload.data
             })
     }
 })
