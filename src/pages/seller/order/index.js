@@ -12,7 +12,7 @@ class SellerOrder extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            status: 'all',
+            status: 'settlement',
             limit: 25,
             offset: 0,
             page: 0,
@@ -39,10 +39,26 @@ class SellerOrder extends Component {
         const {shop} = this.props
 
         const statuses = [
-            'all',
-            'pending',
-            'delivery',
-            'success'
+            {
+                value: 'settlement',
+                label: 'Menunggu Konfirmasi'
+            },
+            {
+                value: 'approved',
+                label: 'sedang proses'
+            },
+            {
+                value: 'delivery',
+                label: 'sedang diantar'
+            },
+            {
+                value: 'success',
+                label: 'berhasil sampai'
+            },
+            {
+                value: 'rejectedBySeller',
+                label: 'ditolak'
+            },
         ]
 
         return (
@@ -73,17 +89,15 @@ class SellerOrder extends Component {
                         <FormControl
                             fullWidth
                             size="small"
-                            value={status}
+                            sx={{textTransform: 'capitalize'}}
                         >
-                            <InputLabel>
-                                Status
-                            </InputLabel>
                             <Select
                                 onChange={this.handleFilterStatus}
+                                value={status}
                             >
                                 {
                                     statuses.map((val) => (
-                                        <MenuItem value={val} key={val}>{val}</MenuItem>
+                                        <MenuItem value={val.value} key={val} sx={{textTransform: 'capitalize'}}>{val.label}</MenuItem>
                                     ))
                                 }
                             </Select>
