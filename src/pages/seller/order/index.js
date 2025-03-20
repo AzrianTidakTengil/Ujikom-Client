@@ -5,14 +5,14 @@ import { withRouter } from "next/router"
 import {Component} from "react"
 import { connect } from "react-redux"
 import { DataGrid } from "@mui/x-data-grid"
-import { Order } from "@/store/shop"
+import { HandleOrderTransaction, Order } from "@/store/shop"
 import dayjs from "dayjs"
 
 class SellerOrder extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            status: 'all',
+            status: 'settlement',
             limit: 25,
             offset: 0,
             page: 0,
@@ -25,9 +25,9 @@ class SellerOrder extends Component {
     }
 
     UNSAFE_componentWillMount() {
-        const {limit, offset} = this.state
+        const {limit, offset, status} = this.state
 
-        this.props.Order({limit, offset})
+        this.props.Order({limit, offset, status})
     }
 
     UNSAFE_componentWillReceiveProps() {
@@ -39,10 +39,26 @@ class SellerOrder extends Component {
         const {shop} = this.props
 
         const statuses = [
-            'all',
-            'pending',
-            'delivery',
-            'success'
+            {
+                value: 'settlement',
+                label: 'Menunggu Konfirmasi'
+            },
+            {
+                value: 'approved',
+                label: 'sedang proses'
+            },
+            {
+                value: 'delivery',
+                label: 'sedang diantar'
+            },
+            {
+                value: 'success',
+                label: 'berhasil sampai'
+            },
+            {
+                value: 'rejectedBySeller',
+                label: 'ditolak'
+            },
         ]
 
         return (
@@ -73,17 +89,15 @@ class SellerOrder extends Component {
                         <FormControl
                             fullWidth
                             size="small"
-                            value={status}
+                            sx={{textTransform: 'capitalize'}}
                         >
-                            <InputLabel>
-                                Status
-                            </InputLabel>
                             <Select
                                 onChange={this.handleFilterStatus}
+                                value={status}
                             >
                                 {
-                                    statuses.map((val) => (
-                                        <MenuItem value={val}>{val}</MenuItem>
+                                    statuses.map((val, index) => (
+                                        <MenuItem value={val.value} key={index} sx={{textTransform: 'capitalize'}}>{val.label}</MenuItem>
                                     ))
                                 }
                             </Select>
@@ -92,6 +106,14 @@ class SellerOrder extends Component {
                 </Grid>
             </Paper>
         )
+    }
+
+    handleFilterStatus = (event) => {
+        const {limit, offset, status} = this.state
+        this.setState({
+            status: event.target.value
+        })
+        this.props.Order({limit, offset, status: event.target.value})
     }
 
     renderDataGrid = () => {
@@ -143,9 +165,9 @@ class SellerOrder extends Component {
                                             }}
                                         >
                                             <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Tanggal tenggat: </Typography>
-                                            <Typography variant="h6">{dayjs(new Date().setDate(new Date(order.transactionToShipment.end_date).getDate() - 2)).format('DD-MM-YYYY')}</Typography>
+                                            <Typography variant="h6">{this.handleDateByStatus(order.transactionToShipment.end_date, order.transactionToPayment.status)}</Typography>
                                         </Box>
-                                        <Box
+                                        {/* <Box
                                             sx={{
                                                 display: 'flex',
                                                 alignItems: 'center'
@@ -153,7 +175,7 @@ class SellerOrder extends Component {
                                         >
                                             <Typography variant="body1" color="gray" sx={{marginRight: 2}}>Status: </Typography>
                                             <Chip {...this.handleAttributeChipStatus(order.transactionToPayment.status)}/>
-                                        </Box>
+                                        </Box> */}
                                     </Stack>
                                 </Box>
                                 <Divider sx={{marginY: 2}}/>
@@ -206,7 +228,8 @@ class SellerOrder extends Component {
                                 <Box
                                     sx={{
                                         display: 'flex',
-                                        justifyContent: 'end',
+                                        justifyContent: 'space-between',
+                                        alignItems: 'center',
                                         marginTop: 2
                                     }}
                                 >
@@ -226,6 +249,30 @@ class SellerOrder extends Component {
                                             Lihat Selengkapnya
                                         </Button>
                                     </Stack>
+                                    {
+                                        order.transactionToPayment.status === 'settlement' ? (
+                                            <Stack
+                                                spacing={2}
+                                                direction={'row'}
+                                                divider={<Divider orientation="vertical" flexItem />}
+                                            >
+                                                <Button
+                                                    variant="outlined"
+                                                    color="error"
+                                                    onClick={() => this.handleOrderingStatus(order.id, 'rejected')}
+                                                >
+                                                    Tolak
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    color="success"
+                                                    onClick={() => this.handleOrderingStatus(order.id, 'approved')}
+                                                >
+                                                    Terima
+                                                </Button>
+                                            </Stack>
+                                        ) : ''
+                                    }
                                 </Box>
                             </Paper>
                         ))
@@ -245,16 +292,25 @@ class SellerOrder extends Component {
 
     handleAttributeChipStatus = (status) => {
         return {
-            label: status === 'settlement' ? 'proses' : status === 'delivery' ? 'diantar' : status === 'expired' ? 'kadaluarsa' : status === 'success' ? 'diterima' : 'menunggu',
-            color: status === 'settlement' ? 'primary' : status === 'delivery' ? 'warning' : status === 'expired' ? 'error' : status === 'success' ? 'success' : 'default',
+            label: status === 'settlement' ? 'menunggu konfirmasi' : status === 'onSeller' ? 'sedang proses' : status === 'delivery' ? 'sedang diantar' : status === 'expired' ? 'kadaluarsa' : status === 'rejectedBySeller' ? 'ditolak' : status === 'success' ? 'diterima' : 'menunggu',
+            color: status === 'settlement' ? 'warning' : status === 'onSeller' ? 'primary' : status === 'delivery' ? 'info' : status === 'expired' ? 'error' : status === 'rejectedBySeller' ? 'error' : status === 'success' ? 'success' : 'default',
         }
     }
 
-    handleFilterStatus = (event) => {
-        console.log(event.target.value)
-        this.setState({
-            status: event.target.value
+    handleOrderingStatus = (id, status) => {
+        this.props.HandleOrderTransaction({
+            id,
+            status
         })
+    }
+
+    handleDateByStatus = (date, status) => {
+        switch(status) {
+            case 'settlement':
+                return dayjs(new Date().setDate(new Date(date).getDate() - 2)).format('DD-MM-YYYY')
+            default:
+                return dayjs(new Date().setDate(new Date(date).getDate())).format('DD-MM-YYYY')
+        }
     }
 
     render() {
@@ -289,7 +345,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-    Order
+    Order,
+    HandleOrderTransaction
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerOrder))
