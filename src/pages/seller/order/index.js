@@ -108,6 +108,14 @@ class SellerOrder extends Component {
         )
     }
 
+    handleFilterStatus = (event) => {
+        const {limit, offset, status} = this.state
+        this.setState({
+            status: event.target.value
+        })
+        this.props.Order({limit, offset, status: event.target.value})
+    }
+
     renderDataGrid = () => {
         const {status} = this.state
         const {shop} = this.props
@@ -294,14 +302,6 @@ class SellerOrder extends Component {
             id,
             status
         })
-    }
-
-    handleFilterStatus = (event) => {
-        const {limit, offset, status} = this.state
-        this.setState({
-            status: event.target.value
-        })
-        this.props.Order({limit, offset, status: event.target.value})
     }
 
     render() {
