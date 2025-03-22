@@ -63,3 +63,10 @@ export const GetShopAddress = (params) => {
         endpoints.STORE.ADDRESS.GET
     )
 }
+
+export const CreateOrUpdateShopAddress = (params) => {
+    return apiServiceV1.post(
+        endpoints.STORE.ADDRESS.CRETEORUPDATE,
+        params
+    )
+}
