@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { ImageInput, TimePick, TimePicker } from "@/components";
-import { getSeller, OperationShop } from "@/store/shop";
+import { getSeller, OperationShop, ShopAddress } from "@/store/shop";
 import { ExpandMore } from '@mui/icons-material';
 import { Accordion, Box, createTheme, ThemeProvider, Typography, Grid2 as Grid, Paper, TextField, Button, AccordionSummary, AccordionDetails, Container, Stack, Divider, FormGroup, FormControlLabel, Switch, Autocomplete } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -9,6 +9,7 @@ import { withRouter } from "next/router";
 import {Component} from "react";
 import { NumericFormat } from "react-number-format";
 import { connect } from "react-redux";
+import ShopMessage from '@/store/shop/message'
 
 class SellerSetting extends Component {
     constructor(props) {
@@ -21,6 +22,16 @@ class SellerSetting extends Component {
             form: {
                 name: '',
                 description: '',
+            },
+            address: {
+                address: '',
+                district: '',
+                city: '',
+                province: '',
+                country: '',
+                postal_code: '',
+                latitude: '',
+                longtitude: ''
             }
         }
         this.theme = createTheme({
@@ -33,6 +44,7 @@ class SellerSetting extends Component {
     UNSAFE_componentWillMount() {
         this.props.getSeller()
         this.props.OperationShop()
+        this.props.ShopAddress()
     }
 
     UNSAFE_componentWillReceiveProps() {
@@ -43,6 +55,21 @@ class SellerSetting extends Component {
                 information: {
                     name: shop.seller.name,
                     description: shop.seller.description
+                }
+            })
+        }
+
+        if (shop.isSuccess && shop.message === ShopMessage.STORE.ADDRESS.GET) {
+            this.setState({
+                address: {
+                    address: shop.address.address,
+                    district: shop.address.district,
+                    city: shop.address.city,
+                    province: shop.address.province,
+                    country: shop.address.country,
+                    postal_code: shop.address.postal_code,
+                    latitude: shop.address.latitude,
+                    longtitude: shop.address.longtitude,
                 }
             })
         }
@@ -218,6 +245,8 @@ class SellerSetting extends Component {
     }
 
     renderLocationShop = () => {
+        const {address} = this.state
+
         const optionType = [
             {
                 value: 'color',
@@ -251,6 +280,7 @@ class SellerSetting extends Component {
                             variant='outlined'
                             size="small"
                             fullWidth
+                            value={address.address}
                             sx={{
                                 marginY: 1
                             }}
@@ -373,13 +403,16 @@ const mapStateToProps = (state) => ({
         product: state.shop.product,
         lengthProduct: state.shop.lengthProduct,
         popularProduct: state.shop.popularProduct,
+        address: state.shop.address,
+        message: state.shop.message,
         error: state.shop.error
     }
 })
 
 const mapDispatchToProps = {
     getSeller,
-    OperationShop
+    OperationShop,
+    ShopAddress
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerSetting))
