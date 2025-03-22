@@ -1,5 +1,6 @@
-import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop, HandleOrdering } from "@/services/shop";
+import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop, HandleOrdering, GetShopAddress } from "@/services/shop";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import message from './message'
 
 export const getSeller = createAsyncThunk('shopSlice/getSeller', async (params) => {
     const response = await BySeller()
@@ -46,6 +47,11 @@ export const OperationShop = createAsyncThunk('shopSlice/OperationShop', async (
     return response.data
 })
 
+export const ShopAddress = createAsyncThunk('shopSlice/ShopAddress', async (params) => {
+    const response = await GetShopAddress()
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     isSuccess: false,
@@ -64,6 +70,8 @@ const initialState = {
     lengthProduct: 0,
     popularProduct: [],
     operation: [],
+    address: {},
+    message: '',
     error: null
 }
 
@@ -192,6 +200,23 @@ export const shopSlice = createSlice({
                 state.isLoading = false,
                 state.isSuccess = true,
                 state.operation = action.payload.data
+            })
+            .addCase(ShopAddress.pending, (state) => {
+                state.isLoading = true,
+                state.isSuccess = false
+                state.message = message.STORE.ADDRESS.GET
+            })
+            .addCase(ShopAddress.rejected, (state, action) => {
+                state.isLoading = false,
+                state.isSuccess = false
+                state.message = message.STORE.ADDRESS.GET
+                state.error = action.error.message
+            })
+            .addCase(ShopAddress.fulfilled, (state, action) => {
+                state.isLoading = false,
+                state.isSuccess = true
+                state.message = message.STORE.ADDRESS.GET
+                state.address = {...action.payload.data.shopToAddress}
             })
     }
 })
