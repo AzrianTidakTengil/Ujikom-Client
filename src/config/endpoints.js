@@ -57,6 +57,10 @@ export default {
         ORDER: '/store/order',
         HANDLEORDER: '/store/order/handle',
         OPERATION: '/store/operation',
+        ADDRESS: {
+            GET: '/store/address',
+            CRETEORUPDATE: 'store/address/edit'
+        },
     },
     TEST: '/test',
     USER: {
