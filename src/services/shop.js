@@ -57,3 +57,16 @@ export const HandleOrdering = (params) => {
         params
     )
 }
+
+export const GetShopAddress = (params) => {
+    return apiServiceV1.get(
+        endpoints.STORE.ADDRESS.GET
+    )
+}
+
+export const CreateOrUpdateShopAddress = (params) => {
+    return apiServiceV1.post(
+        endpoints.STORE.ADDRESS.CRETEORUPDATE,
+        params
+    )
+}
