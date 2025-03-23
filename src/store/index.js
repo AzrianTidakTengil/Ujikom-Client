@@ -6,6 +6,7 @@ import trolleyReducer from './trolley'
 import transactionReducer from './transaction'
 import addressReducer from './address'
 import shopReducer from './shop'
+import regionReducer from './region'
 
 const store = configureStore({
     reducer: {
@@ -15,7 +16,8 @@ const store = configureStore({
         trolley: trolleyReducer,
         transaction: transactionReducer,
         address: addressReducer,
-        shop: shopReducer
+        shop: shopReducer,
+        region: regionReducer,
     },
 })
 
