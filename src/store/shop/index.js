@@ -1,4 +1,4 @@
-import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop, HandleOrdering, GetShopAddress } from "@/services/shop";
+import { Balance, BySeller, InTrolley, Operaion, PopularAnalysis, ProductShop, UpdateShop, Order as OrderShop, HandleOrdering, GetShopAddress, CreateOrUpdateShopAddress } from "@/services/shop";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import message from './message'
 
@@ -49,6 +49,11 @@ export const OperationShop = createAsyncThunk('shopSlice/OperationShop', async (
 
 export const ShopAddress = createAsyncThunk('shopSlice/ShopAddress', async (params) => {
     const response = await GetShopAddress()
+    return response.data
+})
+
+export const UpdateAddressShop = createAsyncThunk('shopSlice/CreateOrUpdateShopAddress', async (params) => {
+    const response = await CreateOrUpdateShopAddress(params)
     return response.data
 })
 
@@ -217,6 +222,16 @@ export const shopSlice = createSlice({
                 state.isSuccess = true
                 state.message = message.STORE.ADDRESS.GET
                 state.address = {...action.payload.data.shopToAddress}
+            })
+            .addCase(UpdateAddressShop.pending, (state) => {
+                state.isLoading = true
+                state.isSuccess = false
+                state.message = ''
+            })
+            .addCase(UpdateAddressShop.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.message = message.STORE.ADDRESS.CRETEORUPDATE
             })
     }
 })
