@@ -10,6 +10,9 @@ import {Component} from "react";
 import { NumericFormat } from "react-number-format";
 import { connect } from "react-redux";
 import ShopMessage from '@/store/shop/message'
+import RegionMessage from '@/store/region/message'
+import { GetCities, GetDistrict, GetProvinces } from "@/store/region";
+import { City, District } from "@/services/region";
 
 class SellerSetting extends Component {
     constructor(props) {
@@ -32,7 +35,15 @@ class SellerSetting extends Component {
                 postal_code: '',
                 latitude: '',
                 longtitude: ''
-            }
+            },
+            selectAddres: {
+                province: '',
+                city: '',
+                district: ''
+            },
+            provinces: [],
+            cities: [],
+            districts: [],
         }
         this.theme = createTheme({
             palette: {
@@ -45,10 +56,11 @@ class SellerSetting extends Component {
         this.props.getSeller()
         this.props.OperationShop()
         this.props.ShopAddress()
+        this.props.GetProvinces()
     }
 
     UNSAFE_componentWillReceiveProps() {
-        const {shop} = this.props
+        const {shop, region} = this.props
 
         if (shop.isSuccess) {
             this.setState({
@@ -71,6 +83,19 @@ class SellerSetting extends Component {
                     latitude: shop.address.latitude,
                     longtitude: shop.address.longtitude,
                 }
+            })
+        }
+
+        if (region.message == RegionMessage.REGION.PROVINCES) {
+            this.setState({
+                provinces: region.provinces
+            })
+        }
+
+        if (region.message == RegionMessage.REGION.CITIES) {
+            console.log(region.cities)
+            this.setState({
+                cities: region.cities
             })
         }
     }
@@ -245,22 +270,7 @@ class SellerSetting extends Component {
     }
 
     renderLocationShop = () => {
-        const {address} = this.state
-
-        const optionType = [
-            {
-                value: 'color',
-                title: 'Warna'
-            },
-            {
-                value: 'size',
-                title: 'Ukuran'
-            },
-            {
-                value: 'pack',
-                title: 'Kemasan'
-            },
-        ]
+        const {address, provinces, cities, selectAddres, districts} = this.state
 
 
         return (
@@ -291,11 +301,43 @@ class SellerSetting extends Component {
                             marginY: 2
                         }}
                     >
-                        <Typography variant='body1'>Kota / Kecamatan</Typography>
+                        <Typography variant='body1'>Provinsi</Typography>
                         <Autocomplete 
                             disableClearable
                             freeSolo
-                            options={optionType.map((option) => option.title)}
+                            options={provinces}
+                            getOptionLabel={(province) => province.name}
+                            renderInput={(params) => {
+                                return (
+                                    <TextField
+                                        {...params}
+                                        slotProps={{
+                                            input: {
+                                                ...params.InputProps,
+                                                type: 'search',
+                                            },
+                                        }}
+                                    />
+                                )
+                            }}
+                            sx={{
+                                marginY: 1,
+                                textTransform: 'capitalize'
+                            }}
+                            onChange={this.handleSelectProvince}
+                        />
+                    </Box>
+                    <Box
+                        sx={{
+                            marginY: 2
+                        }}
+                    >
+                        <Typography variant='body1'>Kota / Kabupaten</Typography>
+                        <Autocomplete 
+                            disableClearable
+                            freeSolo
+                            options={cities}
+                            getOptionLabel={(city) => city.name}
                             renderInput={(params) => {
                                 return (
                                     <TextField
@@ -312,6 +354,39 @@ class SellerSetting extends Component {
                             sx={{
                                 marginY: 1
                             }}
+                            disabled={!selectAddres.province}
+                            loading={!cities}
+                            onChange={this.handleSelectCity}
+                        />
+                    </Box>
+                    <Box
+                        sx={{
+                            marginY: 2
+                        }}
+                    >
+                        <Typography variant='body1'>Kecamatan</Typography>
+                        <Autocomplete 
+                            disableClearable
+                            freeSolo
+                            options={districts}
+                            getOptionLabel={(district) => district.name}
+                            renderInput={(params) => {
+                                return (
+                                    <TextField
+                                        {...params}
+                                        slotProps={{
+                                            input: {
+                                                ...params.InputProps,
+                                                type: 'search',
+                                            },
+                                        }}
+                                    />
+                                )
+                            }}
+                            sx={{
+                                marginY: 1
+                            }}
+                            disabled={!selectAddres.province && !selectAddres.city}
                         />
                     </Box>
                     <Box
@@ -347,6 +422,50 @@ class SellerSetting extends Component {
                 </form>
             </Box>
         )
+    }
+
+    handleSelectProvince = (event, newValue) => {
+        const {id, name} = newValue
+
+        this.setState({
+            selectAddres: {
+                ...this.state.selectAddres,
+                province: id
+            },
+            cities: []
+        })
+
+        this.serviceGetCity({province_id: id})
+    }
+
+    serviceGetCity = async (params) => {
+        const response = await City(params)
+
+        this.setState({
+            cities: response.data
+        })
+    }
+
+    handleSelectCity = (event, newValue) => {
+        const {id, name} = newValue
+
+        this.setState({
+            selectAddres: {
+                ...this.state.selectAddres,
+                city: id
+            },
+            districts: []
+        })
+
+        this.serviceGetDistrict({city_id: id})
+    }
+
+    serviceGetDistrict = async (params) => {
+        const response = await District(params)
+        
+        this.setState({
+            districts: response.data
+        })
     }
 
     render() {
@@ -406,13 +525,25 @@ const mapStateToProps = (state) => ({
         address: state.shop.address,
         message: state.shop.message,
         error: state.shop.error
+    },
+    region: {
+        isSuccess: state.region.isSuccess,
+        isLoading: state.region.isLoading,
+        message: state.region.message,
+        error: state.region.error,
+        district: state.region.district,
+        provinces: state.region.provinces,
+        cities: state.region.cities,
     }
 })
 
 const mapDispatchToProps = {
     getSeller,
     OperationShop,
-    ShopAddress
+    ShopAddress,
+    GetDistrict,
+    GetProvinces,
+    GetCities,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerSetting))
