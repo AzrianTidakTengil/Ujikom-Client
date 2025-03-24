@@ -10,6 +10,7 @@ import CryptoJS from "crypto-js";
 import { Transaction } from "@/services";
 import { getAll as getAllAddress, find, getOne } from "@/store/address";
 import { SearchOutlined } from "@mui/icons-material";
+import AddressMessage from '@/store/address/message'
 
 class CheckOut extends Component {
     constructor(props) {
@@ -37,6 +38,7 @@ class CheckOut extends Component {
     UNSAFE_componentWillMount() {
         const {router, trolley} = this.props
         this.props.getOne()
+        this.props.getAllAddress()
 
         if (trolley.itemsCheckout) {
             this.props.findTrolley({
@@ -73,16 +75,19 @@ class CheckOut extends Component {
 
         if (address.isSuccess) {
             this.setState({
-                addresses: address.list.data,
                 address: address.address.data
+            })
+        }
+
+        if (address.isSuccess && address.message === AddressMessage.ADDRESS.ALL) {
+            this.setState({
+                addresses: address.list.data,
             })
         }
     }
 
     renderAddress = () => {
         const {address, activateAddress} = this.state
-
-        // const {label, city, detail, moreInformation, postalCode} = address[activateAddress]
 
         return(
             <Box>
@@ -113,10 +118,6 @@ class CheckOut extends Component {
 
     handleChangeModalAddress = () => {
         const {isOpenModalChangeAddress} = this.state
-
-        if (!isOpenModalChangeAddress) {
-            this.props.getAllAddress()
-        }
 
         this.setState({
             isOpenModalChangeAddress: !this.state.isOpenModalChangeAddress
@@ -187,70 +188,71 @@ class CheckOut extends Component {
                             }}
                         >
                         {
-                            address.isLoading ? (
+                            address.isSuccess && address.message === AddressMessage.ADDRESS.ALL ? 
+                                addresses.map((val) => (
+                                    <Paper
+                                        key={val.id}
+                                        sx={{
+                                            marginY: 2,
+                                            p: 2
+                                        }}
+                                        >
+                                        <Grid container>
+                                            <Grid size={10}>
+                                            <Stack
+                                                sx={{marginY: 2}}
+                                                direction="row"
+                                                alignItems={'center'}
+                                                divider={<Divider orientation="vertical" flexItem />}
+                                                spacing={2} 
+                                            >
+                                                <Typography variant="body1" fontWeight={600}>{val.receiver}</Typography>
+                                                <Typography variant="body1">{val.name}</Typography>
+                                                {
+                                                val.selectedAddressUser ? (
+                                                    <Chip label="Dipilih" color="success"/>
+                                                ) : ''
+                                                }
+                                                {
+                                                val.defaultAddressUser ? (
+                                                    <Chip label="Utama" />
+                                                ) : ''
+                                                }
+                                            </Stack>
+                                            <Typography variant="body1" sx={{marginY: 2}} textAlign={'left'}>{val.telephone}</Typography>
+                                            <Typography variant="body1" sx={{marginY: 2}} textAlign={'left'}>{`${val.address}, ${val.district}, ${val.city}, ${val.province}, ${val.postal_code} ${val.notes ? `(${val.notes})` : ''}`}</Typography>
+                                            </Grid>
+                                            <Grid 
+                                            size={2}
+                                            sx={{
+                                                display: 'flex',
+                                                justifyContent: 'center',
+                                                flexDirection: 'column'
+                                            }}
+                                            >
+                                            {
+                                                !val.selectedAddressUser ? (
+                                                <Button variant="contained" color="success">
+                                                    Pilih
+                                                </Button>
+                                                ) : ''
+                                            }
+                                            {
+                                                !val.defaultAddressUser ? (
+                                                <Button variant="outlined" color="success" sx={{marginTop: 2}}>
+                                                    Jadikan Utama
+                                                </Button>
+                                                ) : ''
+                                            }
+                                            <Button variant="outlined" color="success" sx={{marginTop: 2}}>
+                                                Edit
+                                            </Button>
+                                            </Grid>
+                                        </Grid>
+                                    </Paper>
+                                ))
+                            : 
                                 <CircularProgress sx={{marginTop: 2}}/>
-                            ) : addresses.map((val) => (
-                                <Paper
-                                key={val.id}
-                                sx={{
-                                    marginY: 2,
-                                    p: 2
-                                }}
-                                >
-                                <Grid container>
-                                    <Grid size={10}>
-                                    <Stack
-                                        sx={{marginY: 2}}
-                                        direction="row"
-                                        alignItems={'center'}
-                                        divider={<Divider orientation="vertical" flexItem />}
-                                        spacing={2} 
-                                    >
-                                        <Typography variant="body1" fontWeight={600}>{val.receiver}</Typography>
-                                        <Typography variant="body1">{val.name}</Typography>
-                                        {
-                                        val.selectedAddressUser ? (
-                                            <Chip label="Dipilih" color="success"/>
-                                        ) : ''
-                                        }
-                                        {
-                                        val.defaultAddressUser ? (
-                                            <Chip label="Utama" />
-                                        ) : ''
-                                        }
-                                    </Stack>
-                                    <Typography variant="body1" sx={{marginY: 2}} textAlign={'left'}>{val.telephone}</Typography>
-                                    <Typography variant="body1" sx={{marginY: 2}} textAlign={'left'}>{`${val.address}, ${val.district}, ${val.city}, ${val.province}, ${val.postal_code} ${val.notes ? `(${val.notes})` : ''}`}</Typography>
-                                    </Grid>
-                                    <Grid 
-                                    size={2}
-                                    sx={{
-                                        display: 'flex',
-                                        justifyContent: 'center',
-                                        flexDirection: 'column'
-                                    }}
-                                    >
-                                    {
-                                        !val.selectedAddressUser ? (
-                                        <Button variant="contained" color="success">
-                                            Pilih
-                                        </Button>
-                                        ) : ''
-                                    }
-                                    {
-                                        !val.defaultAddressUser ? (
-                                        <Button variant="outlined" color="success" sx={{marginTop: 2}}>
-                                            Jadikan Utama
-                                        </Button>
-                                        ) : ''
-                                    }
-                                    <Button variant="outlined" color="success" sx={{marginTop: 2}}>
-                                        Edit
-                                    </Button>
-                                    </Grid>
-                                </Grid>
-                                </Paper>
-                            ))
                         }
                         </Box>
                     </Box>
@@ -519,6 +521,7 @@ const mapStateToProps = (state) => ({
         list: state.address.list,
         address: state.address.address,
         error: state.address.list,
+        message: state.address.message,
       }
 })
 
