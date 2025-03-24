@@ -9,7 +9,7 @@ import { connect } from "react-redux";
 import { getAll, getOne } from "@/store/products";
 import { insertItem } from "@/store/trolley";
 
-const { Component } = require("react");
+import React, { Component } from "react";
 
 const dummy_review = Array.from({ length: 34 }, (_, i) => ({
     id: i + 1,
@@ -73,13 +73,19 @@ class Product extends Component{
         }
     }
 
+    componentDidMount() {
+        const queryString = window.location.search
+        const urlParams = new URLSearchParams(queryString);
+
+        this.props.getOne({id: urlParams.get('id')})
+    }
+
     UNSAFE_componentWillMount() {
         const {allItem} = this.state
         this.props.getAll({
             limit: allItem.limit,
             offset: allItem.offset
         })
-        this.props.getOne({id: this.props.router.query.id})
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
