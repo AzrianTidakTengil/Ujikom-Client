@@ -467,7 +467,10 @@ class CheckOut extends Component {
                 ...type
             }).then(({data}) => {
                 this.props.router.push({
-                    pathname: `/t/${data.data.transaction.id}`
+                    pathname: `/t`,
+                    query: {
+                        id: data.data.transaction.id
+                    }
                 })
                 this.props.clearItemsCheckout()
             })
