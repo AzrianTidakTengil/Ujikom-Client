@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { Address } from "@/services";
+import AddressMessage from './message'
 
 export const getAll = createAsyncThunk('addressSlice/all', async (params) => {
     const response = await Address.getAll()
@@ -36,7 +37,8 @@ const initialState = {
     isSuccess: false,
     error: null,
     list: [],
-    address: {}
+    address: {},
+    message: '',
 }
 
 export const addressSlice = createSlice({
@@ -48,10 +50,12 @@ export const addressSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(getAll.pending, (state) => {
+                state.message = ''
                 state.isLoading = true
                 state.isSuccess = false
             })
             .addCase(getAll.fulfilled, (state, action) => {
+                state.message = AddressMessage.ADDRESS.ALL
                 state.isSuccess = true
                 state.isLoading = false
                 state.list = action.payload
