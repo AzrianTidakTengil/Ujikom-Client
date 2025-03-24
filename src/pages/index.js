@@ -178,9 +178,6 @@ class Main extends Component {
         const {limitProduct, offeringProduct} = this.state
         const startIndex = (value - 1) * limitProduct
 
-        console.log(value)
-        console.log(startIndex + limitProduct)
-
         this.props.getAll({
             limit: startIndex + limitProduct,
             offset: value
