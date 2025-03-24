@@ -84,7 +84,9 @@ export const shopSlice = createSlice({
     name: 'shop',
     initialState,
     reducers: {
-
+        clearMessageShop: (state) => {
+            state.message = ''
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -224,16 +226,18 @@ export const shopSlice = createSlice({
                 state.address = {...action.payload.data.shopToAddress}
             })
             .addCase(UpdateAddressShop.pending, (state) => {
+                state.message = ''
                 state.isLoading = true
                 state.isSuccess = false
-                state.message = ''
             })
             .addCase(UpdateAddressShop.fulfilled, (state, action) => {
+                state.message = message.STORE.ADDRESS.CRETEORUPDATE
                 state.isLoading = false
                 state.isSuccess = true
-                state.message = message.STORE.ADDRESS.CRETEORUPDATE
             })
     }
 })
+
+export const {clearMessageShop} = shopSlice.actions
 
 export default shopSlice.reducer
