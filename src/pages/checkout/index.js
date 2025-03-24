@@ -27,13 +27,12 @@ class CheckOut extends Component {
                 store: ''
             }
         }
+        this.theme = createTheme({
+            palette: {
+                ...palleteV1.palette
+            }
+        })
     }
-
-    theme = () => createTheme({
-        palette: {
-            ...palleteV1.palette
-        }
-    })
 
     UNSAFE_componentWillMount() {
         const {router, trolley} = this.props
