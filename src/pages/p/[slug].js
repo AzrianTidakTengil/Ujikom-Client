@@ -144,108 +144,6 @@ class Product extends Component{
     }
 
     renderProduct = () => {
-        const {query, favorite, product} = this.state
-        const {id, name, description, price, stock, shop} = product
-
-        return(
-            <Container>
-                <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
-                    <Grid container columnSpacing={4}>
-                        <Grid size="auto">
-                            <Image width={320} height={320} src={'/assets/skeleton/product.jpg'}/>
-                        </Grid>
-                        <Grid size="grow">
-                            <Box sx={{width: '100%'}}>
-                                <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                    <Typography variant="h5">{name}</Typography>
-                                    <Stack direction="row" spacing={2}>
-                                        <div style={{display: 'flex', alignItems: 'center'}}>
-                                            <IconButton onClick={() => this.handleFavorite()}>
-                                                {favorite ? <Favorite color="pink"/> : <FavoriteBorderOutlined color="pink"/>}
-                                            </IconButton>
-                                            <Typography variant="subtitle1">(90)</Typography>
-                                        </div>
-                                        <IconButton>
-                                            <Share/>
-                                        </IconButton>
-                                    </Stack>
-                                </Box>
-                                <Box
-                                    sx={{
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                    }}
-                                >
-                                    <div>
-                                        <Rating
-                                            defaultValue={2.5}
-                                            readOnly
-                                        />
-                                    </div>
-                                    <Divider flexItem orientation="vertical" variant="middle" sx={{
-                                        marginInline: 2
-                                    }} />
-                                    <p>
-                                        Terjual 100
-                                    </p>
-                                </Box>
-                                <Typography variant="h5" sx={{fontWeight: 600, marginTop: 2}}>
-                                    {
-                                        new Intl.NumberFormat('id-ID', {
-                                            style: "currency",
-                                            currency: "IDR"
-                                        }).format(price)
-                                    }
-                                </Typography>
-                                <Divider sx={{marginY: 4}}/>
-                                <Box sx={{
-                                    '*': {
-                                        marginBottom: 1
-                                    }
-                                }}>
-                                    <Typography variant="subtitle2">Kondisi: <b>Baru</b></Typography>
-                                    <Typography variant="subtitle2">Min. Pembelian: <b>1</b> Buah</Typography>
-                                    <Typography variant="subtitle2">Kategori: <b>Benda</b></Typography>
-                                    <Typography variant="subtitle2">Berat benda: <b>1</b> Gram</Typography>
-                                </Box>
-                                <Divider sx={{marginY: 4}}/>
-                                <Grid container columnSpacing={2} >
-                                    <Grid>
-                                        <Avatar/>
-                                    </Grid>
-                                    <Grid>
-                                        <Typography variant="h6">
-                                            {shop.name}
-                                        </Typography>
-                                        <Rating defaultValue={4} readOnly/>
-                                        <Typography variant="subtitle2">
-                                            Aktif 1 menit yang lalu
-                                        </Typography>
-                                    </Grid>
-                                    <Grid>
-                                        <Grid container direction={'column'} spacing={1}>
-                                            <Grid>
-                                                <Button variant="outlined" sx={{width: 100}}>
-                                                    Follow
-                                                </Button>
-                                            </Grid>
-                                            <Grid>
-                                                <Button variant="contained" sx={{width: 100}}>
-                                                    Chat
-                                                </Button>
-                                            </Grid>
-                                        </Grid>
-                                    </Grid>
-                                </Grid>
-                            </Box>
-                        </Grid>
-                    </Grid>
-                </Box>
-            </Container>
-        )
-    }
-
-    renderAddTrolley = () => {
         const {query, favorite, product, quantityEditor} = this.state
         const {id, name, description, price, stock, shop} = product
 
@@ -256,51 +154,142 @@ class Product extends Component{
         ]
 
         return(
-            <Container>
-                <Box sx={{border: 1, borderColor: 'gray', p: 2, borderRadius: 2}}>
-                    <Typography variant="h6" sx={{fontWeight: 600}}>Atur Pembelian</Typography>
-                    <Divider sx={{marginBottom: 4}}/>
-                    <Box>
-                        <Box sx={{marginBottom: 2}}>
-                            <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
-                            <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
-                                <QuantityEditor
-                                    initialQuantity={quantityEditor}
-                                    min={1}
-                                    max={stock}
-                                    onChange={(name, value) => {this.setState({quantityEditor: value})}}
-                                />
-                                <Typography variant="subtitle1" sx={{marginLeft: 2}}>
-                                    Total Stok: {stock}
-                                </Typography>
+            <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
+                <Grid container columnSpacing={4}>
+                    <Grid size="auto">
+                        <Image width={320} height={320} src={'/assets/skeleton/product.jpg'}/>
+                    </Grid>
+                    <Grid size="grow">
+                        <Box sx={{width: '100%'}}>
+                            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                                <Typography variant="h5">{name}</Typography>
+                                <Stack direction="row" spacing={2}>
+                                    <div style={{display: 'flex', alignItems: 'center'}}>
+                                        <IconButton onClick={() => this.handleFavorite()}>
+                                            {favorite ? <Favorite color="pink"/> : <FavoriteBorderOutlined color="pink"/>}
+                                        </IconButton>
+                                        <Typography variant="subtitle1">(90)</Typography>
+                                    </div>
+                                    <IconButton>
+                                        <Share/>
+                                    </IconButton>
+                                </Stack>
                             </Box>
-                        </Box>
-                        <Box sx={{marginBottom: 2}}>
-                            <Typography variant="subtitle1">Pilih</Typography>
-                            <SelectChip
-                                options={dummy_color}
-                            />
-                        </Box>
-                        {/* <Box>
-                            <Typography variant="subtitle1">Pilih</Typography>
-                            
-                        </Box> */}
-                        <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2}}>
-                            <Typography variant="subtitle1" sx={{fontWeight: 500}}>Subtotal</Typography>
-                            <Typography variant="h6" sx={{fontWeight: 600}}>
+                            <Box
+                                sx={{
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                }}
+                            >
+                                <div>
+                                    <Rating
+                                        defaultValue={2.5}
+                                        readOnly
+                                    />
+                                </div>
+                                <Divider flexItem orientation="vertical" variant="middle" sx={{
+                                    marginInline: 2
+                                }} />
+                                <p>
+                                    Terjual 100
+                                </p>
+                            </Box>
+                            <Typography variant="h5" sx={{fontWeight: 600, marginTop: 2}}>
                                 {
                                     new Intl.NumberFormat('id-ID', {
                                         style: "currency",
                                         currency: "IDR"
-                                    }).format(price * quantityEditor) 
+                                    }).format(price)
                                 }
                             </Typography>
+                            <Divider sx={{marginY: 4}}/>
+                            <Box sx={{
+                                '*': {
+                                    marginBottom: 1
+                                }
+                            }}>
+                                <Typography variant="subtitle2">Kondisi: <b>Baru</b></Typography>
+                                <Typography variant="subtitle2">Min. Pembelian: <b>1</b> Buah</Typography>
+                                <Typography variant="subtitle2">Kategori: <b>Benda</b></Typography>
+                                <Typography variant="subtitle2">Berat benda: <b>1</b> Gram</Typography>
+                            </Box>
+                            <Divider sx={{marginY: 4}}/>
+                            <Stack direction={'row'} justifyContent={'space-between'}>
+                            <Grid container columnSpacing={2}>
+                                <Grid>
+                                    <Avatar/>
+                                </Grid>
+                                <Grid size="grow">
+                                    <Typography variant="h6">
+                                        {shop.name}
+                                    </Typography>
+                                    <Rating defaultValue={4} readOnly/>
+                                </Grid>
+                            </Grid>
+                            <Grid container direction={'column'} spacing={1}>
+                                        <Grid>
+                                            <Button variant="outlined" sx={{width: 100}}>
+                                                Follow
+                                            </Button>
+                                        </Grid>
+                                        <Grid>
+                                            <Button variant="contained" sx={{width: 100}}>
+                                                Chat
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                            </Stack>
                         </Box>
-                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
-                        <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
-                    </Box>
-                </Box>
-            </Container>
+                    </Grid>
+                    <Grid>
+                        <Paper
+                            sx={{p:2}}
+                        >
+                            <Typography variant="h6" sx={{fontWeight: 600}}>Atur Pembelian</Typography>
+                            <Divider sx={{marginBottom: 4}}/>
+                            <Box>
+                                <Box sx={{marginBottom: 2}}>
+                                    <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
+                                    <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
+                                        <QuantityEditor
+                                            initialQuantity={quantityEditor}
+                                            min={1}
+                                            max={stock}
+                                            onChange={(name, value) => {this.setState({quantityEditor: value})}}
+                                        />
+                                        <Typography variant="subtitle1" sx={{marginLeft: 2}}>
+                                            Total Stok: {stock}
+                                        </Typography>
+                                    </Box>
+                                </Box>
+                                <Box sx={{marginBottom: 2}}>
+                                    <Typography variant="subtitle1">Pilih</Typography>
+                                    <SelectChip
+                                        options={dummy_color}
+                                    />
+                                </Box>
+                                {/* <Box>
+                                    <Typography variant="subtitle1">Pilih</Typography>
+                                    
+                                </Box> */}
+                                <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2}}>
+                                    <Typography variant="subtitle1" sx={{fontWeight: 500}}>Subtotal</Typography>
+                                    <Typography variant="h6" sx={{fontWeight: 600}}>
+                                        {
+                                            new Intl.NumberFormat('id-ID', {
+                                                style: "currency",
+                                                currency: "IDR"
+                                            }).format(price * quantityEditor) 
+                                        }
+                                    </Typography>
+                                </Box>
+                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
+                                <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                            </Box>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </Box>
         )
     }
 
@@ -647,15 +636,8 @@ class Product extends Component{
         return(
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
-                    <Grid container columnSpacing={2} sx={{marginBottom: 6}}>
-                        <Grid size={8}>
-                            {this.renderProduct()}
-                        </Grid>
-                        <Grid size={4}>
-                            {this.renderAddTrolley()}
-                        </Grid>
-                    </Grid>
-                    <Container maxWidth="xl">
+                    <Container maxWidth="xl" sx={{marginY: 4}}>{this.renderProduct()}</Container>
+                    <Container maxWidth="xl" sx={{marginY: 4}}>
                         <Box sx={{border: '1px solid gray', borderRadius: 2, p:2}}>
                             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                                 <Tabs value={appBar} onChange={this.handleChangeAppBar} aria-label="tabel panel product">
