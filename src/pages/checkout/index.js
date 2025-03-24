@@ -27,13 +27,12 @@ class CheckOut extends Component {
                 store: ''
             }
         }
+        this.theme = createTheme({
+            palette: {
+                ...palleteV1.palette
+            }
+        })
     }
-
-    theme = () => createTheme({
-        palette: {
-            ...palleteV1.palette
-        }
-    })
 
     UNSAFE_componentWillMount() {
         const {router, trolley} = this.props
@@ -467,7 +466,10 @@ class CheckOut extends Component {
                 ...type
             }).then(({data}) => {
                 this.props.router.push({
-                    pathname: `/t/${data.data.transaction.id}`
+                    pathname: `/t`,
+                    query: {
+                        id: data.data.transaction.id
+                    }
                 })
                 this.props.clearItemsCheckout()
             })
