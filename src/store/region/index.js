@@ -3,7 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import messageRegion from './message'
 
 export const GetDistrict = createAsyncThunk('regionSlice/GetDistrict', async (params) => {
-    const response = await District()
+    const response = await District(params)
     return response.data
 })
 
@@ -31,7 +31,9 @@ export const regionSlice = createSlice({
     name: 'region',
     initialState,
     reducers: {
-
+        clearMessageRegion: (state) => {
+            state.message = ''
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -70,5 +72,7 @@ export const regionSlice = createSlice({
         })
     }
 })
+
+export const {clearMessageRegion} = regionSlice.actions
 
 export default regionSlice.reducer
