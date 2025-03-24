@@ -73,7 +73,7 @@ class Trolley extends Component {
     }
 
     if (transaction.isSuccess) {
-      console.log(transaction.data)
+      // console.log(transaction.data)
     }
   }
 
