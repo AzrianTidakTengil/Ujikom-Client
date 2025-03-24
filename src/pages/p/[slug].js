@@ -71,6 +71,22 @@ class Product extends Component{
             },
             quantityEditor: 1,
         }
+        this.theme = createTheme({
+            palette: {
+                ...palleteV1.palette
+            },
+            components: {
+                MuiAppBar: {
+                    styleOverrides: {
+                        root: {
+                            background: 'none',
+                            color: 'black',
+                            boxShadow: 'none',
+                        }
+                    }
+                }
+            }
+        })
     }
 
     componentDidMount() {
@@ -118,23 +134,6 @@ class Product extends Component{
             })
         }
     }
-
-    theme = () => createTheme({
-        palette: {
-            ...palleteV1.palette
-        },
-        components: {
-            MuiAppBar: {
-                styleOverrides: {
-                    root: {
-                        background: 'none',
-                        color: 'black',
-                        boxShadow: 'none',
-                    }
-                }
-            }
-        }
-    })
 
     handleFavorite = () => {
         const {favorite} = this.state
