@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { ImageInput, TimePick, TimePicker } from "@/components";
-import { getSeller, OperationShop, ShopAddress } from "@/store/shop";
+import { clearMessageShop, getSeller, OperationShop, ShopAddress, UpdateAddressShop } from "@/store/shop";
 import { ExpandMore } from '@mui/icons-material';
 import { Accordion, Box, createTheme, ThemeProvider, Typography, Grid2 as Grid, Paper, TextField, Button, AccordionSummary, AccordionDetails, Container, Stack, Divider, FormGroup, FormControlLabel, Switch, Autocomplete } from '@mui/material';
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -53,6 +53,8 @@ class SellerSetting extends Component {
     }
 
     UNSAFE_componentWillMount() {
+        const {region, shop} = this.props
+
         this.props.getSeller()
         this.props.OperationShop()
         this.props.ShopAddress()
@@ -61,6 +63,7 @@ class SellerSetting extends Component {
 
     UNSAFE_componentWillReceiveProps() {
         const {shop, region} = this.props
+        const {provinces, selectAddres, address, cities} = this.state
 
         if (shop.isSuccess) {
             this.setState({
@@ -69,6 +72,7 @@ class SellerSetting extends Component {
                     description: shop.seller.description
                 }
             })
+            this.props.clearMessageShop()
         }
 
         if (shop.isSuccess && shop.message === ShopMessage.STORE.ADDRESS.GET) {
@@ -84,18 +88,54 @@ class SellerSetting extends Component {
                     longtitude: shop.address.longtitude,
                 }
             })
+            this.props.clearMessageShop()
         }
 
-        if (region.message == RegionMessage.REGION.PROVINCES) {
+        if (region.isSuccess && region.message == RegionMessage.REGION.PROVINCES) {
             this.setState({
                 provinces: region.provinces
             })
+
+            if (address && address.province) {
+                const provinceId = region.provinces.find((province) => province.name == address.province.toUpperCase())
+
+                if (provinceId && provinceId.id) {
+                    this.setState({
+                        selectAddres: {
+                            ...selectAddres,
+                            province: provinceId.id
+                        },
+                    })
+
+                    this.props.GetCities({province_id: provinceId.id})
+                }
+            }
         }
 
-        if (region.message == RegionMessage.REGION.CITIES) {
-            console.log(region.cities)
+        if (region.isSuccess && region.message == RegionMessage.REGION.CITIES) {
             this.setState({
                 cities: region.cities
+            })
+
+            if (address && address.city) {
+                const cityId = region.cities.find((city) => city.name == address.city.toUpperCase())
+
+                if (cityId && cityId.id) {
+                    this.setState({
+                        selectAddres: {
+                            ...selectAddres,
+                            city: cityId.id
+                        },
+                    })
+                    
+                    this.props.GetDistrict({city_id: cityId.id})
+                }
+            }
+        }
+
+        if (region.isSuccess && region.message == RegionMessage.REGION.DISTRICT) {
+            this.setState({
+                districts: region.districts
             })
         }
     }
@@ -159,7 +199,7 @@ class SellerSetting extends Component {
                                         fontSize="0.75rem"
                                         color="gray"
                                     >
-                                        {`${information.description.length} / 50000`}
+                                        {/* {`${information.description.length} / 50000`} */}
                                     </Box>
                                 </Box>
                             </Box>
@@ -279,7 +319,7 @@ class SellerSetting extends Component {
                     p: 2
                 }}
             >
-                <form>
+                <form onSubmit={this.handleSubmitAddressShop}>
                     <Box
                         sx={{
                             marginY: 2
@@ -287,6 +327,7 @@ class SellerSetting extends Component {
                     >
                         <Typography variant='body1'>Detail Alamat</Typography>
                         <TextField 
+                            name="address"
                             variant='outlined'
                             size="small"
                             fullWidth
@@ -294,6 +335,7 @@ class SellerSetting extends Component {
                             sx={{
                                 marginY: 1
                             }}
+                            onChange={this.handleChangeAddress}
                         />
                     </Box>
                     <Box
@@ -302,7 +344,9 @@ class SellerSetting extends Component {
                         }}
                     >
                         <Typography variant='body1'>Provinsi</Typography>
-                        <Autocomplete 
+                        <Autocomplete
+                            name="province"
+                            value={address.province ? provinces.find((provice) => provice.name == address.province.toUpperCase()) : null}
                             disableClearable
                             freeSolo
                             options={provinces}
@@ -334,6 +378,8 @@ class SellerSetting extends Component {
                     >
                         <Typography variant='body1'>Kota / Kabupaten</Typography>
                         <Autocomplete 
+                            name="city"
+                            value={address.city ? cities.find((city) => city.name == address.city.toUpperCase()) : null}
                             disableClearable
                             freeSolo
                             options={cities}
@@ -365,7 +411,9 @@ class SellerSetting extends Component {
                         }}
                     >
                         <Typography variant='body1'>Kecamatan</Typography>
-                        <Autocomplete 
+                        <Autocomplete
+                            name="district"
+                            value={address.district ? districts.find((district) => district.name == address.district.toUpperCase()) : null}
                             disableClearable
                             freeSolo
                             options={districts}
@@ -387,21 +435,7 @@ class SellerSetting extends Component {
                                 marginY: 1
                             }}
                             disabled={!selectAddres.province && !selectAddres.city}
-                        />
-                    </Box>
-                    <Box
-                        sx={{
-                            marginY: 2
-                        }}
-                    >
-                        <Typography variant='body1'>Kode Pos</Typography>
-                        <NumericFormat 
-                            variant="outlined"
-                            customInput={TextField}
-                            fullWidth
-                            sx={{
-                                marginY: 1
-                            }}
+                            onChange={this.handleSelectDistrict}
                         />
                     </Box>
                     <Box
@@ -424,15 +458,33 @@ class SellerSetting extends Component {
         )
     }
 
+    handleChangeAddress = (event) => {
+        const {value} = event.target
+
+        if (value.length != 0) {
+            this.setState({
+                address: {
+                    ...this.state.address,
+                    address: value
+                }
+            })
+        }
+    }
+
     handleSelectProvince = (event, newValue) => {
         const {id, name} = newValue
 
         this.setState({
+            address: {
+                ...this.state.address,
+                province: name
+            },
             selectAddres: {
                 ...this.state.selectAddres,
                 province: id
             },
-            cities: []
+            cities: [],
+            districts: []
         })
 
         this.serviceGetCity({province_id: id})
@@ -450,6 +502,10 @@ class SellerSetting extends Component {
         const {id, name} = newValue
 
         this.setState({
+            address: {
+                ...this.state.address,
+                city: name
+            },
             selectAddres: {
                 ...this.state.selectAddres,
                 city: id
@@ -460,11 +516,34 @@ class SellerSetting extends Component {
         this.serviceGetDistrict({city_id: id})
     }
 
+    handleSelectDistrict = (event, newValue) => {
+        const {id, name} = newValue
+
+        this.setState({
+            address: {
+                ...this.state.address,
+                district: name
+            },
+        })
+    }
+
     serviceGetDistrict = async (params) => {
         const response = await District(params)
         
         this.setState({
             districts: response.data
+        })
+    }
+
+    handleSubmitAddressShop = (event) => {
+        event.preventDefault()
+        const {address, district, city, province} = this.state.address
+
+        this.props.UpdateAddressShop({
+            address,
+            district,
+            city,
+            province
         })
     }
 
@@ -531,7 +610,7 @@ const mapStateToProps = (state) => ({
         isLoading: state.region.isLoading,
         message: state.region.message,
         error: state.region.error,
-        district: state.region.district,
+        districts: state.region.district,
         provinces: state.region.provinces,
         cities: state.region.cities,
     }
@@ -544,6 +623,8 @@ const mapDispatchToProps = {
     GetDistrict,
     GetProvinces,
     GetCities,
+    UpdateAddressShop,
+    clearMessageShop
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerSetting))
