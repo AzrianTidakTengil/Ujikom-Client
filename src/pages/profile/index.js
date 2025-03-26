@@ -1,10 +1,10 @@
-import React, { Component } from "react";
-import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress } from "@mui/material";
+import React, { Component, createRef } from "react";
+import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress, Modal } from "@mui/material";
 import { connect } from "react-redux";
 import { SearchOutlined } from "@mui/icons-material";
 import { getAll as getAllAddress, find } from "@/store/address";
 import { getAllTransaction, findTransaction } from "@/store/transaction";
-import { DateRangePicker, Dropdown } from "@/components";
+import { CropImage, DateRangePicker, Dropdown } from "@/components";
 import dayjs from "dayjs";
 
 class Profile extends Component {
@@ -25,8 +25,14 @@ class Profile extends Component {
         limit: 10,
         offset: 0,
         data: []
-      }
+      },
+      image: null,
+      previewImage: null,
+      modalEditorAvatar: false,
+      cropImage: null,
     };
+    this.inputImageReff = createRef()
+    this.cropperReff = createRef()
   }
 
   UNSAFE_componentWillMount() {
@@ -382,6 +388,73 @@ class Profile extends Component {
     })
   }
 
+  handleFileChange = (event) => {
+    const file = event.target.files[0];
+    this.setState({
+      image: file
+    })
+
+    const reader = new FileReader();
+    reader.onloadend = () => this.setState({previewImage: reader.result});
+    reader.readAsDataURL(file);
+  }
+
+  renderModalEditorAvatar = () => {
+    const {modalEditorAvatar, previewImage} = this.state
+
+    return (
+      <Modal
+        open={modalEditorAvatar}
+        onClose={this.handleTriggerModalEditorAvatar}
+        sx={{display: 'flex', justifyContent: 'center', marginTop: '10rem'}}
+      >
+        <Container maxWidth="sm">
+          <Card
+            sx={{
+              p: 2
+            }}
+          >
+            <Typography variant="h5" fontWeight={600} textTransform={'capitalize'}>edit foto profile</Typography>
+            <Divider sx={{marginY: 2}} />
+            <Box
+              sx={{
+                height: '20rem',
+                overflowY: 'scroll'
+              }}
+            >
+              <CropImage imageSrc={previewImage}/>
+            </Box>
+            <Button variant="contained" fullWidth sx={{marginY: 2}}>Atur Menjadi Foto Profile</Button>
+          </Card>
+        </Container>
+      </Modal>
+    )
+  }
+
+  handleTriggerModalEditorAvatar = () => {    
+    if (!this.state.previewImage) {
+      this.handleInputImageReff()
+    } 
+
+    this.setState((prevState) => ({
+      modalEditorAvatar: !prevState.modalEditorAvatar
+    }))
+  }
+
+  handleInputImageReff = () => {
+    this.inputImageReff.current.click()
+  }
+
+  handleCrop = () => {
+    if (this.cropperReff.current) {
+      const croppedCanvas = this.cropperRef.current.cropper.getCroppedCanvas();
+
+      this.setState({
+        cropImage: croppedCanvas
+      })
+    }
+  }
+
   render() {
     const { user, renderTabs } = this.state;
     const {address} = this.props
@@ -389,7 +462,30 @@ class Profile extends Component {
       <Container>
         <Card sx={{ p: 3, textAlign: "center"}}>
           <CardContent>
-            <Avatar sx={{ width: 100, height: 100, margin: "auto", mt: 2 }} />
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}
+            >
+              <Avatar sx={{ width: 124, height: 124, marginBottom: 2}} />
+              <Stack
+                direction={'row'}
+                spacing={2}
+              >
+                <Button variant="contained" onClick={this.handleTriggerModalEditorAvatar} size="small">Upload Foto Baru</Button>
+                <input
+                  ref={this.inputImageReff}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={this.handleFileChange}
+                />
+                <Button variant="outlined" size="small">Hapus Foto</Button>
+              </Stack>
+            </Box>
             <Typography variant="h5" sx={{ marginY: 2 }} fontWeight={600}>{user.username}</Typography>
             <Stack
               direction="row"
@@ -465,6 +561,7 @@ class Profile extends Component {
             }
           </Box>
         </Card>
+        {this.renderModalEditorAvatar()}
       </Container>
     );
   }
