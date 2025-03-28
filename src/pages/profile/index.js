@@ -1,11 +1,12 @@
 import React, { Component, createRef } from "react";
-import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress, Modal } from "@mui/material";
+import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress, Modal, createTheme, ThemeProvider } from "@mui/material";
 import { connect } from "react-redux";
 import { SearchOutlined } from "@mui/icons-material";
 import { getAll as getAllAddress, find } from "@/store/address";
 import { getAllTransaction, findTransaction } from "@/store/transaction";
 import { CropImage, DateRangePicker, Dropdown } from "@/components";
 import dayjs from "dayjs";
+import { palleteV1 } from '@/assets/css/template'
 
 class Profile extends Component {
   constructor(props) {
@@ -33,6 +34,11 @@ class Profile extends Component {
     };
     this.inputImageReff = createRef()
     this.cropperReff = createRef()
+    this.theme = createTheme({
+        palette: {
+            ...palleteV1.palette
+        }
+    })
   }
 
   UNSAFE_componentWillMount() {
@@ -459,110 +465,112 @@ class Profile extends Component {
     const { user, renderTabs } = this.state;
     const {address} = this.props
     return (
-      <Container>
-        <Card sx={{ p: 3, textAlign: "center"}}>
-          <CardContent>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center'
-              }}
-            >
-              <Avatar sx={{ width: 124, height: 124, marginBottom: 2}} />
+      <ThemeProvider theme={this.theme}>
+        <Container>
+          <Card sx={{ p: 3, textAlign: "center"}}>
+            <CardContent>
+              <Box
+                sx={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Avatar sx={{ width: 124, height: 124, marginBottom: 2}} />
+                <Stack
+                  direction={'row'}
+                  spacing={2}
+                >
+                  <Button variant="contained" onClick={this.handleTriggerModalEditorAvatar} size="small">Upload Foto Baru</Button>
+                  <input
+                    ref={this.inputImageReff}
+                    type="file"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    onChange={this.handleFileChange}
+                  />
+                  <Button variant="outlined" size="small">Hapus Foto</Button>
+                </Stack>
+              </Box>
+              <Typography variant="h5" sx={{ marginY: 2 }} fontWeight={600}>{user.username}</Typography>
               <Stack
-                direction={'row'}
-                spacing={2}
+                direction="row"
+                divider={<Divider orientation="vertical" flexItem />}
+                spacing={2}       
               >
-                <Button variant="contained" onClick={this.handleTriggerModalEditorAvatar} size="small">Upload Foto Baru</Button>
-                <input
-                  ref={this.inputImageReff}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: "none" }}
-                  onChange={this.handleFileChange}
-                />
-                <Button variant="outlined" size="small">Hapus Foto</Button>
+                <Box
+                  width={'50%'}
+                >
+                  <Grid container sx={{marginY: 2}}>
+                    <Grid size={4}>
+                      <Typography variant="body1" textAlign={'left'}>Nama</Typography>
+                    </Grid>
+                    <Grid size={8}>
+                      <Typography variant="body1" textAlign={'left'}>{user.fullname}</Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid container sx={{marginY: 2}}>
+                    <Grid size={4}>
+                      <Typography variant="body1" textAlign={'left'}>Tanggal Lahir</Typography>
+                    </Grid>
+                    <Grid size={8}>
+                      <Typography variant="body1" textAlign={'left'}>{user.birthDay}</Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid container sx={{marginY: 2}}>
+                    <Grid size={4}>
+                      <Typography variant="body1" textAlign={'left'}>Jenis Kelamin</Typography>
+                    </Grid>
+                    <Grid size={8}>
+                      <Typography variant="body1" textAlign={'left'}>{user.gender}</Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
+                <Box
+                  width={'50%'}
+                >
+                  <Grid container sx={{marginY: 2}}>
+                    <Grid size={4}>
+                      <Typography variant="body1" textAlign={'left'}>Email</Typography>
+                    </Grid>
+                    <Grid size={8}>
+                      <Typography variant="body1" textAlign={'left'}>{user.email}</Typography>
+                    </Grid>
+                  </Grid>
+                  <Grid container sx={{marginY: 2}}>
+                    <Grid size={4}>
+                      <Typography variant="body1" textAlign={'left'}>Nomor HP</Typography>
+                    </Grid>
+                    <Grid size={8}>
+                      <Typography variant="body1" textAlign={'left'}>{user.telephone}</Typography>
+                    </Grid>
+                  </Grid>
+                </Box>
               </Stack>
-            </Box>
-            <Typography variant="h5" sx={{ marginY: 2 }} fontWeight={600}>{user.username}</Typography>
-            <Stack
-              direction="row"
-              divider={<Divider orientation="vertical" flexItem />}
-              spacing={2}       
-            >
-              <Box
-                width={'50%'}
-              >
-                <Grid container sx={{marginY: 2}}>
-                  <Grid size={4}>
-                    <Typography variant="body1" textAlign={'left'}>Nama</Typography>
-                  </Grid>
-                  <Grid size={8}>
-                    <Typography variant="body1" textAlign={'left'}>{user.fullname}</Typography>
-                  </Grid>
-                </Grid>
-                <Grid container sx={{marginY: 2}}>
-                  <Grid size={4}>
-                    <Typography variant="body1" textAlign={'left'}>Tanggal Lahir</Typography>
-                  </Grid>
-                  <Grid size={8}>
-                    <Typography variant="body1" textAlign={'left'}>{user.birthDay}</Typography>
-                  </Grid>
-                </Grid>
-                <Grid container sx={{marginY: 2}}>
-                  <Grid size={4}>
-                    <Typography variant="body1" textAlign={'left'}>Jenis Kelamin</Typography>
-                  </Grid>
-                  <Grid size={8}>
-                    <Typography variant="body1" textAlign={'left'}>{user.gender}</Typography>
-                  </Grid>
-                </Grid>
+            </CardContent>
+          </Card>
+          <Card sx={{ p: 3, textAlign: "center", marginTop: 4}}>
+            <Box>
+              <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                <Tabs
+                  onChange={this.handleChangeValueTab}
+                  value={renderTabs}
+                >
+                  <Tab value="address" label="Detail Alamat"/>
+                  <Tab value="transaction" label="Riwayat Transaksi"/>
+                </Tabs>
               </Box>
-              <Box
-                width={'50%'}
-              >
-                <Grid container sx={{marginY: 2}}>
-                  <Grid size={4}>
-                    <Typography variant="body1" textAlign={'left'}>Email</Typography>
-                  </Grid>
-                  <Grid size={8}>
-                    <Typography variant="body1" textAlign={'left'}>{user.email}</Typography>
-                  </Grid>
-                </Grid>
-                <Grid container sx={{marginY: 2}}>
-                  <Grid size={4}>
-                    <Typography variant="body1" textAlign={'left'}>Nomor HP</Typography>
-                  </Grid>
-                  <Grid size={8}>
-                    <Typography variant="body1" textAlign={'left'}>{user.telephone}</Typography>
-                  </Grid>
-                </Grid>
-              </Box>
-            </Stack>
-          </CardContent>
-        </Card>
-        <Card sx={{ p: 3, textAlign: "center", marginTop: 4}}>
-          <Box>
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs
-                onChange={this.handleChangeValueTab}
-                value={renderTabs}
-              >
-                <Tab value="address" label="Detail Alamat"/>
-                <Tab value="transaction" label="Riwayat Transaksi"/>
-              </Tabs>
+              {
+                renderTabs === 'address' ? this.renderMoreAddress() :
+                renderTabs === 'transaction' ? this.renderTransaction() :
+                ''
+              }
             </Box>
-            {
-              renderTabs === 'address' ? this.renderMoreAddress() :
-              renderTabs === 'transaction' ? this.renderTransaction() :
-              ''
-            }
-          </Box>
-        </Card>
-        {this.renderModalEditorAvatar()}
-      </Container>
+          </Card>
+          {this.renderModalEditorAvatar()}
+        </Container>
+      </ThemeProvider>
     );
   }
 }
