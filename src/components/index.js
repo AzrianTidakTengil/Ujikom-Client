@@ -9,6 +9,7 @@ import Dropdown from "./dropdown";
 import SellerLayout from "./sellerlayout";
 import ImageInput from "./imageinput";
 import TimePick from "./timepicker";
+import CropImage from "./cropimage";
 
 export {
     Auth,
@@ -21,5 +22,6 @@ export {
     Dropdown,
     SellerLayout,
     ImageInput,
-    TimePick
+    TimePick,
+    CropImage,
 }
