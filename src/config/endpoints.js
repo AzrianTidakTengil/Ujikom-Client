@@ -65,6 +65,7 @@ export default {
     TEST: '/test',
     USER: {
         GET: '/user',
+        AVATAR: '/user/avatar',
         ADDRESS: {
             ONE: '/user/address',
             ALL: '/user/addresses',
