@@ -5,3 +5,10 @@ export const get = () => {
         endpoints.USER.GET,
     )
 }
+
+export const CreateOrUpadateAvatar = (params) => {
+    return apiServiceV1.post(
+        endpoints.USER.AVATAR,
+        params
+    )
+}
