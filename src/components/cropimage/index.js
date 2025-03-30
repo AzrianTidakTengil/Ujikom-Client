@@ -1,12 +1,18 @@
-import { CircularProgress, Box } from "@mui/material";
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 
-const CropImage = ({ imageSrc }) => {
+const CropImage = forwardRef(({ imageSrc }, ref) => {
   const [crop, setCrop] = useState();
   const imgRef = useRef(null);
   const canvasRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    getCroppedImage: () => {
+      if (!canvasRef.current) return null;
+      return canvasRef.current.toDataURL("image/png", 0.5); // Get cropped image as data URL
+    }
+  }));
 
   const onImageLoad = (e) => {
     const { naturalWidth, naturalHeight } = e.currentTarget;
@@ -31,13 +37,9 @@ const CropImage = ({ imageSrc }) => {
       const scaleX = image.naturalWidth / image.width;
       const scaleY = image.naturalHeight / image.height;
       const ctx = canvas.getContext("2d");
-      const pixelRatio = window.devicePixelRatio;
 
       canvas.width = Math.floor(crop.width * scaleX);
       canvas.height = Math.floor(crop.height * scaleY);
-
-      ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.imageSmoothingQuality = "high";
 
       ctx.drawImage(
         image,
@@ -55,29 +57,20 @@ const CropImage = ({ imageSrc }) => {
 
   return (
     <div>
-        {imageSrc ? (
-            <ReactCrop
-            src={imageSrc}
-            crop={crop}
-            onChange={(c) => setCrop(c)}
-            onComplete={handleCropComplete}
-            aspect={1} // Fixed aspect ratio
-            >
-            <img ref={imgRef} src={imageSrc} alt="Source" onLoad={onImageLoad} />
-            </ReactCrop>
-        ) : (
-            <Box
-                sx={{
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}
-            >
-                <CircularProgress/>
-            </Box>
-        )}
-        <canvas ref={canvasRef} style={{ display: "none" }} />
+      {imageSrc && (
+        <ReactCrop
+          src={imageSrc}
+          crop={crop}
+          onChange={(c) => setCrop(c)}
+          onComplete={handleCropComplete}
+          aspect={1} // Fixed aspect ratio
+        >
+          <img ref={imgRef} src={imageSrc} alt="Source" onLoad={onImageLoad} />
+        </ReactCrop>
+      )}
+      <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
-};
+});
 
 export default CropImage;
