@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@cloudinary/url-gen": "^1.21.0",
     "@cropper/element-canvas": "^2.0.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
