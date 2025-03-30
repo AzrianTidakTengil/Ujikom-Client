@@ -1,5 +1,5 @@
 import { Users } from "@/services"
-import { CreateOrUpadateAvatar } from "@/services/user"
+import { CreateOrUpadateAvatar, DeleteAvatar } from "@/services/user"
 import { fabClasses } from "@mui/material"
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import UserMessage from './message'
@@ -11,6 +11,11 @@ export const getUser = createAsyncThunk('userSlice/get', async (params) => {
 
 export const updateAvatarUser = createAsyncThunk('userSlice/UpdateAvatarUser', async (params) => {
     const response = await CreateOrUpadateAvatar(params)
+    return response.data
+})
+
+export const deleteAvatarUser = createAsyncThunk('userSlice/deleteAvatarUser', async (params) => {
+    const response = await DeleteAvatar()
     return response.data
 })
 
@@ -71,6 +76,22 @@ export const userSlice = createSlice({
             state.message = UserMessage.USER.AVATAR
             state.isLoading = false
             state.isSuccess = false
+        })
+        .addCase(deleteAvatarUser.pending, (state) => {
+            state.message = ''
+            state.isLoading = true
+            state.isSuccess = false
+        })
+        .addCase(deleteAvatarUser.rejected, (state, action) => {
+            state.message = UserMessage.USER.DELETE_AVATAR
+            state.isLoading = false
+            state.isSuccess = false
+            state.error = action.error.message
+        })
+        .addCase(deleteAvatarUser.fulfilled, (state, action) => {
+            state.message = UserMessage.USER.DELETE_AVATAR
+            state.isLoading = false
+            state.isSuccess = true
         })
     }
 })
