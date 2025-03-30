@@ -12,3 +12,9 @@ export const CreateOrUpadateAvatar = (params) => {
         params
     )
 }
+
+export const DeleteAvatar = (params) => {
+    return apiServiceV1.delete(
+        endpoints.USER.AVATAR
+    )
+}
