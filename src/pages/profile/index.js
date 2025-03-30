@@ -1,12 +1,14 @@
 import React, { Component, createRef } from "react";
 import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress, Modal, createTheme, ThemeProvider } from "@mui/material";
 import { connect } from "react-redux";
-import { SearchOutlined } from "@mui/icons-material";
+import { SearchOutlined, Update } from "@mui/icons-material";
 import { getAll as getAllAddress, find } from "@/store/address";
 import { getAllTransaction, findTransaction } from "@/store/transaction";
 import { CropImage, DateRangePicker, Dropdown } from "@/components";
 import dayjs from "dayjs";
 import { palleteV1 } from '@/assets/css/template'
+import { updateAvatarUser } from "@/store/user";
+import { Cld } from "@/config";
 
 class Profile extends Component {
   constructor(props) {
@@ -19,6 +21,7 @@ class Profile extends Component {
         gender: "",
         email: "",
         telephone: "",
+        avatar: "",
       },
       renderTabs: 'address',
       addresses: [],
@@ -33,7 +36,7 @@ class Profile extends Component {
       cropImage: null,
     };
     this.inputImageReff = createRef()
-    this.cropperReff = createRef()
+    this.cropperRef = createRef()
     this.theme = createTheme({
         palette: {
             ...palleteV1.palette
@@ -55,7 +58,8 @@ class Profile extends Component {
           username: user.username,
           fullname: `${user.firstname} ${user.lastname}`,
           email: user.email,
-          telephone: user.telephone
+          telephone: user.telephone,
+          avatar: user.avatar
         }
       })
     }
@@ -428,9 +432,9 @@ class Profile extends Component {
                 overflowY: 'scroll'
               }}
             >
-              <CropImage imageSrc={previewImage}/>
+              <CropImage imageSrc={previewImage} ref={this.cropperRef}/>
             </Box>
-            <Button variant="contained" fullWidth sx={{marginY: 2}}>Atur Menjadi Foto Profile</Button>
+            <Button variant="contained" fullWidth sx={{marginY: 2}} onClick={this.handleCrop}>Atur Menjadi Foto Profile</Button>
           </Card>
         </Container>
       </Modal>
@@ -452,11 +456,13 @@ class Profile extends Component {
   }
 
   handleCrop = () => {
-    if (this.cropperReff.current) {
-      const croppedCanvas = this.cropperRef.current.cropper.getCroppedCanvas();
+    if (this.cropperRef.current) {
+      const croppedCanvas = this.cropperRef.current.getCroppedImage();
 
-      this.setState({
-        cropImage: croppedCanvas
+      console.log(croppedCanvas)
+
+      this.props.updateAvatarUser({
+        image: croppedCanvas
       })
     }
   }
@@ -477,7 +483,7 @@ class Profile extends Component {
                   alignItems: 'center'
                 }}
               >
-                <Avatar sx={{ width: 124, height: 124, marginBottom: 2}} />
+                <Avatar sx={{ width: 124, height: 124, marginBottom: 2}} src={Cld.image(user.avatar).toURL()}/>
                 <Stack
                   direction={'row'}
                   spacing={2}
@@ -582,8 +588,10 @@ const mapStateToProps = (state) => ({
     username: state.user.user.username,
     firstname: state.user.user.firstname,
     lastname: state.user.user.lastname,
+    avatar: state.user.user.avatar,
     email: state.user.user.email,
-    telephone: state.user.user.telephone
+    telephone: state.user.user.telephone,
+    message: state.user.message,
   },
   address: {
     isLoading: state.address.isLoading,
@@ -603,7 +611,8 @@ const mapDispatchToProps = {
   getAllAddress,
   find,
   getAllTransaction,
-  findTransaction
+  findTransaction,
+  updateAvatarUser,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
