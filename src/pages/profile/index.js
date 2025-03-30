@@ -7,7 +7,7 @@ import { getAllTransaction, findTransaction } from "@/store/transaction";
 import { CropImage, DateRangePicker, Dropdown } from "@/components";
 import dayjs from "dayjs";
 import { palleteV1 } from '@/assets/css/template'
-import { updateAvatarUser } from "@/store/user";
+import { deleteAvatarUser, updateAvatarUser } from "@/store/user";
 import { Cld } from "@/config";
 
 class Profile extends Component {
@@ -467,6 +467,10 @@ class Profile extends Component {
     }
   }
 
+  handleRemoveAvatar = () => {
+    this.props.deleteAvatarUser()
+  }
+
   render() {
     const { user, renderTabs } = this.state;
     const {address} = this.props
@@ -496,7 +500,7 @@ class Profile extends Component {
                     style={{ display: "none" }}
                     onChange={this.handleFileChange}
                   />
-                  <Button variant="outlined" size="small">Hapus Foto</Button>
+                  <Button variant="outlined" size="small" onClick={this.handleRemoveAvatar}>Hapus Foto</Button>
                 </Stack>
               </Box>
               <Typography variant="h5" sx={{ marginY: 2 }} fontWeight={600}>{user.username}</Typography>
@@ -613,6 +617,7 @@ const mapDispatchToProps = {
   getAllTransaction,
   findTransaction,
   updateAvatarUser,
+  deleteAvatarUser,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Profile);
