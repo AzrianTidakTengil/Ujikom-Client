@@ -53,42 +53,41 @@ class Navbar extends React.Component {
         anchorEL: null
       }
     }
+    this.theme = createTheme({
+      palette: {
+        ...palleteV1.palette,
+      },
+      components: {
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    '--TextField-brandBorderColor': palleteV1.palette.white.main,
+                    '--TextField-brandBorderHoverColor': palleteV1.palette.white.main,
+                    '--TextField-brandBorderFocusedColor': palleteV1.palette.white.main,
+                    '& label.Mui-focused': {
+                        color: 'var(--TextField-brandBorderFocusedColor)',
+                    },
+                },
+            },
+        },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                notchedOutline: {
+                    borderColor: 'var(--TextField-brandBorderColor)',
+                },
+                root: {
+                    [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+                        borderColor: 'var(--TextField-brandBorderHoverColor)',
+                    },
+                    [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+                        borderColor: 'var(--TextField-brandBorderFocusedColor)',
+                    },
+                },
+            }
+        },
+      }
+    })
   }
-  
-  theme = (outerTheme) => createTheme({
-    palette: {
-      ...palleteV1.palette,
-    },
-    components: {
-      MuiTextField: {
-          styleOverrides: {
-              root: {
-                  '--TextField-brandBorderColor': palleteV1.palette.white.main,
-                  '--TextField-brandBorderHoverColor': palleteV1.palette.white.main,
-                  '--TextField-brandBorderFocusedColor': palleteV1.palette.white.main,
-                  '& label.Mui-focused': {
-                      color: 'var(--TextField-brandBorderFocusedColor)',
-                  },
-              },
-          },
-      },
-      MuiOutlinedInput: {
-          styleOverrides: {
-              notchedOutline: {
-                  borderColor: 'var(--TextField-brandBorderColor)',
-              },
-              root: {
-                  [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-                      borderColor: 'var(--TextField-brandBorderHoverColor)',
-                  },
-                  [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
-                      borderColor: 'var(--TextField-brandBorderFocusedColor)',
-                  },
-              },
-          }
-      },
-    }
-  })
 
   componentDidMount() {
     const {showModal} = this.state
