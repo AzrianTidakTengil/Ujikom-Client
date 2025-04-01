@@ -71,6 +71,8 @@ export const userSlice = createSlice({
             state.message = UserMessage.USER.AVATAR
             state.isLoading = false
             state.isSuccess = true
+            
+            window.location.reload()
         })
         .addCase(updateAvatarUser.rejected, (state, action) => {
             state.message = UserMessage.USER.AVATAR
@@ -92,6 +94,8 @@ export const userSlice = createSlice({
             state.message = UserMessage.USER.DELETE_AVATAR
             state.isLoading = false
             state.isSuccess = true
+
+            window.location.reload()
         })
     }
 })
