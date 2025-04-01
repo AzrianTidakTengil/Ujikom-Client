@@ -180,12 +180,6 @@ class SellerProductAdd extends Component {
         )
     }
 
-    handleSubmit = (e) => {
-        e.preventDefault()
-
-        console.log(e.target)
-    }
-
     handleChangeLengthName = (event) => {
         const {value} = event.target
 
@@ -652,6 +646,12 @@ class SellerProductAdd extends Component {
                 </Grid>
             </Paper>
         )
+    }
+
+    handleSubmit = (e) => {
+        e.preventDefault()
+
+        console.log(e.target)
     }
 
     render() {
