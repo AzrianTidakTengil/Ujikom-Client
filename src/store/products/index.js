@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Product } from "@/services";
+import { CreateProduct } from "@/services/product";
 
 export const getAll = createAsyncThunk('productSlice/getAll', async (params) => {
     const response = await Product.ALl(params)
@@ -13,6 +14,11 @@ export const getOne = createAsyncThunk('productSlice/getOne', async (params) => 
 
 export const findProduct = createAsyncThunk('productSlice/findProduct', async () => {
     const response = await Product.Find()
+    return response.data
+})
+
+export const createProduct = createAsyncThunk('productSlice/createProduct', async (params) => {
+    const response = await CreateProduct(params)
     return response.data
 })
 
@@ -91,6 +97,19 @@ export const productSlice = createSlice({
             }).addCase(findProduct.rejected, (state, action) => {
                 state.isLoading = false
                 state.error = action.error.message
+            })
+            .addCase(createProduct.pending, (state) => {
+                state.isLoading = true
+                state.isSuccess = false
+            })
+            .addCase(createProduct.rejected, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = false
+                state.error =  action.error.message
+            })
+            .addCase(createProduct.fulfilled, (state) => {
+                state.isLoading = false
+                state.isSuccess = true
             })
     }
 })
