@@ -9,6 +9,7 @@ import dayjs from "dayjs";
 import { palleteV1 } from '@/assets/css/template'
 import { deleteAvatarUser, updateAvatarUser } from "@/store/user";
 import { Cld } from "@/config";
+import UserMessage from '@/store/user/message'
 
 class Profile extends Component {
   constructor(props) {
@@ -447,7 +448,8 @@ class Profile extends Component {
     } 
 
     this.setState((prevState) => ({
-      modalEditorAvatar: !prevState.modalEditorAvatar
+      modalEditorAvatar: !prevState.modalEditorAvatar,
+      previewImage: null
     }))
   }
 
