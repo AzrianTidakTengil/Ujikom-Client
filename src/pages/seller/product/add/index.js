@@ -1,5 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { ImageInput } from "@/components";
+import { createProduct } from "@/store/products";
 import { Delete } from "@mui/icons-material";
 import { Autocomplete, Box, Button, Container, createTheme, Divider, FormControl, FormControlLabel, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField, ThemeProvider, Typography, Grid2 as Grid, InputAdornment, OutlinedInput, IconButton, List, ListItemButton, ListItemText } from "@mui/material";
 import { withRouter } from "next/router";
@@ -708,7 +709,7 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-
+    createProduct
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerProductAdd))
