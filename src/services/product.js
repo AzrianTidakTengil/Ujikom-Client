@@ -20,3 +20,10 @@ export const Find = (params) => {
         params
     )
 }
+
+export const CreateProduct = (params) => {
+    return apiServiceV1.post(
+        endpoints.PRODUCTS.CREATE,
+        params
+    )
+}
