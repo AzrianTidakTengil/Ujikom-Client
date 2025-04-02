@@ -15,6 +15,8 @@ export default {
         STORE: '/item/store',
         LISTVARIANT: '/items/variant',
         LISTSUBVARIANT: '/items/subvariant',
+        CREATEVARIANT: '/item/variant/create',
+        CREATESUBVARIANT: '/item/subvariant/create',
         TREECATEGORIES: '/items/categories/trees'
     },
     TROLLEY: {
