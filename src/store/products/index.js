@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Product } from "@/services";
-import { CreateProduct } from "@/services/product";
+import { CreateProduct, CreateSubVariant, CreateVariant, SubVariant, TreeCateogories, Variant } from "@/services/product";
 
 export const getAll = createAsyncThunk('productSlice/getAll', async (params) => {
     const response = await Product.ALl(params)
@@ -19,6 +19,31 @@ export const findProduct = createAsyncThunk('productSlice/findProduct', async ()
 
 export const createProduct = createAsyncThunk('productSlice/createProduct', async (params) => {
     const response = await CreateProduct(params)
+    return response.data
+})
+
+export const listCategoriesProduct = createAsyncThunk('productSlice/listCategoriesProduct', async (params) => {
+    const response = await TreeCateogories()
+    return response.data
+})
+
+export const listVariantProduct = createAsyncThunk('productSlice/listVariantProduct', async (params) => {
+    const response = await Variant()
+    return response.data
+})
+
+export const listSubVariantProduct = createAsyncThunk('productSlice/listSubVariantProduct', async (params) => {
+    const response = await SubVariant(params)
+    return response.data
+})
+
+export const createVariantProduct = createAsyncThunk('productSlice/createVariantProduct', async (params) => {
+    const response = await CreateVariant(params)
+    return response.data
+})
+
+export const createSubVariantProduct = createAsyncThunk('productSlice/createSubVariantProduct', async (params) => {
+    const response = await CreateSubVariant(params)
     return response.data
 })
 
