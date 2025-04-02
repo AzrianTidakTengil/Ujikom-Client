@@ -27,3 +27,23 @@ export const CreateProduct = (params) => {
         params
     )
 }
+
+export const TreeCateogories = () => {
+    return apiServiceV1.get(
+        endpoints.PRODUCTS.TREECATEGORIES
+    )
+}
+
+export const CreateVariant = (params) => {
+    return apiServiceV1.post(
+        endpoints.PRODUCTS.LISTVARIANT,
+        params
+    )
+}
+
+export const CreateSubVariant = (params) => {
+    return apiServiceV1.post(
+        endpoints.PRODUCTS.LISTSUBVARIANT,
+        params
+    )
+}
