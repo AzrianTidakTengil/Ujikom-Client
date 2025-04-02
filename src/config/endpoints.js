@@ -12,7 +12,9 @@ export default {
         DELETE: '/item/delete',
         MARK: '/item/mark',
         POPULAR: '/item/popular',
-        STORE: '/item/store'
+        STORE: '/item/store',
+        LISTVARIANT: '/items/variant',
+        LISTSUBVARIANT: '/items/subvariant',
     },
     TROLLEY: {
         FIND: '/trolley/find',
