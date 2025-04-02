@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { ImageInput } from "@/components";
-import { createProduct } from "@/store/products";
+import { createProduct, createSubVariantProduct, createVariantProduct, listCategoriesProduct, listSubVariantProduct, listVariantProduct } from "@/store/products";
 import { Delete } from "@mui/icons-material";
 import { Autocomplete, Box, Button, Container, createTheme, Divider, FormControl, FormControlLabel, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField, ThemeProvider, Typography, Grid2 as Grid, InputAdornment, OutlinedInput, IconButton, List, ListItemButton, ListItemText } from "@mui/material";
 import { withRouter } from "next/router";
@@ -705,11 +705,22 @@ class SellerProductAdd extends Component {
 }
 
 const mapStateToProps = (state) => ({
-
+    isLoading: state.product.isLoading,
+    isSuccess: state.product.isSuccess,
+    error: state.product.error,
+    listCategories: state.product.listCategories,
+    listVariant: state.product.listVariant,
+    listSubVariant: state.product.listSubVariant,
+    message: state.product.message,
 })
 
 const mapDispatchToProps = {
-    createProduct
+    createProduct,
+    listCategoriesProduct,
+    listVariantProduct,
+    listSubVariantProduct,
+    createVariantProduct,
+    createSubVariantProduct,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(SellerProductAdd))
