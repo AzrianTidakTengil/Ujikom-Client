@@ -216,7 +216,7 @@ class SellerProduct extends Component {
                         }}
                     >
                         <Typography variant="h4" fontWeight={600} sx={{marginBottom: 2}}>Produk toko anda</Typography>
-                        <Button variant="contained">
+                        <Button variant="contained" href="/seller/product/add">
                             Tambah Produk Baru
                         </Button>
                     </Box>
