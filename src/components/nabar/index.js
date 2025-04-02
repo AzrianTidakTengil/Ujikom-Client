@@ -32,6 +32,7 @@ import { login, logout} from "@/store/auth";
 import { getUser } from "@/store/user";
 import { getAllItemTrolley } from "@/store/trolley";
 import { withRouter } from "next/router";
+import { Cld } from "@/config";
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -45,7 +46,8 @@ class Navbar extends React.Component {
         firstname: '',
         lastname: '',
         email: '',
-        telephone: ''
+        telephone: '',
+        avatar: '',
       },
       badgeTrolley: 0,
       popover: {
@@ -53,42 +55,41 @@ class Navbar extends React.Component {
         anchorEL: null
       }
     }
+    this.theme = createTheme({
+      palette: {
+        ...palleteV1.palette,
+      },
+      components: {
+        MuiTextField: {
+            styleOverrides: {
+                root: {
+                    '--TextField-brandBorderColor': palleteV1.palette.white.main,
+                    '--TextField-brandBorderHoverColor': palleteV1.palette.white.main,
+                    '--TextField-brandBorderFocusedColor': palleteV1.palette.white.main,
+                    '& label.Mui-focused': {
+                        color: 'var(--TextField-brandBorderFocusedColor)',
+                    },
+                },
+            },
+        },
+        MuiOutlinedInput: {
+            styleOverrides: {
+                notchedOutline: {
+                    borderColor: 'var(--TextField-brandBorderColor)',
+                },
+                root: {
+                    [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+                        borderColor: 'var(--TextField-brandBorderHoverColor)',
+                    },
+                    [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+                        borderColor: 'var(--TextField-brandBorderFocusedColor)',
+                    },
+                },
+            }
+        },
+      }
+    })
   }
-  
-  theme = (outerTheme) => createTheme({
-    palette: {
-      ...palleteV1.palette,
-    },
-    components: {
-      MuiTextField: {
-          styleOverrides: {
-              root: {
-                  '--TextField-brandBorderColor': palleteV1.palette.white.main,
-                  '--TextField-brandBorderHoverColor': palleteV1.palette.white.main,
-                  '--TextField-brandBorderFocusedColor': palleteV1.palette.white.main,
-                  '& label.Mui-focused': {
-                      color: 'var(--TextField-brandBorderFocusedColor)',
-                  },
-              },
-          },
-      },
-      MuiOutlinedInput: {
-          styleOverrides: {
-              notchedOutline: {
-                  borderColor: 'var(--TextField-brandBorderColor)',
-              },
-              root: {
-                  [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-                      borderColor: 'var(--TextField-brandBorderHoverColor)',
-                  },
-                  [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
-                      borderColor: 'var(--TextField-brandBorderFocusedColor)',
-                  },
-              },
-          }
-      },
-    }
-  })
 
   componentDidMount() {
     const {showModal} = this.state
@@ -115,7 +116,8 @@ class Navbar extends React.Component {
           firstname: user.firstname,
           lastname: user.lastname,
           email: user.email,
-          telephone: user.telephone
+          telephone: user.telephone,
+          avatar: user.avatar
         }
       })
     }
@@ -263,7 +265,7 @@ class Navbar extends React.Component {
                 </Grid>
                 <Grid>
                   <div style={{cursor: 'pointer'}} onClick={this.handleOpenPopever}>
-                    <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
+                    <Avatar src={Cld.image(user.avatar).toURL()}/>
                   </div>
                   <Popover
                     open={Boolean(popover.anchorEL)}
@@ -349,7 +351,8 @@ const mapStateToProps = (state) => ({
     firstname: state.user.user.firstname,
     lastname: state.user.user.lastname,
     email: state.user.user.email,
-    telephone: state.user.user.telephone
+    telephone: state.user.user.telephone,
+    avatar: state.user.user.avatar,
   },
   trolley: {
     isSuccess: state.trolley.isSucces,
