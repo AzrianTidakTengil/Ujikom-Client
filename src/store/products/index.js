@@ -68,7 +68,11 @@ const initialState = {
                 address: ''
             }
         }
-    }
+    },
+    listCategories: [],
+    listVariant: [],
+    listSubVariant: [],
+    message: '',
 }
 
 export const productSlice = createSlice({
@@ -134,6 +138,84 @@ export const productSlice = createSlice({
             })
             .addCase(createProduct.fulfilled, (state) => {
                 state.isLoading = false
+                state.isSuccess = true
+            })
+            .addCase(listCategoriesProduct.pending, (state, action) => {
+                state.isLoading = true
+                state.message = ''
+                state.isSuccess = false
+            })
+            .addCase(listCategoriesProduct.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.error = action.error.message
+            })
+            .addCase(listCategoriesProduct.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.isSuccess = true
+                state.listCategories = action.payload
+            })
+            .addCase(listVariantProduct.pending, (state, action) => {
+                state.isLoading = true
+                state.message = ''
+                state.isSuccess = false
+            })
+            .addCase(listVariantProduct.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.error = action.error.message
+            })
+            .addCase(listVariantProduct.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.isSuccess = true
+                state.listVariant = action.payload
+            })
+            .addCase(listSubVariantProduct.pending, (state, action) => {
+                state.isLoading = true
+                state.message = ''
+                state.isSuccess = false
+            })
+            .addCase(listSubVariantProduct.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.error = action.error.message
+            })
+            .addCase(listSubVariantProduct.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.isSuccess = true
+                state.listSubVariant = action.payload
+            })
+            .addCase(createVariantProduct.pending, (state, action) => {
+                state.isLoading = true
+                state.message = ''
+                state.isSuccess = false
+            })
+            .addCase(createVariantProduct.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.error = action.error.message
+            })
+            .addCase(createVariantProduct.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.isSuccess = true
+            })
+            .addCase(createSubVariantProduct.pending, (state, action) => {
+                state.isLoading = true
+                state.message = ''
+                state.isSuccess = false
+            })
+            .addCase(createSubVariantProduct.rejected, (state, action) => {
+                state.isLoading = false
+                state.message = ''
+                state.error = action.error.message
+            })
+            .addCase(createSubVariantProduct.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.message = ''
                 state.isSuccess = true
             })
     }
