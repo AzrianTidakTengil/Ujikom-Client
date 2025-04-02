@@ -15,6 +15,7 @@ export default {
         STORE: '/item/store',
         LISTVARIANT: '/items/variant',
         LISTSUBVARIANT: '/items/subvariant',
+        TREECATEGORIES: '/items/categories/trees'
     },
     TROLLEY: {
         FIND: '/trolley/find',
