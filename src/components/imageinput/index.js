@@ -9,18 +9,29 @@ const ImageInput = ({ onImageSelect }) => {
 
   const handleImageChange = (event) => {
     const files = Array.from(event.target.files);
-    console.log(event.target.files)
     if (images.length + files.length > MAX_IMAGES) {
       alert(`You can only upload up to ${MAX_IMAGES} images.`);
       return;
     }
-    const imageUrls = files.map((file) => URL.createObjectURL(file));
-    setImages((prevImages) => [...prevImages, ...imageUrls]);
-    if (onImageSelect) {
-      console.log(imageUrls)
-      onImageSelect(files);
-    }
+  
+    const newImages = [];
+    const base64Images = [];
+  
+    files.forEach((file) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        newImages.push(reader.result); // Base64 string
+        if (newImages.length === files.length) {
+          setImages((prevImages) => [...prevImages, ...newImages]);
+          if (onImageSelect) {
+            onImageSelect(newImages); // Pass Base64 images
+          }
+        }
+      };
+    });
   };
+  
 
   const handleRemoveImage = (index) => {
     setImages((prevImages) => prevImages.filter((_, i) => i !== index));
