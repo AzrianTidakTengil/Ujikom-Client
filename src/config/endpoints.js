@@ -17,7 +17,7 @@ export default {
         LISTSUBVARIANT: '/items/subvariant',
         CREATEVARIANT: '/item/variant/create',
         CREATESUBVARIANT: '/item/subvariant/create',
-        TREECATEGORIES: '/items/categories/trees'
+        TREECATEGORIES: '/items/categories/tree'
     },
     TROLLEY: {
         FIND: '/trolley/find',
