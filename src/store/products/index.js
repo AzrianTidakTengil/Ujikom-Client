@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Product } from "@/services";
 import { CreateProduct, CreateSubVariant, CreateVariant, SubVariant, TreeCateogories, Variant } from "@/services/product";
+import ProductMessage from './message'
 
 export const getAll = createAsyncThunk('productSlice/getAll', async (params) => {
     const response = await Product.ALl(params)
@@ -128,6 +129,7 @@ export const productSlice = createSlice({
                 state.error = action.error.message
             })
             .addCase(createProduct.pending, (state) => {
+                state.message = ProductMessage.PRODUCTS.CREATE
                 state.isLoading = true
                 state.isSuccess = false
             })
@@ -137,6 +139,7 @@ export const productSlice = createSlice({
                 state.error =  action.error.message
             })
             .addCase(createProduct.fulfilled, (state) => {
+                state.message = ProductMessage.PRODUCTS.CREATE
                 state.isLoading = false
                 state.isSuccess = true
             })
@@ -154,7 +157,7 @@ export const productSlice = createSlice({
                 state.isLoading = false
                 state.message = ''
                 state.isSuccess = true
-                state.listCategories = action.payload
+                state.listCategories = action.payload.data
             })
             .addCase(listVariantProduct.pending, (state, action) => {
                 state.isLoading = true
@@ -170,7 +173,7 @@ export const productSlice = createSlice({
                 state.isLoading = false
                 state.message = ''
                 state.isSuccess = true
-                state.listVariant = action.payload
+                state.listVariant = action.payload.data
             })
             .addCase(listSubVariantProduct.pending, (state, action) => {
                 state.isLoading = true
@@ -186,7 +189,7 @@ export const productSlice = createSlice({
                 state.isLoading = false
                 state.message = ''
                 state.isSuccess = true
-                state.listSubVariant = action.payload
+                state.listSubVariant = action.payload.data
             })
             .addCase(createVariantProduct.pending, (state, action) => {
                 state.isLoading = true
@@ -200,7 +203,7 @@ export const productSlice = createSlice({
             })
             .addCase(createVariantProduct.fulfilled, (state, action) => {
                 state.isLoading = false
-                state.message = ''
+                state.message = 
                 state.isSuccess = true
             })
             .addCase(createSubVariantProduct.pending, (state, action) => {
