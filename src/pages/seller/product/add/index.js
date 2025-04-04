@@ -2,11 +2,12 @@ import { palleteV1 } from "@/assets/css/template";
 import { ImageInput } from "@/components";
 import { createProduct, createSubVariantProduct, createVariantProduct, listCategoriesProduct, listSubVariantProduct, listVariantProduct } from "@/store/products";
 import { Delete } from "@mui/icons-material";
-import { Autocomplete, Box, Button, Container, createTheme, Divider, FormControl, FormControlLabel, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField, ThemeProvider, Typography, Grid2 as Grid, InputAdornment, OutlinedInput, IconButton, List, ListItemButton, ListItemText } from "@mui/material";
+import { Autocomplete, Box, Button, Container, createTheme, Divider, FormControl, FormControlLabel, InputLabel, MenuItem, Paper, Radio, RadioGroup, Select, TextField, ThemeProvider, Typography, Grid2 as Grid, InputAdornment, OutlinedInput, IconButton, List, ListItemButton, ListItemText, Backdrop, CircularProgress } from "@mui/material";
 import { withRouter } from "next/router";
 import {Component} from "react";
 import { NumericFormat } from "react-number-format";
 import { connect } from "react-redux";
+import ProductMessage from '@/store/products/message'
 
 class SellerProductAdd extends Component {
     constructor(props) {
@@ -18,19 +19,23 @@ class SellerProductAdd extends Component {
                 category: null,
                 condition: 'new',
                 description: '',
-                price: 0,
-                minimumPurchase: 0,
-                stock: 0,
-                weight: 0,
+                price: null,
+                minimumPurchase: null,
+                stock: null,
+                weight: null,
                 size: {
-                    width: 0,
-                    height: 0,
-                    length: 0
+                    long: null,
+                    width: null,
+                    height: null
                 },
                 variant: []
             },
             useVariant: false,
             addNewType: false,
+            categories: [],
+            variants: [],
+            subvariants: [],
+            loading: false,
         }
         this.theme = createTheme({
             palette: {
@@ -39,22 +44,60 @@ class SellerProductAdd extends Component {
         })
     }
 
+    UNSAFE_componentWillMount() {
+        this.props.listCategoriesProduct()
+        this.props.listVariantProduct()
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const {isLoading, isSuccess, error, listCategories, listVariant, listSubVariant, message, router} = nextProps
+
+        if (isSuccess && listCategories) {
+            this.setState({
+                categories: listCategories
+            })
+        }
+
+        if (isSuccess && listVariant) {
+            this.setState({
+                variants: [
+                    ...listVariant,
+                    {
+                        id: 0,
+                        name: 'Tambah Opsi'
+                    }
+                ]
+            })
+        }
+
+        if (isSuccess && listSubVariant) {
+            this.setState({
+                subvariants: [
+                    ...listSubVariant,
+                    {
+                        id: 0,
+                        name: 'Tambah Opsi'
+                    }
+                ]
+            })
+        }
+
+        if (isSuccess && message === ProductMessage.PRODUCTS.CREATE) {
+            router.push({
+                pathname: '/seller/product'
+            })
+        }
+
+        if (isLoading && message === ProductMessage.PRODUCTS.CREATE) {
+            this.setState({
+                loading: true
+            })
+        }
+    }
+
     renderFormInformationProduct = () => {
-        const {useVariant} = this.state
+        const {useVariant, categories} = this.state
         const {name, condition, description, minimumPurchase, stock, weight, size, variant} = this.state.form
-        const top100Films = [
-            { title: 'The Shawshank Redemption', year: 1994 },
-            { title: 'The Godfather', year: 1972 },
-            { title: 'The Godfather: Part II', year: 1974 },
-            { title: 'The Dark Knight', year: 2008 },
-            { title: '12 Angry Men', year: 1957 },
-            { title: "Schindler's List", year: 1993 },
-            { title: 'Pulp Fiction', year: 1994 },
-            {
-              title: 'The Lord of the Rings: The Return of the King',
-              year: 2003,
-            },
-        ]
 
         return (
             <Paper
@@ -105,7 +148,9 @@ class SellerProductAdd extends Component {
                         <Autocomplete
                             disableClearable
                             freeSolo
-                            options={top100Films.map((option) => option.title)}
+                            options={categories}
+                            onChange={this.handleChangeCategory}
+                            getOptionLabel={(category) => category.label}
                             renderInput={(params) => (
                                 <TextField
                                     {...params}
@@ -134,7 +179,7 @@ class SellerProductAdd extends Component {
                     >
                         <Typography variant="h6" fontWeight={600}>Kondisi Produk</Typography>
                         <FormControl>
-                            <RadioGroup defaultValue={condition} name="condition">
+                            <RadioGroup onChange={this.handleChangeRadioCondition} defaultValue={condition} name="condition">
                                 <FormControlLabel value="new" control={<Radio/>} label="Baru"/>
                                 <FormControlLabel value="old" control={<Radio/>} label="Bekas"/>
                             </RadioGroup>
@@ -211,36 +256,29 @@ class SellerProductAdd extends Component {
         })
     }
 
+    handleChangeRadioCondition = (event) => {
+        const {value, name} = event.target
+
+        this.setState({
+            form: {
+                ...this.state.form,
+                condition: value
+            }
+        })
+    }
+
+    handleChangeCategory = (event, newValue) => {
+        this.setState({
+            form: {
+                ...this.state.form,
+                category: newValue.value
+            }
+        })
+    }
+
     renderVariant = () => {
-        const {useVariant, addNewType} = this.state
+        const {useVariant, addNewType, variants, subvariants} = this.state
         const {name, condition, description, minimumPurchase, stock, weight, size, variant} = this.state.form
-        const top100Films = [
-            { title: 'The Shawshank Redemption', year: 1994 },
-            { title: 'The Godfather', year: 1972 },
-            { title: 'The Godfather: Part II', year: 1974 },
-            { title: 'The Dark Knight', year: 2008 },
-            { title: '12 Angry Men', year: 1957 },
-            { title: "Schindler's List", year: 1993 },
-            { title: 'Pulp Fiction', year: 1994 },
-            {
-              title: 'The Lord of the Rings: The Return of the King',
-              year: 2003,
-            },
-        ]
-        const optionType = [
-            {
-                value: 'color',
-                title: 'Warna'
-            },
-            {
-                value: 'size',
-                title: 'Ukuran'
-            },
-            {
-                value: 'pack',
-                title: 'Kemasan'
-            },
-        ]
 
         return (
             <Paper
@@ -296,7 +334,8 @@ class SellerProductAdd extends Component {
                                                     <Autocomplete
                                                         disableClearable
                                                         freeSolo
-                                                        options={optionType.map((option) => option.title)}
+                                                        options={variants}
+                                                        getOptionLabel={(variant) => variant.name}
                                                         renderInput={(params) => {
                                                             return (
                                                                 <TextField
@@ -310,13 +349,26 @@ class SellerProductAdd extends Component {
                                                                 />
                                                             )
                                                         }}
+                                                        onChange={(event, newValue) => {
+                                                            if (newValue.id === 0) {
+                                                                alert('tambah opsi')
+                                                            } else {
+                                                                val.id = newValue.id
+                                                                if (!newValue.shop_id) {
+                                                                    this.handleChangeSelectVariant(newValue.id)
+                                                                } else {
+                                                                    this.props.listSubVariantProduct({variant_id: newValue.id})
+                                                                }
+                                                            }
+                                                        }}
                                                     />
                                                 </Grid>
                                                 <Grid size={8}>
                                                     <Autocomplete
                                                         freeSolo
                                                         multiple
-                                                        options={top100Films.map((option) => option.title)}
+                                                        options={subvariants}
+                                                        getOptionLabel={(subvariant) => subvariant.name}
                                                         renderInput={(params) => (
                                                             <TextField
                                                                 {...params}
@@ -328,6 +380,9 @@ class SellerProductAdd extends Component {
                                                                 }}
                                                             />
                                                         )}
+                                                        onChange={(event, newValue) => {
+                                                            val.type = newValue.map((v) => v.id)
+                                                        }}
                                                     />
                                                 </Grid>
                                             </Grid>
@@ -336,11 +391,15 @@ class SellerProductAdd extends Component {
                                                     <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Harga</Typography>
                                                     <NumericFormat
                                                         name="price"
-                                                        thousandSeparator
-                                                        prefix="Rp."
+                                                        thousandSeparator="."
+                                                        decimalSeparator=","
+                                                        prefix="Rp "
                                                         variant="outlined"
                                                         customInput={TextField}
                                                         fullWidth
+                                                        onValueChange={(values) => {
+                                                            val.price = parseInt(values.value)
+                                                        }}
                                                     />
                                                 </Grid>
                                                 <Grid size={3}>
@@ -352,6 +411,9 @@ class SellerProductAdd extends Component {
                                                         variant="outlined"
                                                         customInput={TextField}
                                                         fullWidth
+                                                        onChange={(event) => {
+                                                            val.minimumPurchase = parseInt(event.target.value)
+                                                        }}
                                                     />
                                                 </Grid>
                                                 <Grid size={3}>
@@ -363,6 +425,9 @@ class SellerProductAdd extends Component {
                                                         variant="outlined"
                                                         customInput={TextField}
                                                         fullWidth
+                                                        onChange={(event) => {
+                                                            val.stock = parseInt(event.target.value)
+                                                        }}
                                                     />
                                                 </Grid>
                                                 <Grid size={3}>
@@ -378,6 +443,9 @@ class SellerProductAdd extends Component {
                                                             input: {
                                                                 endAdornment: <InputAdornment position="end">gram</InputAdornment>,
                                                             },
+                                                        }}
+                                                        onChange={(event) => {
+                                                            val.weight = parseInt(event.target.value)
                                                         }}
                                                     />
                                                 </Grid>
@@ -426,11 +494,20 @@ class SellerProductAdd extends Component {
                                         <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Harga</Typography>
                                         <NumericFormat
                                             name="price"
-                                            thousandSeparator
-                                            prefix="Rp."
+                                            thousandSeparator="."
+                                            decimalSeparator=","
+                                            prefix="Rp "
                                             variant="outlined"
                                             customInput={TextField}
                                             fullWidth
+                                            onValueChange={(values) => {
+                                                this.setState({
+                                                    form: {
+                                                        ...this.state.form,
+                                                        price: parseInt(values.value)
+                                                    }
+                                                })
+                                            }}
                                         />
                                     </Grid>
                                     <Grid size={3}>
@@ -442,6 +519,7 @@ class SellerProductAdd extends Component {
                                             variant="outlined"
                                             customInput={TextField}
                                             fullWidth
+                                            onChange={this.handleChangeNoVariant}
                                         />
                                     </Grid>
                                     <Grid size={3}>
@@ -453,6 +531,7 @@ class SellerProductAdd extends Component {
                                             variant="outlined"
                                             customInput={TextField}
                                             fullWidth
+                                            onChange={this.handleChangeNoVariant}
                                         />
                                     </Grid>
                                     <Grid size={3}>
@@ -469,6 +548,7 @@ class SellerProductAdd extends Component {
                                                     endAdornment: <InputAdornment position="end">gram</InputAdornment>,
                                                 },
                                             }}
+                                            onChange={this.handleChangeNoVariant}
                                         />
                                     </Grid>
                                 </Grid>
@@ -480,19 +560,15 @@ class SellerProductAdd extends Component {
         )
     }
 
-    handleNumberInput = (event) => {
+    handleChangeNoVariant = (event) => {
         const {name, value} = event.target
 
-        if (name === 'weight') {
-            if (/\d/g.test(value)) {
-                this.setState({
-                    form: {
-                        ...this.state.form,
-                        weight: value
-                    }
-                })
+        this.setState({
+            form: {
+                ...this.state.form,
+                [name]: parseInt(value)
             }
-        }
+        })
     }
 
     handleAddVariant = () => {
@@ -502,8 +578,12 @@ class SellerProductAdd extends Component {
                 variant: [
                     ...this.state.form.variant,
                     {
-                        name: '',
-                        type: []
+                        id: null,
+                        type: [],
+                        price: null,
+                        minimumPurchase: null,
+                        stock: null,
+                        weight: null,
                     }
                 ]
             }
@@ -523,8 +603,12 @@ class SellerProductAdd extends Component {
                     ...form,
                     variant: [
                         {
-                            name: '',
-                            type: []
+                            id: null,
+                            type: [],
+                            price: null,
+                            minimumPurchase: null,
+                            stock: null,
+                            weight: null,
                         }
                     ]
                 }
@@ -539,20 +623,36 @@ class SellerProductAdd extends Component {
         }
     }
 
-    handleChangeSelectTypeVariant = (event, index) => {
-        const {name, value} = event.target
-        
-        this.setState((prevState) => {
-            const array = prevState.form.variant.map((val, i) =>
-                i === index ? {...val, name: value} : val
-            )
-            return {
-                form: {
-                    ...this.state.form,
-                    variant: array
-                }
-            }
-        })
+    handleChangeSelectVariant = (value) => {
+        if (value === 1) {
+            const colors = ["blue", "red", "yellow", "purple", "green", "orange", "black", "white"]
+
+            this.setState({
+                subvariants: [
+                    ...colors.map((c, i) => ({id: i + 1, name: c})),
+                    {
+                        id: 0,
+                        name: 'Tambah Opsi'
+                    }
+                ]
+            })   
+        } else if (value === 2) {
+            const size = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+
+            this.setState({
+                subvariants: [
+                    ...size.map((c, i) => ({id: i + 1, name: c})),
+                ]
+            })   
+        } else if (value === 3) {
+            const packages = ['small', 'medium', 'large']
+
+            this.setState({
+                subvariants: [
+                    ...packages.map((c, i) => ({id: i + 1, name: c})),
+                ]
+            })   
+        }
     }
 
     handleCreateType = (event) => {
@@ -598,12 +698,14 @@ class SellerProductAdd extends Component {
                     <Grid size={4}>
                         <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Panjang</Typography>
                         <NumericFormat
-                            name="width"
+                            name="long"
                             // thousandSeparator
                             // prefix="Rp."
                             variant="outlined"
                             customInput={TextField}
                             fullWidth
+                            onChange={this.handleChangeSize}
+                            value={size.long}
                             slotProps={{
                                 input: {
                                     endAdornment: <InputAdornment position="end">cm</InputAdornment>,
@@ -614,11 +716,13 @@ class SellerProductAdd extends Component {
                     <Grid size={4}>
                         <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Lebar</Typography>
                         <NumericFormat
-                            name="height"
+                            name="width"
                             // thousandSeparator
                             // prefix="Rp."
                             variant="outlined"
                             customInput={TextField}
+                            onChange={this.handleChangeSize}
+                            value={size.width}
                             fullWidth
                             slotProps={{
                                 input: {
@@ -630,12 +734,14 @@ class SellerProductAdd extends Component {
                     <Grid size={4}>
                         <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Tinggi</Typography>
                         <NumericFormat
-                            name="length"
+                            name="height"
                             // thousandSeparator
                             // prefix="Rp."
                             variant="outlined"
                             customInput={TextField}
                             fullWidth
+                            value={size.height}
+                            onChange={this.handleChangeSize}
                             slotProps={{
                                 input: {
                                     endAdornment: <InputAdornment position="end">cm</InputAdornment>,
@@ -648,17 +754,68 @@ class SellerProductAdd extends Component {
         )
     }
 
+    handleChangeSize = (event) => {
+        const {name, value} = event.target
+        
+        this.setState({
+            form: {
+                ...this.state.form,
+                size: {
+                    ...this.state.form.size,
+                    [name]: value
+                }
+            }
+        })
+    }
+
     handleSubmit = (e) => {
         e.preventDefault()
+        const {images, name, description, condition, size, category, variant, price, minimumPurchase, stock, weight} = this.state.form
 
-        console.log(e.target)
+        const noVariants = [
+            {
+                id: null,
+                price,
+                minimum_purchase: minimumPurchase,
+                stock,
+                weight,
+                subvariant: []
+            }
+        ]
+
+        const params = {
+            name,
+            description,
+            condition,
+            long: parseInt(size.long),
+            width: parseInt(size.width),
+            height: parseInt(size.height),
+            categories: category,
+            images,
+            variants: variant.length != 0 ? variant.map((v) => ({
+                id: v.id,
+                price: v.price,
+                minimum_purchase: v.minimumPurchase,
+                stock: v.stock,
+                weight: v.weight,
+                subvariant: v.type
+            })) : noVariants
+        }
+
+        this.props.createProduct(params)
     }
 
     render() {
-        const {form} = this.state
+        const {form, loading} = this.state
 
         return (
             <ThemeProvider theme={this.theme}>
+                <Backdrop
+                    open={loading}
+                    sx={{zIndex: this.theme.zIndex.appBar + 1000}}
+                >
+                    <CircularProgress color="info"/>
+                </Backdrop>
                 <Container>
                     <Typography variant="h4" fontWeight={600}>Tambahkan Produk</Typography>
                     <form onSubmit={this.handleSubmit}>
