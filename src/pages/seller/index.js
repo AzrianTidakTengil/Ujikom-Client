@@ -237,7 +237,7 @@ class Seller extends Component {
                                             {val.name}
                                         </TableCell>
                                         <TableCell>
-                                            {val.productToLabel.length !== 0 ? val.productToLabel.map((label) => `${label.name}, `) : '-'}
+                                            {val.productToCategory ? `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name} > ${val.productToCategory.productCategoryToCategory3.name}` : '-'}
                                         </TableCell>
                                         <TableCell>
                                             <Button variant="contained" color="primary" onClick={() => alert(`Visiting products in Tier ${val.name}`)} size="small">
@@ -277,9 +277,9 @@ class Seller extends Component {
                         </Grid>
                     </Grid>
                 </Container>
-                <Container sx={{marginY: 2}}>
+                {/* <Container sx={{marginY: 2}}>
                     {this.renderMision()}
-                </Container>
+                </Container> */}
                 <Container sx={{marginY: 2}}>
                     {this.renderTren()}
                 </Container>
