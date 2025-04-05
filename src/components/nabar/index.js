@@ -21,7 +21,7 @@ import {
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { AccountCircle, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined } from "@mui/icons-material";
+import { AccountCircle, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
@@ -53,7 +53,8 @@ class Navbar extends React.Component {
       popover: {
         id: null,
         anchorEL: null
-      }
+      },
+      isSeller: false,
     }
     this.theme = createTheme({
       palette: {
@@ -118,7 +119,8 @@ class Navbar extends React.Component {
           email: user.email,
           telephone: user.telephone,
           avatar: user.avatar
-        }
+        },
+        isSeller: user.isSeller
       })
     }
     if (trolley.isSuccess) {
@@ -208,7 +210,7 @@ class Navbar extends React.Component {
   }
 
   render() {
-    const {showModal, user, badgeTrolley, popover} = this.state
+    const {showModal, user, badgeTrolley, popover, isSeller} = this.state
     const {auth} = this.props
     const dummy_search = [
       {
@@ -263,6 +265,13 @@ class Navbar extends React.Component {
                     <MailOutlineOutlined />
                   </IconButton>
                 </Grid>
+                {
+                  isSeller ? (
+                    <IconButton href="/seller/">
+                      <StoreOutlined />
+                    </IconButton>
+                  ) : ''
+                }
                 <Grid>
                   <div style={{cursor: 'pointer'}} onClick={this.handleOpenPopever}>
                     <Avatar src={Cld.image(user.avatar).toURL()}/>
@@ -353,6 +362,7 @@ const mapStateToProps = (state) => ({
     email: state.user.user.email,
     telephone: state.user.user.telephone,
     avatar: state.user.user.avatar,
+    isSeller: state.user.isSeller,
   },
   trolley: {
     isSuccess: state.trolley.isSucces,
