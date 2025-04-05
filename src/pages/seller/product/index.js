@@ -1,5 +1,5 @@
 import { palleteV1 } from "@/assets/css/template"
-import { Container, createTheme, Paper, ThemeProvider, Typography, Grid2 as Grid, Card, CardContent, Select, MenuItem, FormControl, InputLabel, Box, IconButton, Divider, Stack, TextField, InputAdornment, Button } from "@mui/material"
+import { Container, createTheme, Paper, ThemeProvider, Typography, Grid2 as Grid, Card, CardContent, Select, MenuItem, FormControl, InputLabel, Box, IconButton, Divider, Stack, TextField, InputAdornment, Button, Chip } from "@mui/material"
 import { withRouter } from "next/router"
 import {Component} from "react"
 import { connect } from "react-redux"
@@ -7,6 +7,8 @@ import { SellerLayout } from "@/components"
 import { DataGrid } from "@mui/x-data-grid"
 import { Delete, Edit, SearchOutlined } from "@mui/icons-material"
 import { MyProductShop } from "@/store/shop"
+import { Cld } from "@/config"
+import { thumbnail } from "@cloudinary/url-gen/actions/resize"
 
 
 class SellerProduct extends Component {
@@ -59,21 +61,45 @@ class SellerProduct extends Component {
                 headerName: 'Id',
             },
             {
+                field: 'image',
+                headerName: 'Foto',
+                width: 250,
+                renderCell: (params) => (
+                    <img src={params.value} width={160} height={160}/>
+                ),
+            },
+            {
                 field: 'name',
                 headerName: 'Nama',
-                width: 500,
+                width: 400,
             },
             {
-                field: 'price',
-                headerName: 'Harga',
+                field: 'variant',
+                headerName: 'Varian',
                 width: 300,
+                renderCell: (params) => {
+                    const variant = params.value.map((v) => ({name: v.productVariantToVariant ? v.productVariantToVariant.name : null}))
+
+                    return (
+                        <div
+                            style={{
+                                display: 'flex'
+                            }}
+                        >
+                            {
+                                variant.map((e) => (
+                                    <div>
+                                        {
+                                            e.name ? <Chip label={e.name} sx={{marginRight: 2}} /> : <p>-</p>
+                                        }
+                                    </div>
+                                ))
+                            }
+                        </div>
+                    )
+                }
             },
             {
-                field: 'stock',
-                headerName: 'Stok',
-                width: 120,
-            },
-            ,{
                 field: 'action',
                 headerName: 'Aksi',
                 renderCell: (params) => (
@@ -86,12 +112,9 @@ class SellerProduct extends Component {
 
         const rows = shop.product.map((p) => ({
             id: p.id,
+            image: p.productToImage.length != 0 ? Cld.image(p.productToImage[0].public_id).resize(thumbnail().width(150).height(150)).toURL() : '',
             name: p.name,
-            price: new Intl.NumberFormat('id-ID', {
-                style: "currency",
-                currency: "IDR"
-            }).format(p.price),
-            stock: p.stock
+            variant: p.productToProductVariant,
         }))
 
         return (
@@ -114,6 +137,18 @@ class SellerProduct extends Component {
                     rowSelectionModel={selectRow}
                     onPaginationModelChange={this.handleSetPageDataGrid}
                     paginationMode="server"
+                    getRowHeight={() => 'auto'}
+                    getEstimatedRowHeight={() => 200}
+                    sx={{
+                        '&.MuiDataGrid-root--densityStandard .MuiDataGrid-cell': {
+                            py: '15px',
+                        },
+                        '&.MuiDataGrid-root--densityComfortable .MuiDataGrid-cell': {
+                            py: '22px',
+                        },'&.MuiDataGrid-root--densityCompact .MuiDataGrid-cell': {
+                            py: 1,
+                        }
+                      }}
                 />
             </Box>
         )
