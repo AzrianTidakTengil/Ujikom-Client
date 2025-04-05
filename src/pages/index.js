@@ -119,7 +119,7 @@ class Main extends Component {
                                         component="img"
                                         height={160}
                                         width={160}
-                                        image={Cld.image('product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                                        image={Cld.image(product.productToImage.length != 0 ? product.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
                                         alt={product.name}
                                     />
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
@@ -140,7 +140,7 @@ class Main extends Component {
                                             new Intl.NumberFormat('id-ID', {
                                                 style: "currency",
                                                 currency: "IDR"
-                                            }).format(product.price)
+                                            }).format(product.productToProductVariant.length != 0 ? product.productToProductVariant[0].price : product.price)
                                         }
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
@@ -177,9 +177,6 @@ class Main extends Component {
     handlePageChange = (event, value) => {
         const {limitProduct, offeringProduct} = this.state
         const startIndex = (value - 1) * limitProduct
-
-        console.log(value)
-        console.log(startIndex + limitProduct)
 
         this.props.getAll({
             limit: startIndex + limitProduct,
