@@ -10,6 +10,7 @@ import { connect } from "react-redux";
 import { logout } from "@/store/auth";
 import { getUser } from "@/store/user";
 import { getSeller } from "@/store/shop";
+import { Cld } from "@/config";
 
 const drawerWidth = 240;
 const miniDrawerWidth = 60;
@@ -30,10 +31,12 @@ class SellerLayout extends Component {
         firstname: '',
         lastname: '',
         email: '',
-        telephone: ''
+        telephone: '',
+        avatar: '',
       },
       seller: {
-        name: ''
+        name: '',
+        avatar: '',
       }
     };
     this.theme = createTheme({
@@ -93,7 +96,8 @@ class SellerLayout extends Component {
           firstname: user.firstname,
           lastname: user.lastname,
           email: user.email,
-          telephone: user.telephone
+          telephone: user.telephone,
+          avatar: user.avatar,
         }
       })
     }
@@ -281,7 +285,7 @@ class SellerLayout extends Component {
       <ThemeProvider theme={this.theme}>
         <Box sx={{ display: "flex" }}>
           <AppBar position="fixed" sx={{ width: { sm: `calc(100% - ${drawerOpen ? drawerWidth : 0}px)` }, ml: { sm: `${drawerOpen ? drawerWidth : 0}px` }, zIndex: this.theme.zIndex.drawer + 1}}>
-            <Toolbar sx={{justifyContent: 'space-between'}}>
+            <Toolbar sx={{justifyContent: drawerOpen ? 'end' : 'space-between'}}>
               {
                 drawerOpen ? '' :
                 (
@@ -306,66 +310,20 @@ class SellerLayout extends Component {
                   </Box>
                 )
               }
-              <TextField
-                sx={{ width: '40rem' }}
-                size="small"
-                hiddenLabel
-                slotProps={{ input: {
-                  startAdornment: (
-                      <InputAdornment position="start">
-                          <SearchOutlined color="white"/>
-                      </InputAdornment>
-                  )
-                }}}
-                // onChange={(event) => this.handleChange(event.target.value)}
-                onClick={this.handleAnchorSearch}
-              />
               <Stack
                 direction="row"
                 divider={<Divider flexItem orientation="vertical"/>}
                 spacing={2}
               >
                 <Button sx={{display: 'flex', alignItems: 'center'}} variant="text" color="white">
-                  <Avatar {...this.handleSplitCharacter(`${seller.name} shop`)} sizes="small"></Avatar>
+                  <Avatar src={Cld.image(seller.avatar ?? 'component-avatar-seller').toURL()} sizes="small"></Avatar>
                   <Typography variant="subtitle2" color="black" sx={{marginLeft: 2}}>{seller.name}</Typography>
                 </Button>
                 <Button onClick={this.handleAnchorAvatar}>
-                  <Avatar {...this.handleSplitCharacter(`${user.firstname} ${user.lastname}`)}/>
+                  <Avatar src={Cld.image(user.avatar).toURL()}/>
                 </Button>
               </Stack>
             </Toolbar>
-            <Popover
-              open={Boolean(anchorEl.search)}
-              anchorEl={anchorEl.search}
-              onClose={this.handleClearAchorSearch}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'center',
-              }}
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'center',
-              }}
-            >
-              <Box sx={{p:'2rem', width: '36rem'}}>
-                {
-                  search.length != 0 ? 
-                  (
-                    'p'
-                  ) : 
-                  (
-                    <Box
-                      sx={{
-                        display: 'flex',
-                        justifyContent: 'center'
-                      }}
-                    >
-                      <CircularProgress/>
-                    </Box>
-                  )
-                }
-              </Box>
-            </Popover>
             <Popover
               open={Boolean(anchorEl.user)}
               anchorEl={anchorEl.user}
@@ -433,7 +391,8 @@ const mapStateToProps = (state) => ({
     firstname: state.user.user.firstname,
     lastname: state.user.user.lastname,
     email: state.user.user.email,
-    telephone: state.user.user.telephone
+    telephone: state.user.user.telephone,
+    avatar: state.user.user.avatar,
   },
   seller: {
     isLoading: state.shop.isLoading,
