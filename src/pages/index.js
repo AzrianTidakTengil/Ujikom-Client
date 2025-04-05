@@ -19,6 +19,8 @@ import {
 import { palleteV1 } from '@/assets/css/template';
 import { connect } from 'react-redux';
 import { getAll } from '@/store/products';
+import { Cld } from '@/config';
+import { thumbnail } from '@cloudinary/url-gen/actions/resize';
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
@@ -105,23 +107,21 @@ class Main extends Component {
                 </Typography>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
                     {products.map((product) => (
-                        <Grid key={product.id} size={3}>
+                        <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
                                 }}
                                 style={{textDecoration: 'none'}}
                             >
-                                <Card sx={{textDecoration: 'none', minHeight: '14rem'}}>
-                                    {/* <CardMedia
+                                <Card sx={{textDecoration: 'none'}}>
+                                    <CardMedia
                                         component="img"
-                                        height="140"
-                                        image={product.image}
+                                        height={160}
+                                        width={160}
+                                        image={Cld.image('product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
                                         alt={product.name}
-                                    /> */}
-                                    <Paper sx={{p:3}}>
-
-                                    </Paper>
+                                    />
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
                                         <Typography 
                                             variant="subtitle1"
@@ -190,12 +190,12 @@ class Main extends Component {
     render() {
         return(
             <ThemeProvider theme={theme}>
-                <div style={{paddingInline: '6rem'}}>
+                <Container maxWidth="lg">
                     <Carousel/>
                     <hr style={{marginTop: 64}}/>
                     {this.renderCategorySection()}
                     {this.renderProducts()}
-                </div>
+                </Container>
             </ThemeProvider>
         )
     }
