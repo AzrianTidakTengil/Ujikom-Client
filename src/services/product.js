@@ -15,7 +15,7 @@ export const One = (params) => {
 }
 
 export const Find = (params) => {
-    return apiServiceV1.get(
+    return apiServiceV1.post(
         endpoints.PRODUCTS.FIND,
         params
     )
