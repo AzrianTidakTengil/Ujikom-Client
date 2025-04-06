@@ -7,6 +7,7 @@ import transactionReducer from './transaction'
 import addressReducer from './address'
 import shopReducer from './shop'
 import regionReducer from './region'
+import keywordReducer from './keyword'
 
 const store = configureStore({
     reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
         address: addressReducer,
         shop: shopReducer,
         region: regionReducer,
+        keyword: keywordReducer,
     },
 })
 
