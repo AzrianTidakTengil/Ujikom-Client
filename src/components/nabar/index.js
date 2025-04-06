@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { AccountCircle, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined } from "@mui/icons-material";
+import { AccountCircle, HistoryOutlined, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined, TrendingUp } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
@@ -65,7 +65,11 @@ class Navbar extends React.Component {
         width: 0,
         left: 0,
       },
-      valueSearch: ''
+      valueSearch: '',
+      keyword: {
+        list: [],
+        popular: [],
+      },
     }
     this.theme = createTheme({
       palette: {
@@ -120,7 +124,7 @@ class Navbar extends React.Component {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
-    const {auth, user, trolley} = nextProps
+    const {auth, user, trolley, keyword} = nextProps
     if (user.isSuccess) {
       this.setState({
         user: {
@@ -139,11 +143,21 @@ class Navbar extends React.Component {
         badgeTrolley: trolley.data.length
       })
     }
+    if (keyword.isSuccess) {
+      this.setState({
+        keyword: {
+          list: keyword.data.filter((d) => d.status != 'popular'),
+          popular: keyword.data.filter((d) => d.status == 'popular'),
+        }
+      })
+    }
   }
 
   handleFocus = (event) => {
     const {showModal} = this.state
     const rect = event.currentTarget.getBoundingClientRect();
+
+    this.props.KeywordFind({keyword: null})
 
     this.setState({
       showModal: true,
@@ -163,6 +177,9 @@ class Navbar extends React.Component {
   }
 
   handleChange = (val) => {
+    
+    this.props.KeywordFind({keyword: val})
+
     this.setState({
       valueSearch: val
     })
@@ -215,11 +232,20 @@ class Navbar extends React.Component {
     })
   }
 
-  handlePush = (path) => {
+  handlePush = (val) => {
     const {router} = this.props
 
     router.push({
-      pathname: path
+      pathname: '/search',
+      query: {
+        keyword: val
+      }
+    })
+
+    this.props.KeywordCreate({keyword: val})
+
+    this.setState({
+      showModal: false,
     })
   }
 
@@ -228,24 +254,8 @@ class Navbar extends React.Component {
   }
 
   render() {
-    const {showModal, user, badgeTrolley, popover, isSeller, inputSearch, valueSearch} = this.state
+    const {showModal, user, badgeTrolley, popover, isSeller, inputSearch, valueSearch, keyword} = this.state
     const {auth} = this.props
-    const dummy_search = [
-      {
-        id: 1,
-        name: 'infinix'
-      },{
-        id: 2,
-        name: 'infinix gt 20 pro'
-      },{
-        id: 3,
-        name: 'handphone'
-      },{
-        id: 4,
-        name: 'mainan'
-      },
-    ]
-
 
     return (
       <ThemeProvider theme={this.theme}>
@@ -265,6 +275,7 @@ class Navbar extends React.Component {
               }}}
               onChange={(event) => this.handleChange(event.target.value)}
               onClick={this.handleFocus}
+              autoComplete="off"
             />
             <div>
               {user.username ? 
@@ -345,46 +356,74 @@ class Navbar extends React.Component {
                 sx={{
                   ...mainItem,
                   width: inputSearch.width,
-                  left: `${parseInt(inputSearch.left)}px`
+                  left: `${parseInt(inputSearch.left)}px`,
+                  maxHeight: 500,
+                  overflowY: 'scroll',
                 }}
               >
-                  <List>
-                  {/* <Link 
-                  href={{
-                    pathname: '/search',
-                    query: {keyword: val.name}
-                  }}
-                  key={index}
-                  scroll={true}
-                  prefetch={true}
-                  onClick={() => this.handleOutFocus()}
-                  >
-                    <div key={val.id}>{val.name}</div>
-                  </Link> */}
                   {
-                    valueSearch ? (
-                      <ListItem>
-                        <ListItemButton>
-                          <ListItemIcon>
-                            <SearchOutlined/>
-                          </ListItemIcon>
-                          <ListItemText primary={valueSearch}/>
-                        </ListItemButton>
-                      </ListItem>
-                    ) : ''
+                    this.props.keyword.isLoading ? (
+                      <CircularProgress sx={{marginX: 'auto', marginY: 2}}/>
+                    ) : (
+                      <List>
+                      {
+                        valueSearch ? (
+                          <ListItem
+                          sx={{
+                            paddingY: 0,
+                          }}
+                          >
+                            <ListItemButton onClick={() => this.handlePush(valueSearch)}>
+                              <ListItemIcon>
+                                <SearchOutlined/>
+                              </ListItemIcon>
+                              <ListItemText primary={valueSearch}/>
+                            </ListItemButton>
+                          </ListItem>
+                        ) : ''
+                      }
+                      {
+                        keyword.list.map((val, index) => (
+                          <ListItem
+                            key={index}
+                            sx={{
+                              paddingY: 0,
+                            }}
+                          >
+                            <ListItemButton onClick={() => this.handlePush(val.label)}>
+                              <ListItemIcon>
+                                {
+                                  val.status == 'history' ? <HistoryOutlined/> : <SearchOutlined/>
+                                }
+                              </ListItemIcon>
+                              <ListItemText primary={val.label}/>
+                            </ListItemButton>
+                          </ListItem>
+                        ))
+                      }
+                      {
+                        keyword.list.length != 0 ? <Divider/> : ''
+                      }
+                      {
+                        keyword.popular.map((val, index) => (
+                          <ListItem
+                            key={index}
+                            sx={{
+                              paddingY: 0,
+                            }}
+                          >
+                            <ListItemButton onClick={() => this.handlePush(val.label)}>
+                              <ListItemIcon>
+                                <TrendingUp/>
+                              </ListItemIcon>
+                              <ListItemText primary={val.label}/>
+                            </ListItemButton>
+                          </ListItem>
+                        ))
+                      }
+                    </List>
+                    )
                   }
-                  {
-                    dummy_search.map((val, index) => (
-                      <ListItem
-                        key={index}
-                      >
-                        <ListItemButton>
-                          <ListItemText primary={val.name}/>
-                        </ListItemButton>
-                      </ListItem>
-                    ))
-                  }
-                  </List>
               </Box>
           </Modal>
       </ThemeProvider>
