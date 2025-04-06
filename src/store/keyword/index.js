@@ -1,4 +1,4 @@
-import { KeywordProductCreate } from "@/services/keyword";
+import { KeywordProductCreate, KeywordProductDelete, KeywordProductFind } from "@/services/keyword";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import KeywordMessage from './message'
 
@@ -7,13 +7,13 @@ export const KeywordCreate = createAsyncThunk('keywordSlice/KeywordCreate', asyn
     return response.data
 })
 
-export const KeywordFind = createAsyncThunk('keywordSlice/KeywordCreate', async (params) => {
-    const response = await KeywordFind(params)
+export const KeywordFind = createAsyncThunk('keywordSlice/KeywordFind', async (params) => {
+    const response = await KeywordProductFind(params)
     return response.data
 })
 
-export const KeywordDelete = createAsyncThunk('keywordSlice/KeywordCreate', async (params) => {
-    const response = await KeywordDelete(params)
+export const KeywordDelete = createAsyncThunk('keywordSlice/KeywordDelete', async (params) => {
+    const response = await KeywordProductDelete(params)
     return response.data
 })
 
