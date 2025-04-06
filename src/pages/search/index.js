@@ -8,6 +8,8 @@ import { ExpandMore, Filter, FilterAlt, SearchOff, SearchOutlined, Star } from '
 import { InputText } from '@/components/input';
 import { palleteV1 } from '@/assets/css/template';
 import Link from 'next/link';
+import { Cld } from '@/config';
+import { thumbnail } from '@cloudinary/url-gen/actions/resize';
 
 const products = Array.from({ length: 500 }, (_, i) => ({
     id: i + 1,
@@ -18,8 +20,8 @@ const products = Array.from({ length: 500 }, (_, i) => ({
         currency: "IDR"
     }).format(1000 * i),
     image: "https://via.placeholder.com/150",
-    rating: Math.floor(Math.random() * 5) + 1,
-    sold: Math.floor(Math.random() * 100) + 1,
+    rating: 4,
+    sold: 100,
 }));
 
 class Search extends Component {
@@ -31,23 +33,22 @@ class Search extends Component {
             limitProduct: 50,
             visibleProducts: products.slice(0, 50)
         }
-    }
-
-    theme = () => createTheme({
-        palette: {
-            ...palleteV1.palette
-        }
-    })
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {keyword} = nextProps.router.query
-
-        this.setState({
-            keyword
+        this.theme = createTheme({
+            palette: {
+                ...palleteV1.palette
+            }
         })
     }
 
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const {router} = nextProps
 
+        if (router.query) {
+            this.setState({
+                keyword: router.query.keyword
+            })
+        }
+    }
 
     renderProducts = () => {
         const {visibleProducts, offeringProduct, limitProduct, keyword} = this.state
@@ -75,7 +76,7 @@ class Search extends Component {
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={10}>
                     {visibleProducts.map((product) => (
-                       <Grid key={product.id} size={2}>
+                       <Grid key={product.id} size={{xs: 6, sm: 4, md:2.5, lg: 2}}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
@@ -85,8 +86,9 @@ class Search extends Component {
                                 <Card sx={{textDecoration: 'none'}}>
                                     <CardMedia
                                         component="img"
-                                        height="140"
-                                        image={product.image}
+                                        height={160}
+                                        width={160}
+                                        image={Cld.image('product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
                                         alt={product.name}
                                     />
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
