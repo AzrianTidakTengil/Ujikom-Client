@@ -17,11 +17,16 @@ import {
   Badge,
   Popover,
   Stack,
-  Typography
+  Typography,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { AccountCircle, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined } from "@mui/icons-material";
+import { AccountCircle, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
@@ -53,7 +58,13 @@ class Navbar extends React.Component {
       popover: {
         id: null,
         anchorEL: null
-      }
+      },
+      isSeller: false,
+      inputSearch: {
+        width: 0,
+        left: 0,
+      },
+      valueSearch: ''
     }
     this.theme = createTheme({
       palette: {
@@ -118,7 +129,8 @@ class Navbar extends React.Component {
           email: user.email,
           telephone: user.telephone,
           avatar: user.avatar
-        }
+        },
+        isSeller: user.isSeller
       })
     }
     if (trolley.isSuccess) {
@@ -128,15 +140,20 @@ class Navbar extends React.Component {
     }
   }
 
-  handleFocus() {
+  handleFocus = (event) => {
     const {showModal} = this.state
-    
+    const rect = event.currentTarget.getBoundingClientRect();
+
     this.setState({
-      showModal: true
+      showModal: true,
+      inputSearch: {
+        width: rect.width,
+        left: rect.left
+      }
     })
   }
 
-  handleOutFocus() {
+  handleOutFocus = () => {
     const {showModal} = this.state
     
     this.setState({
@@ -144,8 +161,10 @@ class Navbar extends React.Component {
     })
   }
 
-  handleChange(val) {
-    console.log(val)
+  handleChange = (val) => {
+    this.setState({
+      valueSearch: val
+    })
   }
 
   handleRandomColor = (string) => {
@@ -208,7 +227,7 @@ class Navbar extends React.Component {
   }
 
   render() {
-    const {showModal, user, badgeTrolley, popover} = this.state
+    const {showModal, user, badgeTrolley, popover, isSeller, inputSearch, valueSearch} = this.state
     const {auth} = this.props
     const dummy_search = [
       {
@@ -244,7 +263,7 @@ class Navbar extends React.Component {
                 )
               }}}
               onChange={(event) => this.handleChange(event.target.value)}
-              onClick={() => this.handleFocus()}
+              onClick={this.handleFocus}
             />
             <div>
               {user.username ? 
@@ -263,6 +282,13 @@ class Navbar extends React.Component {
                     <MailOutlineOutlined />
                   </IconButton>
                 </Grid>
+                {
+                  isSeller ? (
+                    <IconButton href="/seller/">
+                      <StoreOutlined />
+                    </IconButton>
+                  ) : ''
+                }
                 <Grid>
                   <div style={{cursor: 'pointer'}} onClick={this.handleOpenPopever}>
                     <Avatar src={Cld.image(user.avatar).toURL()}/>
@@ -310,27 +336,54 @@ class Navbar extends React.Component {
         </AppBar>
           <Modal
               open={showModal}
-              onClose={() => this.handleOutFocus()}
+              onClose={this.handleOutFocus}
               sx={containerModal}
               disableAutoFocus
           >
               <Box
-                sx={mainItem}
+                sx={{
+                  ...mainItem,
+                  width: inputSearch.width,
+                  left: `${parseInt(inputSearch.left)}px`
+                }}
               >
-                  <div className={styles.listItem}>
-                    {dummy_search.map((val, index) => <Link 
-                    href={{
-                      pathname: '/search',
-                      query: {keyword: val.name}
-                    }}
-                    key={index}
-                    scroll={true}
-                    prefetch={true}
-                    onClick={() => this.handleOutFocus()}
-                    >
-                      <div key={val.id}>{val.name}</div>
-                    </Link>)}
-                  </div>
+                  <List>
+                  {/* <Link 
+                  href={{
+                    pathname: '/search',
+                    query: {keyword: val.name}
+                  }}
+                  key={index}
+                  scroll={true}
+                  prefetch={true}
+                  onClick={() => this.handleOutFocus()}
+                  >
+                    <div key={val.id}>{val.name}</div>
+                  </Link> */}
+                  {
+                    valueSearch ? (
+                      <ListItem>
+                        <ListItemButton>
+                          <ListItemIcon>
+                            <SearchOutlined/>
+                          </ListItemIcon>
+                          <ListItemText primary={valueSearch}/>
+                        </ListItemButton>
+                      </ListItem>
+                    ) : ''
+                  }
+                  {
+                    dummy_search.map((val, index) => (
+                      <ListItem
+                        key={index}
+                      >
+                        <ListItemButton>
+                          <ListItemText primary={val.name}/>
+                        </ListItemButton>
+                      </ListItem>
+                    ))
+                  }
+                  </List>
               </Box>
           </Modal>
       </ThemeProvider>
@@ -353,6 +406,7 @@ const mapStateToProps = (state) => ({
     email: state.user.user.email,
     telephone: state.user.user.telephone,
     avatar: state.user.user.avatar,
+    isSeller: state.user.isSeller,
   },
   trolley: {
     isSuccess: state.trolley.isSucces,
