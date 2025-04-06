@@ -13,8 +13,8 @@ export const getOne = createAsyncThunk('productSlice/getOne', async (params) => 
     return response.data
 })
 
-export const findProduct = createAsyncThunk('productSlice/findProduct', async () => {
-    const response = await Product.Find()
+export const findProduct = createAsyncThunk('productSlice/findProduct', async (params) => {
+    const response = await Product.Find(params)
     return response.data
 })
 
