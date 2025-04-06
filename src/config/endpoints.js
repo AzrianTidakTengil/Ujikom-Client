@@ -79,5 +79,12 @@ export default {
             UPDATE: '/user/address/update',
             DELETE: '/user/address/delete',
         }
-    }
+    },
+    KEYWORD: {
+        PRODUCT: {
+            GET: '/keyword/products',
+            CREATE: '/keyword/products/find',
+            DELETE: '/keyword/products/delete',
+        },
+    },
 }
