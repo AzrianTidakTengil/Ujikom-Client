@@ -32,6 +32,7 @@ const initialState = {
         avatar: '',
     },
     message: '',
+    isSeller: false,
 }
 
 export const userSlice = createSlice({
@@ -46,7 +47,7 @@ export const userSlice = createSlice({
             state.isSuccess = false
             state.isLoading = true
         }).addCase(getUser.fulfilled, (state, action) => {
-            const {username, firstname, lastname, email, telephone, avatar} = action.payload.data
+            const {username, firstname, lastname, email, telephone, avatar, userToStore} = action.payload.data
             state.message = UserMessage.USER.GET
             state.isLoading = false
             state.user.email = email
@@ -56,6 +57,7 @@ export const userSlice = createSlice({
             state.user.username = username
             state.user.avatar = avatar
             state.isSuccess = true
+            state.isSeller = Boolean(userToStore)
         }).addCase(getUser.rejected, (state,action) => {
             state.message = UserMessage.USER.GET
             state.isLoading = false
