@@ -38,6 +38,7 @@ import { getUser } from "@/store/user";
 import { getAllItemTrolley } from "@/store/trolley";
 import { withRouter } from "next/router";
 import { Cld } from "@/config";
+import { KeywordCreate, KeywordDelete, KeywordFind } from "@/store/keyword";
 
 class Navbar extends React.Component {
   constructor(props) {
@@ -411,13 +412,23 @@ const mapStateToProps = (state) => ({
   trolley: {
     isSuccess: state.trolley.isSucces,
     data: state.trolley.data,
-  }
+  },
+  keyword: {
+    isLoading: state.keyword.isLoading,
+    error: state.keyword.error,
+    message: state.keyword.message,
+    isSuccess: state.keyword.isSuccess,
+    data: state.keyword.data,
+  },
 })
 
 const mapDispatchToProps = {
   getUser,
   getAllItemTrolley,
-  logout
+  logout,
+  KeywordFind,
+  KeywordCreate,
+  KeywordDelete
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Navbar))
