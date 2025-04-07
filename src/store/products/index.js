@@ -120,9 +120,11 @@ export const productSlice = createSlice({
             })
             .addCase(findProduct.pending, (state) => {
                 state.isLoading = true
+                state.isSuccess = false
             })
             .addCase(findProduct.fulfilled, (state, action) => {
                 state.isLoading = false
+                state.isSuccess = true
                 state.show = action.payload.data
             }).addCase(findProduct.rejected, (state, action) => {
                 state.isLoading = false
