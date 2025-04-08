@@ -2,6 +2,8 @@ export default {
     AUTH: {
         LOGIN: '/auth/signin',
         REGISTER: '/auth/signup',
+        GOOGLE: '/auth/google',
+        LOGOUT: '/auth/logout',
     },
     PRODUCTS: {
         ALL: '/items',
