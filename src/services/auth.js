@@ -14,6 +14,12 @@ export const register = (params) => {
     )
 }
 
+export const LoginGoogle = (params) => {
+    return apiServiceV1.get(
+        endpoints.AUTH.GOOGLE
+    )
+}
+
 export const test = () => {
    return apiServiceV1.get(
         endpoints.TEST
