@@ -90,10 +90,12 @@ export const InputOTP = ({style = {}, value, ...props}) => {
             type="text"
             variant="standard"
             autoFocus
-            defaultValue={value}
             value={value}
             style={style}
             {...props}
+            inputProps={{
+                maxLength: 6
+            }}
         />
         </ThemeProvider>
     )
