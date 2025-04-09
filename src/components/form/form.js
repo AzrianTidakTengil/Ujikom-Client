@@ -88,7 +88,7 @@ class Auth extends Component {
               </div>
               <form className={styles.body} onSubmit={this.handleSubmit}>
                 <InputEmail name="email" type="text" label="Email" style={input} onBlur={(event) => this.handleInput(event)}/>
-                <InputPassword name="password" type="password" label="Password" style={input} blur={(event) => this.handleInput(event)}/>
+                <InputPassword name="password" type="password" label="Password" style={input} onBlur={(event) => this.handleInput(event)}/>
                 <p>Forgot Password</p>
                 <Button variant="contained" color="success" sx={{width: '85%', marginTop: 6}} type="submit">
                     Submit
