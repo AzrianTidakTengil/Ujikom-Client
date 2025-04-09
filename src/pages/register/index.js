@@ -235,7 +235,7 @@ class Register extends React.Component{
                             name="password"
                             label="Password *"
                             style={{width: '85%', marginBottom: 6}}
-                            blur={(event) => this.handleInputInformation(event)}
+                            onBlur={(event) => this.handleInputInformation(event)}
                         />
                         <Button variant="contained" color="success" sx={{width: '85%'}} type="submit">Selanjutnya</Button>
                     </form>
