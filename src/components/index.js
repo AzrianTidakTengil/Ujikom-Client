@@ -10,6 +10,7 @@ import SellerLayout from "./sellerlayout";
 import ImageInput from "./imageinput";
 import TimePick from "./timepicker";
 import CropImage from "./cropimage";
+import BlankLayout from "./blanklayout";
 
 export {
     Auth,
@@ -24,4 +25,5 @@ export {
     ImageInput,
     TimePick,
     CropImage,
+    BlankLayout
 }
