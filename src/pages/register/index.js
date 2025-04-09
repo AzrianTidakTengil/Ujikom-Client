@@ -186,7 +186,7 @@ class Register extends React.Component{
         const {name, value} = event.target
         const {otp} = this.state
 
-        if (!value.match('\\D', 'g') && otp.length < 6) {
+        if (!value.match('\\D', 'g')) {
             this.setState({
                 otp: value
             })
