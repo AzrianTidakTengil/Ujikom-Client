@@ -1,4 +1,4 @@
-import { Layout, SellerLayout } from "../components";
+import { BlankLayout, Layout, SellerLayout } from "../components";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { Provider } from "react-redux";
 import store from "@/store";
@@ -14,7 +14,8 @@ const font = Poppins({
 })
 
 const regex = {
-    seller: /seller/i
+    seller: /seller/i,
+    blank: /register/i,
 }
 
 export default function MyApp({ Component, pageProps }) {
@@ -33,6 +34,10 @@ export default function MyApp({ Component, pageProps }) {
                     <SellerLayout>
                         <Component {...pageProps} />
                     </SellerLayout>
+                : regex.blank.test(router.route) ?
+                    <BlankLayout>
+                        <Component {...pageProps} />
+                    </BlankLayout>
                 : getLayout ? (
                     getLayout(<Component {...pageProps} />)
                 ) : (<Layout>
