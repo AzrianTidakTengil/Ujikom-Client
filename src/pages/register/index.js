@@ -1,12 +1,16 @@
-import { AppBar, createTheme, ThemeProvider, Toolbar, Box, Button, IconButton, Grid2, FormGroup, FormControlLabel, Typography } from "@mui/material"
+import { AppBar, createTheme, ThemeProvider, Toolbar, Box, Button, IconButton, Grid2, FormGroup, FormControlLabel, Typography, Divider, Container } from "@mui/material"
 import styles from "./style.module.css";
 import React from "react"
 import Link from "next/link";
 import { palleteV1 } from "@/assets/css/template";
 import { box } from "./theme";
 import { InputGender, InputOTP, InputPassword, InputText } from "@/components/input";
-import { ArrowBackIosNew, CheckBox, CheckCircleRounded, EmailOutlined } from "@mui/icons-material";
+import { ArrowBackIosNew, CheckBox, CheckCircleRounded, EmailOutlined, Google } from "@mui/icons-material";
 import OtpInput from 'react-otp-input';
+import { Playfair_Display, Poppins } from "next/font/google";
+import { LoginGoogle } from "@/services/auth";
+
+const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
 class Register extends React.Component{
     constructor(props){
@@ -53,28 +57,57 @@ class Register extends React.Component{
         const {credential, errorMessage} = this.state
 
         return (
-            <>
+            <Box
+                sx={{
+                    px: 2
+                }}
+            >
                 <div className={styles.Box_title}>
                     <h2>Daftar</h2>
                 </div>
-                <form onSubmit={this.handleSubmitCredential} className={styles.Box_main}>
-                    <InputText
-                        name="credential"
-                        label="Email *"
-                        value={credential}
-                        style={{width: '85%', marginBottom: 50}}
-                        onBlur={this.handleInputCredential}
-                        error={
-                            errorMessage && errorMessage.credential ? errorMessage.credential : undefined
-                        }
-                    />
-                    <Typography sx={{fontSize: '0.75rem'}}>Dengan mendaftar, anda dinyatakan menyetujui <b>Syarat dan Ketentuan</b> serta <b>Kebijakan Privasi Popping</b></Typography>
-                    <Button variant="contained" color="success" sx={{width: '85%'}} type="submit">Selanjutnya</Button>
-                </form>
+                <Box
+                    sx={{
+                        paddingX: 2,
+                    }}
+                >
+                    <form onSubmit={this.handleSubmitCredential} className={styles.Box_main}>
+                        <InputText
+                            name="credential"
+                            label="Email *"
+                            value={credential}
+                            onBlur={this.handleInputCredential}
+                            error={
+                                errorMessage && errorMessage.credential ? errorMessage.credential : undefined
+                            }
+                            fullWidth={true}
+                        />
+                        <Button variant="contained" color="success" fullWidth type="submit" sx={{marginTop: 2}}>Selanjutnya</Button>
+                    </form>
+                </Box>
+                <Divider/>
+                <Box
+                    sx={{
+                        marginY: 2,
+                        paddingX: 2,
+                    }}
+                >
+                    <Button
+                        variant="contained"
+                        startIcon={<Google/>}
+                        fullWidth
+                        sx={{
+                            textTransform: 'capitalize'
+                        }}
+                        href="http://localhost:3001/api/auth/google"
+                    >
+                        Google
+                    </Button>
+                </Box>
+                <Typography sx={{fontSize: '0.75rem'}} textAlign={'center'}>Dengan mendaftar, anda dinyatakan menyetujui <b>Syarat dan Ketentuan</b> serta <b>Kebijakan Privasi Popping</b></Typography>
                 <div className={styles.Box_footer}>
                     <p>Sudah Memiliki Akun? <Link href='/'>Login sekarang</Link> </p>
                 </div>
-            </>
+            </Box>
         )
     }
 
@@ -392,20 +425,28 @@ class Register extends React.Component{
 
     render(){
         return(
-            <ThemeProvider theme={this.theme()}>
-                <div className={styles.container}>
-                    <div>
-
-                    </div>
-                    <div>
+            <ThemeProvider theme={this.theme}>
+                <Container sx={{paddingY: 8}}>
+                    <Grid2 container>
+                    <Grid2 size={6} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                        <Box>
+                            <Typography textAlign={'center'} variant="h3" className={playfair.className}>Popping E-Commerce</Typography>
+                            <Typography textAlign={'center'} variant="body1" marginY={2} className={playfair.className}>Tempat berbelanja secara daring</Typography>
+                        </Box>
+                    </Grid2>
+                    <Grid2 size={6}>
                         <Box
-                            sx={box}
+                            sx={{
+                                ...box,
+                                marginX: 'auto'
+                            }}
                             id="box_container"
                         >
                             {this.renderBox()}
                         </Box>
-                    </div>
-                </div>
+                    </Grid2>
+                    </Grid2>
+                </Container>
             </ThemeProvider>
         )
     }
