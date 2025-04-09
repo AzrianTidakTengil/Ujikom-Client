@@ -26,13 +26,12 @@ class Register extends React.Component{
             otp: '',
             errorMessage: null,
         }
+        this.theme = createTheme({
+            pallete: {
+                ...palleteV1.palette
+            }
+        })
     }
-
-    theme = () => createTheme({
-        pallete: {
-            ...palleteV1
-        }
-    })
 
     handleNextBox = () => {
         const {boxIndex} = this.state
