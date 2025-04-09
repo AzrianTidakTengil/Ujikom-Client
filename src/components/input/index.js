@@ -23,14 +23,12 @@ export const InputEmail = ({fullWidth, placeholder = "", value, label, style = {
     )
 }
 
-export const InputPassword = ({blur = {}, type, placeholder = "", value, label, style = {}}, ...props) => {
+export const InputPassword = ({type, placeholder = "", value, label, ...props}) => {
     const [showPassword, isShow] = useState(false)
 
     return (
         <FormControl
-            sx={style}
             variant="outlined"
-            onBlur={blur}
             {...props}
         >
             <InputLabel htmlFor="outlined-adornment-password">{label}</InputLabel>
