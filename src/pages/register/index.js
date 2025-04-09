@@ -452,23 +452,4 @@ class Register extends React.Component{
     }
 }
 
-Register.getLayout = function getLayout(page) {
-    return(
-        <>
-            <AppBar position="fixed">
-                <Toolbar sx={{ justifyContent: "space-between" }}>
-                <Link href="/"><h1 className={styles.title}>Popping</h1></Link>
-
-                </Toolbar>
-            </AppBar>
-            <main style={{
-                marginTop: '4.5rem',
-                padding: '1rem 0.5rem'
-            }}>
-                {page}
-            </main>
-        </>
-    )
-}
-
 export default Register
