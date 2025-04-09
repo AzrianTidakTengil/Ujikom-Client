@@ -1,4 +1,4 @@
-import { AppBar, createTheme, ThemeProvider, Toolbar, Box, Button, IconButton, Grid2, FormGroup, FormControlLabel, Typography, Divider, Container } from "@mui/material"
+import { AppBar, createTheme, ThemeProvider, Toolbar, Box, Button, IconButton, Grid2, FormGroup, FormControlLabel, Typography, Divider, Container, Paper } from "@mui/material"
 import styles from "./style.module.css";
 import React from "react"
 import Link from "next/link";
@@ -428,23 +428,21 @@ class Register extends React.Component{
             <ThemeProvider theme={this.theme}>
                 <Container sx={{paddingY: 8}}>
                     <Grid2 container>
-                    <Grid2 size={6} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                        <Box>
-                            <Typography textAlign={'center'} variant="h3" className={playfair.className}>Popping E-Commerce</Typography>
-                            <Typography textAlign={'center'} variant="body1" marginY={2} className={playfair.className}>Tempat berbelanja secara daring</Typography>
-                        </Box>
-                    </Grid2>
-                    <Grid2 size={6}>
-                        <Box
-                            sx={{
-                                ...box,
-                                marginX: 'auto'
-                            }}
-                            id="box_container"
-                        >
-                            {this.renderBox()}
-                        </Box>
-                    </Grid2>
+                        <Grid2 size={6} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                            <Box>
+                                <Typography textAlign={'center'} variant="h3" className={playfair.className}>Popping E-Commerce</Typography>
+                                <Typography textAlign={'center'} variant="body1" marginY={2} className={playfair.className}>Tempat berbelanja secara daring</Typography>
+                            </Box>
+                        </Grid2>
+                        <Grid2 size={6} sx={{paddingX: 8}}>
+                            <Paper
+                                sx={{
+                                    p: 2
+                                }}
+                            >
+                                {this.renderBox()}
+                            </Paper>
+                        </Grid2>
                     </Grid2>
                 </Container>
             </ThemeProvider>
