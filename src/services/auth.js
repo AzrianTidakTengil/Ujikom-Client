@@ -14,9 +14,17 @@ export const register = (params) => {
     )
 }
 
-export const LoginGoogle = (params) => {
-    return apiServiceV1.get(
-        endpoints.AUTH.GOOGLE
+export const SendOtpToEmail = (params) => {
+    return apiServiceV1.post(
+        endpoints.AUTH.SENDOTP,
+        params
+    )
+}
+
+export const VerifyOtpToEmail = (params) => {
+    return apiServiceV1.post(
+        endpoints.AUTH.SENDOTP,
+        params
     )
 }
 
