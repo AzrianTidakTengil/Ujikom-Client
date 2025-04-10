@@ -4,6 +4,8 @@ export default {
         REGISTER: '/auth/signup',
         GOOGLE: '/auth/google',
         LOGOUT: '/auth/logout',
+        SENDOTP: '/auth/otp',
+        VERIFYOTP: '/auth/otp/verify',
     },
     PRODUCTS: {
         ALL: '/items',
