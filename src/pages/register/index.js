@@ -11,6 +11,7 @@ import { Playfair_Display, Poppins } from "next/font/google";
 import { LoginGoogle } from "@/services/auth";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
+import { SendCodeOtp, VerifyCodeOtp } from "@/store/auth";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
@@ -458,7 +459,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-
+    SendCodeOtp,
+    VerifyCodeOtp,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Register))
