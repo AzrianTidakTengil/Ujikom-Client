@@ -148,18 +148,19 @@ class Register extends React.Component{
 
         return (
             <>
-                <div className={styles.Box_title} style={{width: '85%'}}>
-                    <Grid2 container spacing={2}>
-                        <Grid2 xs={3}>
-                            <IconButton onClick={() => this.handleBackBox()}>
-                                <ArrowBackIosNew/>
-                            </IconButton>
-                        </Grid2>
-                        <Grid2 xs sx={{marginLeft: '1rem'}}>
-                            <h2>Kode Verifikasi</h2>
-                        </Grid2>
+                <Grid2 container spacing={2}>
+                    <Grid2 size={3}>
+                        <IconButton onClick={() => this.handleBackBox()}>
+                            <ArrowBackIosNew/>
+                        </IconButton>
                     </Grid2>
-                </div>
+                    <Grid2 size={6} display={'flex'} alignItems={'center'}>
+                        <Typography variant="h5" textAlign={'center'} fontWeight={600}>Kode Verifikasi</Typography>
+                    </Grid2>
+                    <Grid2 size={3}>
+
+                    </Grid2>
+                </Grid2>
                 <div className={styles.Box_main}>
                     <p>Kode telah dikirimkan ke email {`${this.state.form.credential}`}. Silahkan cek email tersebut</p>
                     <form onSubmit={this.handleSubmitOTP} className={styles.Box_main}>
