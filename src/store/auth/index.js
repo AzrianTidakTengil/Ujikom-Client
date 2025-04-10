@@ -7,6 +7,16 @@ export const login = createAsyncThunk('authSlice/login', async (params) => {
     return response.data
 })
 
+export const SendCodeOtp = createAsyncThunk('authSlice/SendCodeOtp', async (params) => {
+    const response = await Auth.SendOtpToEmail(params)
+    return response.data
+})
+
+export const VerifyCodeOtp = createAsyncThunk('authSlice/VerifyCodeOtp', async (params) => {
+    const response = await Auth.VerifyOtpToEmail(params)
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     error: null,
