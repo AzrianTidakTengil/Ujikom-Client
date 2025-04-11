@@ -17,6 +17,11 @@ export const VerifyCodeOtp = createAsyncThunk('authSlice/VerifyCodeOtp', async (
     return response.data
 })
 
+export const RegisterUser = createAsyncThunk('authSlice/RegisterUser', async (params) => {
+    const response = await Auth.register(params)
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     error: null,
@@ -25,6 +30,7 @@ const initialState = {
     isSuccessToken: false,
     isSuccessSend: false,
     progressIndex: 0,
+    isSuccessRegister: false,
 }
 
 export const authSlice = createSlice({
@@ -88,7 +94,17 @@ export const authSlice = createSlice({
                 state.isSuccessToken = true
                 state.progressIndex = 2
             })
-            
+            .addCase(RegisterUser.pending, (state, action) => {
+                state.isLoading = true
+                state.isSuccessRegister = false
+            })
+            .addCase(RegisterUser.rejected, (state, action) => {
+                state.isLoading = false
+            })
+            .addCase(RegisterUser.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccessRegister = true
+            })
     }
 })
 
