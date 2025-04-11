@@ -3,7 +3,7 @@ import { Box, Container, Paper, createTheme, Divider, Avatar, Chip, Grid2 as Gri
 import { withRouter } from "next/router";
 import Image from "next/image";
 import { QuantityEditor, SelectChip } from "@/components";
-import { Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
+import { ChevronLeft, ChevronRight, Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
 import Link from "next/link";
 import { connect } from "react-redux";
 import { getAll, getOne } from "@/store/products";
@@ -156,10 +156,63 @@ class Product extends Component{
         return(
             <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
                 <Grid container columnSpacing={4}>
-                    <Grid size="auto">
-                        <Image width={320} height={320} src={'/assets/skeleton/product.jpg'}/>
+                    <Grid size={{lg: 3.5, xs: 4.5}}>
+                        <Box
+                            sx={{
+                                position: 'relative'
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    left: 5,
+                                    top: '45%',
+                                }}
+                            >
+                                <IconButton>
+                                    <ChevronLeft/>
+                                </IconButton>
+                            </Box>
+                            <img 
+                                style={{
+                                    width: '100%',
+                                    height: 320,
+                                    objectFit: 'cover',
+                                    objectPosition: 'center',
+                                    border: '1px solid #a5a5a5'
+                                }} 
+                                src={'/assets/skeleton/product.jpg'}
+                            />
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    right: 5,
+                                    top: '45%',
+                                }}
+                            >
+                                <IconButton>
+                                    <ChevronRight/>
+                                </IconButton>
+                            </Box>
+                        </Box>
+                        <Stack
+                            direction={'row'}
+                            sx={{
+                                overflowX: 'scroll',
+                                marginY: 2
+                            }}
+                            spacing={2}
+                        >
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                            <Image width={80} height={80} src={'/assets/skeleton/product.jpg'} alt="ImageProduct"/>
+                        </Stack>
                     </Grid>
-                    <Grid size="grow">
+                    <Grid size={{lg: 5.5, xs: 7.5}}>
                         <Box sx={{width: '100%'}}>
                             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                                 <Typography variant="h5">{name}</Typography>
@@ -226,18 +279,18 @@ class Product extends Component{
                                     <Rating defaultValue={4} readOnly/>
                                 </Grid>
                             </Grid>
-                            <Grid container direction={'column'} spacing={1}>
-                                        <Grid>
-                                            <Button variant="outlined" sx={{width: 100}}>
-                                                Follow
-                                            </Button>
-                                        </Grid>
-                                        <Grid>
-                                            <Button variant="contained" sx={{width: 100}}>
-                                                Chat
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
+                            {/* <Grid container direction={'column'} spacing={1}>
+                                <Grid>
+                                    <Button variant="outlined" sx={{width: 100}}>
+                                        Follow
+                                    </Button>
+                                </Grid>
+                                <Grid>
+                                    <Button variant="contained" sx={{width: 100}}>
+                                        Chat
+                                    </Button>
+                                </Grid>
+                            </Grid> */}
                             </Stack>
                         </Box>
                     </Grid>
@@ -247,6 +300,7 @@ class Product extends Component{
                                 display: 'none'
                             }
                         }}
+                        size={{lg: 3}}
                     >
                         <Paper
                             sx={{p:2}}
