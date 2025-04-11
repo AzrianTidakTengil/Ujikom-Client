@@ -312,6 +312,70 @@ class Product extends Component{
         })
     }
 
+    renderSetBuy = () => {
+        const {query, favorite, product, quantityEditor} = this.state
+        const {id, name, description, price, stock, shop} = product
+
+        const dummy_color = [
+            {id: 0, name: 'green'},
+            {id: 1, name: 'blue'},
+            {id: 2, name: 'green'},
+        ]
+
+        return (
+            <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
+                <Typography variant="h6" sx={{fontWeight: 600}}>Atur Pembelian</Typography>
+                    <Divider sx={{marginBottom: 4}}/>
+                    <Box>
+                        <Stack
+                            direction={'row'}
+                            justifyContent={'space-between'}
+                        >
+                            <Box>
+                                <Box sx={{marginBottom: 2}}>
+                                    <Typography variant="subtitle1">Pilih</Typography>
+                                    <SelectChip
+                                        options={dummy_color}
+                                    />
+                                </Box>
+                                {/* <Box>
+                                    <Typography variant="subtitle1">Pilih</Typography>
+                                    
+                                </Box> */}
+                            </Box>
+                            <Box>
+                                <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
+                                <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
+                                    <QuantityEditor
+                                        initialQuantity={quantityEditor}
+                                        min={1}
+                                        max={stock}
+                                        onChange={(name, value) => {this.setState({quantityEditor: value})}}
+                                    />
+                                    <Typography variant="subtitle1" sx={{marginLeft: 2}}>
+                                        Total Stok: {stock}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Stack>
+                        <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2}}>
+                            <Typography variant="subtitle1" sx={{fontWeight: 500}}>Subtotal</Typography>
+                            <Typography variant="h6" sx={{fontWeight: 600}}>
+                                {
+                                    new Intl.NumberFormat('id-ID', {
+                                        style: "currency",
+                                        currency: "IDR"
+                                    }).format(price * quantityEditor) 
+                                }
+                            </Typography>
+                        </Box>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
+                        <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                    </Box>
+            </Box>
+        )
+    }
+
     renderDescriptionProduct = () => {
         const {query, favorite, product} = this.state
         const {id, name, description, price, stock, shop} = product
@@ -643,6 +707,7 @@ class Product extends Component{
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
                     <Container maxWidth="xl" sx={{marginY: 4}}>{this.renderProduct()}</Container>
+                    <Container maxWidth="xl" sx={{marginY: 4, [this.theme.breakpoints.up('lg')]: {display: 'none'}}}>{this.renderSetBuy()}</Container>
                     <Container maxWidth="xl" sx={{marginY: 4}}>
                         <Box sx={{border: '1px solid gray', borderRadius: 2, p:2}}>
                             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
