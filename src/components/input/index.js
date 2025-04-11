@@ -55,15 +55,13 @@ export const InputPassword = ({type, placeholder = "", value, label, ...props}) 
     )
 }
 
-export const InputText = ({fullWidth, placeholder = "", value, label, style = {}, ...props}) => {
+export const InputText = ({placeholder = "", value, label, style = {}, ...props}) => {
     return(
         <TextField
             style={style}
             label={label}
             type="text"
             variant="outlined"
-            // autoFocus
-            fullWidth={fullWidth ? true : false}
             {...props}
         />
     )
