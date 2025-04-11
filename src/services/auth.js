@@ -23,7 +23,7 @@ export const SendOtpToEmail = (params) => {
 
 export const VerifyOtpToEmail = (params) => {
     return apiServiceV1.post(
-        endpoints.AUTH.SENDOTP,
+        endpoints.AUTH.VERIFYOTP,
         params
     )
 }
