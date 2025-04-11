@@ -1,4 +1,4 @@
-import { AppBar, createTheme, ThemeProvider, Toolbar, Box, Button, IconButton, Grid2, FormGroup, FormControlLabel, Typography, Divider, Container, Paper } from "@mui/material"
+import { AppBar, createTheme, ThemeProvider, Toolbar, Box, Button, IconButton, Grid2, FormGroup, FormControlLabel, Typography, Divider, Container, Paper, Backdrop, CircularProgress, Stack } from "@mui/material"
 import styles from "./style.module.css";
 import React from "react"
 import Link from "next/link";
@@ -11,7 +11,7 @@ import { Playfair_Display, Poppins } from "next/font/google";
 import { LoginGoogle } from "@/services/auth";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
-import { SendCodeOtp, VerifyCodeOtp } from "@/store/auth";
+import { SendCodeOtp, upProgress, VerifyCodeOtp } from "@/store/auth";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
@@ -40,6 +40,19 @@ class Register extends React.Component{
         })
     }
 
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const {auth} = nextProps
+
+        if (auth.error) {
+            this.setState({
+                errorMessage: {
+                    ...this.state.errorMessage,
+                    ...auth.error
+                }
+            })
+        }
+    }
+
     handleNextBox = () => {
         const {boxIndex} = this.state
 
@@ -65,9 +78,7 @@ class Register extends React.Component{
                     px: 2
                 }}
             >
-                <div className={styles.Box_title}>
-                    <h2>Daftar</h2>
-                </div>
+                <Typography variant="h5" textAlign={'center'} fontWeight={600} marginY={2}>Daftar Alamat Email</Typography>
                 <Box
                     sx={{
                         paddingX: 2,
@@ -81,6 +92,9 @@ class Register extends React.Component{
                             onBlur={this.handleInputCredential}
                             error={
                                 errorMessage && errorMessage.credential ? errorMessage.credential : undefined
+                            }
+                            helperText={
+                                errorMessage && errorMessage.credential ? errorMessage.credential : ''
                             }
                             fullWidth={true}
                         />
@@ -115,24 +129,22 @@ class Register extends React.Component{
     }
 
     handleInputCredential = (event) => {
-        // const { credential } = this.state.form
         const {name, value} = event.target
-        console.log(`${name}: ${value}`)
-        console.log(value.length)
         if (value.length < 3 && value.length > 0) {
             this.setState({
                 errorMessage: {
                     credential: 'Email must have more 3 character'
                 }
             })
-            console.log(this.state.errorMessage)
         } else {
             this.setState({
                 form: {
                     ...this.state.form,
                     credential: value,
                 },
-                errorMessage: null
+                errorMessage: {
+                    credential: null
+                }
             })
         }
     }
@@ -141,8 +153,8 @@ class Register extends React.Component{
         e.preventDefault()
         const {errorMessage, form} = this.state
 
-        if (!errorMessage) {
-            this.handleNextBox()
+        if (!errorMessage.credential) {
+            this.props.SendCodeOtp({email: form.credential})
         }
     }
 
@@ -171,12 +183,11 @@ class Register extends React.Component{
                             value={otp}
                             name="otp"
                             onChange={(event) => this.handleOTPinput(event)}
-                            onBlur={() => console.log(this.state.otp)}
                             style={{
                                 marginBottom: 50
                             }}
                         />
-                        <Button variant="contained" color="success" sx={{width: '85%'}} type="submit">Selanjutnya</Button>
+                        <Button variant="contained" color="success" sx={{width: '85%'}} type="submit" loading={this.props.auth.isLoading}>Selanjutnya</Button>
                     </form>
                 </div>
                 <div className={styles.Box_footer}>
@@ -200,50 +211,45 @@ class Register extends React.Component{
     handleSubmitOTP = (e) => {
         e.preventDefault()
         const {otp} = this.state
-        const dummy_token = `012432`
 
-        if (otp === `${dummy_token}`) {
-            alert('success')
-            this.handleNextBox()
-        } else {
-            alert('error')
-            this.setState({
-                otp: ''
-            })
-        }
+        this.props.VerifyCodeOtp({code: otp})
     }
 
     renderInformation = () => {
-        const {credential, telephone, username, password} = this.state.form
+        const {errorMessage} = this.state
 
         return (
             <>
-                <div className={styles.Box_title}>
-                    <h2>Information</h2>
-                </div>
-                <div className={styles.Box_main}>
+                <Typography variant="h5" textAlign={'center'} fontWeight={600} sx={{marginY: 2}}>Informasi Penting</Typography>
+                <Box
+                    sx={{
+                        paddingX: 2
+                    }}
+                >
                     <form onSubmit={this.handleSubmitInformation} className={styles.Box_main}>
-                        <InputText
-                            name="telephone"
-                            label="No Telephone *"
-                            style={{width: '85%', marginBottom: 24}}
-                            onBlur={(event) => this.handleInputInformation(event)}
-                        />
                         <InputText
                             name="username"
                             label="Username *"
-                            style={{width: '85%', marginBottom: 24}}
+                            fullWidth
                             onBlur={(event) => this.handleInputInformation(event)}
+                            sx={{
+                                marginY: 2
+                            }}
+                            error={errorMessage && errorMessage.username ? errorMessage.username : undefined}
                         />
                         <InputPassword
                             name="password"
                             label="Password *"
-                            style={{width: '85%', marginBottom: 6}}
                             onBlur={(event) => this.handleInputInformation(event)}
+                            fullWidth
+                            sx={{
+                                marginY: 2
+                            }}
+                            error={errorMessage && errorMessage.username ? errorMessage.username : undefined}
                         />
-                        <Button variant="contained" color="success" sx={{width: '85%'}} type="submit">Selanjutnya</Button>
+                        <Button variant="contained" color="success" fullWidth type="submit" sx={{marginY: 4}}>Selanjutnya</Button>
                     </form>
-                </div>
+                </Box>
                 <div className={styles.Box_footer}>
                     
                 </div>
@@ -253,13 +259,13 @@ class Register extends React.Component{
 
     handleInputInformation = (event) => {
         const {name, value} = event.target
-
-        console.log(name)
-        console.log(value)
-
         if (name === 'username') {
             if (value.length < 3) {
-                console.log('error')
+                this.setState({
+                    errorMessage: {
+                        [name]: `Username must have more 3 character`
+                    }
+                })
             } else {
                 this.setState({
                     form: {
@@ -268,24 +274,14 @@ class Register extends React.Component{
                     },
                     errorMessage: null
                 })
-                console.log(this.state.form.username)
             }
-        } else if (name === 'telephone') {
-            if (value.length < 3) {
-                console.log('error')
-            } else {
-                this.setState({
-                    form: {
-                        ...this.state.form,
-                        [name]: value
-                    },
-                    errorMessage: null
-                })
-                console.log(this.state.form.telephone)
-            }
-        } else if (name === 'password') {
+        } if (name === 'password') {
             if (value.length < 8) {
-                console.log('error password')
+                this.setState({
+                    errorMessage: {
+                        [name]: `Username must have more 3 character`
+                    }
+                })
             } else {    
                 this.setState({
                     form: {
@@ -294,7 +290,6 @@ class Register extends React.Component{
                     },
                     errorMessage: null
                 })
-                console.log(this.state.form.password)
             }
         }
     }
@@ -302,43 +297,52 @@ class Register extends React.Component{
     handleSubmitInformation = (e) => {
         e.preventDefault()
         const {errorMessage, form} = this.state
-        console.log(form)
 
-        if (!errorMessage) {
-            this.handleNextBox()
-        }
+        this.props.upProgress()
     }
     
     renderMoreInformation = () => {
         const {firstname, lastname, gender} = this.state.form
         return (
             <>
-                <div className={styles.Box_title}>
-                    <h2>More Information</h2>
-                </div>
-                <div className={styles.Box_main}>
+                <Typography variant="h5" textAlign={'center'} fontWeight={600} sx={{marginY: 2}}>Lengkapi Data Diri</Typography>
+                <Box
+                    sx={{
+                        marginY: 2,
+                        paddingX: 2,
+                    }}
+                >
                     <form onSubmit={this.handleSubmitMoreInformation} className={styles.Box_main}>
                         <InputText
                             name="firstname"
                             label="Nama depan *"
-                            style={{width: '85%', marginBottom: 24}}
+                            fullWidth
+                            sx={{
+                                marginY: 2
+                            }}
                             onBlur={(event) => this.handleInputMoreInformation(event)}
                         />
                         <InputText
                             name="lastname"
                             label="Nama akhir *"
-                            style={{width: '85%', marginBottom: 24}}
+                            fullWidth
+                            sx={{
+                                marginY: 2
+                            }}
                             onBlur={(event) => this.handleInputMoreInformation(event)}
                         />
                         <InputGender
-                            style={{width: '85%', marginBottom: 24}}
+                            fullWidth
+                            sx={{
+                                marginY: 2
+                            }}
                             change={(event) => this.handleChangeRadioGender(event)}
                         />
-                        <Button variant="contained" color="success" sx={{width: '85%'}} type="submit">Kirim</Button>
+                        <Button variant="contained" color="success" fullWidth type="submit" sx={{marginY: 4}}>Kirim</Button>
                     </form>
-                </div>
+                </Box>
                 <div className={styles.Box_footer} style={{marginTop: '0.5rem'}}>
-                    <p style={{color: 'blue', textDecoration: 'underline', cursor: 'pointer'}} onClick={() => this.handleNextBox()}>Lewati isi data tersebut</p>
+                    {/* <p style={{color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Lewati isi data tersebut</p> */}
                 </div>
             </>
         )
@@ -373,8 +377,6 @@ class Register extends React.Component{
     }
     
     handleChangeRadioGender = (event) => {
-        console.log(event.target)
-        console.log(event.target.value)
         this.setState({
             form: {
                 ...this.state.form,
@@ -386,12 +388,8 @@ class Register extends React.Component{
     handleSubmitMoreInformation = (e) => {
         e.preventDefault()
         const {errorMessage} = this.state
-        
-        console.log(this.state.form)
 
-        if (!errorMessage) {
-            this.handleNextBox()
-        }
+        this.props.upProgress()
     }
 
     renderSuccess = () => {
@@ -402,32 +400,21 @@ class Register extends React.Component{
                 <div className={styles.Box_main}>
                     <CheckCircleRounded color="success" sx={{fontSize: '5rem'}}/>
                     <p>Anda telah berhasil membuat akun. Lanjutkan ke menu Login</p>
-                    <Link href="/"><Button variant="contained" color="success" sx={{marginBottom: 4}}>Login</Button></Link>
-                    <Button variant="contained">Lanjutkan untuk membuka Toko</Button>
+                    <Stack
+                        direction={'row'}
+                        spacing={2}
+                    >
+                        <Button variant="contained" color="success" href="/">Login</Button>
+                        <Button variant="outlined" href="/register/shop">Buka Toko</Button>
+                    </Stack>
                 </div>
             </>
         )
     }
 
-    renderBox = () => {
-        const list = [
-            this.renderInputEmailOrTelp(),
-            this.renderCodeOTP(),
-            this.renderInformation(),
-            this.renderMoreInformation(),
-            this.renderSuccess()
-        ]
-        const {boxIndex} = this.state
-
-        return (
-            <>
-                {list[boxIndex]}
-            </>
-        )
-        
-    }
-
     render(){
+        const {progressIndex} = this.props.auth
+
         return(
             <ThemeProvider theme={this.theme}>
                 <Container sx={{paddingY: 8}}>
@@ -441,10 +428,29 @@ class Register extends React.Component{
                         <Grid2 size={6} sx={{paddingX: 8}}>
                             <Paper
                                 sx={{
-                                    p: 2
+                                    p: 2,
+                                    position: 'relative'
                                 }}
                             >
-                                {this.renderBox()}
+                                <Backdrop
+                                    open={this.props.auth.isLoading}
+                                    sx={{
+                                        position: 'absolute',
+                                        top: 0,
+                                        left: 0,
+                                        zIndex: this.theme.zIndex.modal + 1,
+                                        backgroundColor: 'rgba(236, 236, 236, 0.3)'
+                                    }}
+                                >
+                                    <CircularProgress color="white"/>
+                                </Backdrop>
+                                {
+                                    progressIndex === 0 ? this.renderInputEmailOrTelp() :
+                                    progressIndex === 1 ? this.renderCodeOTP() :
+                                    progressIndex === 2 ? this.renderInformation() :
+                                    progressIndex === 3 ? this.renderMoreInformation() :
+                                    this.renderSuccess()
+                                }
                             </Paper>
                         </Grid2>
                     </Grid2>
@@ -455,12 +461,21 @@ class Register extends React.Component{
 }
 
 const mapStateToProps = (state) => ({
-    
+    auth: {
+        isLoading: state.auth.isLoading,
+        error: state.auth.error,
+        data: state.auth.data,
+        token: state.auth.token,
+        isSuccessToken: state.auth.isSuccessToken,
+        isSuccessSend: state.auth.isSuccessSend,
+        progressIndex: state.auth.progressIndex,
+    }
 })
 
 const mapDispatchToProps = {
     SendCodeOtp,
     VerifyCodeOtp,
+    upProgress,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Register))
