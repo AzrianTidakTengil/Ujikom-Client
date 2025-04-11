@@ -11,7 +11,7 @@ import { Playfair_Display, Poppins } from "next/font/google";
 import { LoginGoogle } from "@/services/auth";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
-import { SendCodeOtp, upProgress, VerifyCodeOtp } from "@/store/auth";
+import { RegisterUser, SendCodeOtp, upProgress, VerifyCodeOtp } from "@/store/auth";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
@@ -387,9 +387,19 @@ class Register extends React.Component{
 
     handleSubmitMoreInformation = (e) => {
         e.preventDefault()
-        const {errorMessage} = this.state
+        const {errorMessage, form} = this.state
 
-        this.props.upProgress()
+        const params = {
+            role: 'user',
+            email: form.credential,
+            username: form.username,
+            firstname: form.firstname || form.username,
+            lastname: form.lastname,
+            password: form.password,
+            gender: form.gender == '1' ? "Perempuan" : form.gender == '2' ? "Laki laki" : 'Tidak tau'
+        }
+
+        this.props.RegisterUser(params)
     }
 
     renderSuccess = () => {
@@ -476,6 +486,7 @@ const mapDispatchToProps = {
     SendCodeOtp,
     VerifyCodeOtp,
     upProgress,
+    RegisterUser,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Register))
