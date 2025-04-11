@@ -99,12 +99,12 @@ class Auth extends Component {
               </div>
           </Box>
         </Modal>
-                  <Backdrop
-                    sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.modal + 100 })}
-                    open={this.props.isLoading}
-                  >
-                    <CircularProgress color="inherit" />
-                  </Backdrop>
+        <Backdrop
+          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.appBar + 1000 })}
+          open={this.props.isLoading}
+        >
+          <CircularProgress color="inherit" />
+        </Backdrop>
       </ThemeProvider>
     )
   }
