@@ -241,7 +241,13 @@ class Product extends Component{
                             </Stack>
                         </Box>
                     </Grid>
-                    <Grid>
+                    <Grid
+                        sx={{
+                            [this.theme.breakpoints.down('lg')]: {
+                                display: 'none'
+                            }
+                        }}
+                    >
                         <Paper
                             sx={{p:2}}
                         >
