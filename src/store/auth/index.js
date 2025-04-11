@@ -104,6 +104,7 @@ export const authSlice = createSlice({
             .addCase(RegisterUser.fulfilled, (state, action) => {
                 state.isLoading = false
                 state.isSuccessRegister = true
+                state.progressIndex = 4
             })
     }
 })
