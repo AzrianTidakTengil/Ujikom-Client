@@ -10,6 +10,8 @@ import { getAll } from '@/store/products';
 import { createTransaction } from '@/store/transaction';
 import { withRouter } from 'next/router';
 import { insertCheckout, clearItemsCheckout } from '@/store/trolley';
+import { Cld } from '@/config';
+import { thumbnail } from '@cloudinary/url-gen/actions/resize';
 
 class Trolley extends Component {
   constructor(props) {
@@ -25,13 +27,12 @@ class Trolley extends Component {
       selectedItems: [],
       subTotalPrice: 0,
     }
+    this.theme = createTheme({
+      palette: {
+        ...palleteV1.palette
+      }
+    })
   }
-
-  theme = () => createTheme({
-    palette: {
-      ...palleteV1.palette
-    }
-  })
 
   UNSAFE_componentWillMount() {
     const {allItem} = this.state
@@ -54,8 +55,10 @@ class Trolley extends Component {
           id: val.id,
           quantity: val.items,
           name: val.trolleyToProduct.name,
-          price: val.trolleyToProduct.price,
-          stock: val.trolleyToProduct.stock
+          price: val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.price), 0),
+          stock: val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.stock), 0),
+          image: val.trolleyToProduct.productToImage.length != 0 ? val.trolleyToProduct.productToImage[0].public_id : 'product-not-found',
+          product_id: val.product_id,
         })
       }) 
       this.setState({
@@ -106,13 +109,29 @@ class Trolley extends Component {
                       />
                     </Grid>
                     <Grid size={3}>
-                      <Paper sx={{p: 2}}>
-                        Image
-                      </Paper>
+                      <img
+                        width={160}
+                        height={160}
+                        alt={item.name}
+                        src={Cld.image(item.image).resize(thumbnail().width(160).height(160)).toURL()}
+                      />
                     </Grid>
                     <Grid size={5}>
                       <CardContent>
-                        <Typography variant="h6">{item.name}</Typography>
+                        <Link 
+                          href={{
+                            pathname: `/p/${item.name}`,
+                            query: {id: item.product_id}
+                            }}
+                          style={{
+                            textDecoration: 'none',
+                            color: 'black'
+                          }}
+                        >
+                          <Typography variant="h6">
+                            {item.name}
+                          </Typography>
+                        </Link>
                         <Typography variant="body2">{
                           new Intl.NumberFormat('id-ID', {
                               style: "currency",
@@ -131,7 +150,7 @@ class Trolley extends Component {
                           >
                             <QuantityEditor 
                             name={item.id}
-                            initialQuantity={item.items}
+                            initialQuantity={item.quantity}
                             min={1}
                             max={item.stock}
                             onChange={this.handleChangeQuantity}
@@ -226,7 +245,7 @@ class Trolley extends Component {
   };
 
   renderAllProduct = () => {
-    const {offer, limit, products, length} = this.state.allItem
+    const {products} = this.state.allItem
 
     return (
       <Box>
@@ -239,47 +258,62 @@ class Trolley extends Component {
             </Button>
         </div>
         <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={12} sx={{marginTop: 4}}>
-            {products.map((product) => (
-                <Grid key={product.id} size={{xs: 6, md: 3}}>
-                    <Link href={{
-                        pathname: `/p/${product.name}`,
-                        query: {id: product.id}
-                        }}
-                        style={{textDecoration: 'none'}}
-                    >
-                        <Card sx={{textDecoration: 'none'}}>
-                            <Paper sx={{p:3}}>
-
-                            </Paper>
-                            <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
-                                <Typography variant="subtitle1">{product.name}</Typography>
-                                <Typography variant="subtitle1" fontWeight={600}>
-                                {
-                                    new Intl.NumberFormat('id-ID', {
-                                        style: "currency",
-                                        currency: "IDR"
-                                    }).format(product.price)
-                                }
-                                </Typography>
-                                <Typography variant="body2" color="textSecondary">
-                                {product.productToOwner.ownerToStore.name}
-                                </Typography>
-                                <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
-                                    <div style={{display: 'flex', alignItems: 'center'}}>
-                                        <Star fontSize='small' color='yellow'/>
-                                        <Typography variant="body2" color="textSecondary">
-                                            4
-                                        </Typography>
-                                    </div>
-                                    <Typography variant='body2' color='textSecondary'>
-                                        100 terjual
+          {products.map((product) => (
+            <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
+                <Link href={{
+                    pathname: `/p/${product.name}`,
+                    query: {id: product.id}
+                    }}
+                    style={{textDecoration: 'none'}}
+                >
+                    <Card sx={{textDecoration: 'none'}}>
+                        <CardMedia
+                            component="img"
+                            height={160}
+                            width={160}
+                            image={Cld.image(product.productToImage.length != 0 ? product.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                            alt={product.name}
+                        />
+                        <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
+                            <Typography 
+                                variant="subtitle1"
+                                sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: 'vertical',
+                                    display: "-webkit-box",
+                                }}
+                            >
+                                {product.name}
+                            </Typography>
+                            <Typography variant="subtitle1" fontWeight={600}>
+                            {
+                                new Intl.NumberFormat('id-ID', {
+                                    style: "currency",
+                                    currency: "IDR"
+                                }).format(product.productToProductVariant.length != 0 ? product.productToProductVariant[0].price : product.price)
+                            }
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                            {product.productToOwner.ownerToStore.name}
+                            </Typography>
+                            <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
+                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                    <Star fontSize='small' color='yellow'/>
+                                    <Typography variant="body2" color="textSecondary">
+                                        4
                                     </Typography>
-                                </Stack>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                </Grid>
-            ))}
+                                </div>
+                                <Typography variant='body2' color='textSecondary'>
+                                    100 terjual
+                                </Typography>
+                            </Stack>
+                        </CardContent>
+                    </Card>
+                </Link>
+            </Grid>
+        ))}
         </Grid>
     </Box>
     )
@@ -314,9 +348,9 @@ class Trolley extends Component {
             <Grid>
               <Stack direction={'row'} spacing={3} divider={<Divider orientation='vertical' flexItem/>}>
                 <FormControlLabel control={<Checkbox color='white' onChange={this.handleCheckAllItem} checked={isItCheked}/>} label="Pilih Semua"/>
-                <FormGroup>
+                {/* <FormGroup>
                   <FormControlLabel control={<IconButton color='white'><Delete/></IconButton>} label="Hapus Semua"/>
-                </FormGroup>
+                </FormGroup> */}
               </Stack>
             </Grid>
             <Grid 
