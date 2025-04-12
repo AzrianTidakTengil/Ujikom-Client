@@ -22,17 +22,6 @@ const dummy_review = Array.from({ length: 34 }, (_, i) => ({
     love: 1,
 }));
 
-const products = Array.from({ length: 500 }, (_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    address: `Bandung`,
-    price: new Intl.NumberFormat('id-ID', {
-        style: "currency",
-        currency: "IDR"
-    }).format(1000 * i),
-    image: "https://via.placeholder.com/150",
-}));
-
 class Product extends Component{
     constructor(props) {
         super(props)
@@ -65,12 +54,7 @@ class Product extends Component{
                 visibleItem: dummy_review.slice(0, 5)
             },
             otherItemFromStore: [],
-            allItem: {
-                offset: 1,
-                limit: 36,
-                length: 36,
-                products: []
-            },
+            allItem: [],
             quantityEditor: 1,
             indexImage: 0,
             indexVariant: 0,
@@ -106,8 +90,8 @@ class Product extends Component{
     UNSAFE_componentWillMount() {
         const {allItem, product} = this.state
         this.props.getAll({
-            limit: allItem.limit,
-            offset: allItem.offset
+            limit: 36,
+            offset: 0
         })
     }
 
@@ -123,10 +107,7 @@ class Product extends Component{
 
         if (products.isSuccess) {
             this.setState({
-                allItem: {
-                    ...this.state.allItem,
-                    products: products.allProduct
-                }
+                allItem: products.allProduct
             })
         }
 
@@ -402,8 +383,8 @@ class Product extends Component{
                                         }
                                     </Typography>
                                 </Box>
-                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
-                                <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? true : false }>Tambah Ke Keranjang</Button>
+                                <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
                             </Box>
                         </Paper>
                     </Grid>
@@ -502,8 +483,8 @@ class Product extends Component{
                                 }
                             </Typography>
                         </Box>
-                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
-                        <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
+                        <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
                     </Box>
             </Box>
         )
@@ -803,7 +784,7 @@ class Product extends Component{
     }
 
     renderAllProduct = () => {
-        const {offset, limit, products} = this.state.allItem
+        const {allItem} = this.state
 
         return (
             <Box>
@@ -816,8 +797,8 @@ class Product extends Component{
                     </Button>
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
-                    {products.map((product) => (
-                        <Grid key={product.id} size={3}>
+                    {allItem.map((product) => (
+                        <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
@@ -825,17 +806,32 @@ class Product extends Component{
                                 style={{textDecoration: 'none'}}
                             >
                                 <Card sx={{textDecoration: 'none'}}>
-                                    <Paper sx={{p:3}}>
-
-                                    </Paper>
+                                    <CardMedia
+                                        component="img"
+                                        height={160}
+                                        width={160}
+                                        image={Cld.image(product.productToImage.length != 0 ? product.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                                        alt={product.name}
+                                    />
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
-                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                        <Typography 
+                                            variant="subtitle1"
+                                            sx={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                display: "-webkit-box",
+                                            }}
+                                        >
+                                            {product.name}
+                                        </Typography>
                                         <Typography variant="subtitle1" fontWeight={600}>
                                         {
                                             new Intl.NumberFormat('id-ID', {
                                                 style: "currency",
                                                 currency: "IDR"
-                                            }).format(product.price)
+                                            }).format(product.productToProductVariant.length != 0 ? product.productToProductVariant[0].price : product.price)
                                         }
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
@@ -906,6 +902,14 @@ const mapStateToProps = (state) => ({
         totalItems: state.product.totalItems,
         visitProduct: state.product.visitProduct,
         message: state.product.message
+    },
+    trolley: {
+        isLoading: state.trolley.isLoading,
+        isSuccess: state.trolley.isSucces,
+        error: state.trolley.error,
+        data: state.trolley.data,
+        checkout: state.trolley.checkout,
+        itemsCheckout: state.trolley.itemsCheckout,
     },
 })
 
