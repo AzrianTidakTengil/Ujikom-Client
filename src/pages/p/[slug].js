@@ -383,7 +383,7 @@ class Product extends Component{
                                         }
                                     </Typography>
                                 </Box>
-                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? true : false }>Tambah Ke Keranjang</Button>
+                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
                                 <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
                             </Box>
                         </Paper>
