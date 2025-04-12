@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { Product } from "@/services";
-import { CreateProduct, CreateSubVariant, CreateVariant, SubVariant, TreeCateogories, Variant } from "@/services/product";
+import { CreateProduct, CreateSubVariant, CreateVariant, GetProductShop, SubVariant, TreeCateogories, Variant } from "@/services/product";
 import ProductMessage from './message'
 
 export const getAll = createAsyncThunk('productSlice/getAll', async (params) => {
@@ -48,6 +48,11 @@ export const createSubVariantProduct = createAsyncThunk('productSlice/createSubV
     return response.data
 })
 
+export const VisitProductShop = createAsyncThunk('productSlice/VisitProductShop', async (params) => {
+    const response = await GetProductShop(params)
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     isSuccess: false,
@@ -81,6 +86,7 @@ const initialState = {
             variant: [],
         }
     },
+    visitProduct: [],
     listCategories: [],
     listVariant: [],
     listSubVariant: [],
@@ -260,6 +266,20 @@ export const productSlice = createSlice({
                 state.isLoading = false
                 state.message = ''
                 state.isSuccess = true
+            })
+            .addCase(VisitProductShop.pending, (state, action) => {
+                state.isLoading = true
+                state.message = ProductMessage.PRODUCTS.VISITSHOP
+                state.isSuccess = false
+            })
+            .addCase(VisitProductShop.rejected, (state, action) => {
+                state.isLoading = false
+                state.error = action.error.message
+            })
+            .addCase(VisitProductShop.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
+                state.visitProduct = action.payload.data.product
             })
     }
 })

@@ -8,6 +8,7 @@ export default {
         DELETE: 'DeleteProduct',
         MARK: 'MarkProduct',
         POPULAR: 'FilterPopularProduct',
-        STORE: 'FilterProductByShop'
+        STORE: 'FilterProductByShop',
+        VISITSHOP: 'GetProductShopById',
     },
 }
