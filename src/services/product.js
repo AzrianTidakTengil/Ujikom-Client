@@ -60,3 +60,10 @@ export const CreateSubVariant = (params) => {
         params
     )
 }
+
+export const GetProductShop = (params) => {
+    return apiServiceV1.post(
+        `${endpoints.PRODUCTS.STORE}/summary`,
+        params
+    )
+}
