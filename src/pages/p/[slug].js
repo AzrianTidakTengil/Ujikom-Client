@@ -22,17 +22,6 @@ const dummy_review = Array.from({ length: 34 }, (_, i) => ({
     love: 1,
 }));
 
-const products = Array.from({ length: 500 }, (_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    address: `Bandung`,
-    price: new Intl.NumberFormat('id-ID', {
-        style: "currency",
-        currency: "IDR"
-    }).format(1000 * i),
-    image: "https://via.placeholder.com/150",
-}));
-
 class Product extends Component{
     constructor(props) {
         super(props)
