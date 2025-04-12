@@ -383,8 +383,8 @@ class Product extends Component{
                                         }
                                     </Typography>
                                 </Box>
-                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
-                                <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? true : false }>Tambah Ke Keranjang</Button>
+                                <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
                             </Box>
                         </Paper>
                     </Grid>
@@ -483,8 +483,8 @@ class Product extends Component{
                                 }
                             </Typography>
                         </Box>
-                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
-                        <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
+                        <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
                     </Box>
             </Box>
         )
@@ -902,6 +902,14 @@ const mapStateToProps = (state) => ({
         totalItems: state.product.totalItems,
         visitProduct: state.product.visitProduct,
         message: state.product.message
+    },
+    trolley: {
+        isLoading: state.trolley.isLoading,
+        isSuccess: state.trolley.isSucces,
+        error: state.trolley.error,
+        data: state.trolley.data,
+        checkout: state.trolley.checkout,
+        itemsCheckout: state.trolley.itemsCheckout,
     },
 })
 
