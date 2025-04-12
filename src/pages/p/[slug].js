@@ -6,11 +6,12 @@ import { QuantityEditor, SelectChip } from "@/components";
 import { ChevronLeft, ChevronRight, Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
 import Link from "next/link";
 import { connect } from "react-redux";
-import { getAll, getOne } from "@/store/products";
+import { getAll, getOne, VisitProductShop } from "@/store/products";
 import { insertItem } from "@/store/trolley";
-
+import { thumbnail } from "@cloudinary/url-gen/actions/resize";
 import React, { Component } from "react";
 import { Cld } from "@/config";
+import ProductMessage from '@/store/products/message'
 
 const dummy_review = Array.from({ length: 34 }, (_, i) => ({
     id: i + 1,
@@ -63,12 +64,7 @@ class Product extends Component{
                 length: 34,
                 visibleItem: dummy_review.slice(0, 5)
             },
-            otherItemFromStore: {
-                offer: 1,
-                limit: 12,
-                length: 12,
-                visibleItem: products.slice(0, 12)
-            },
+            otherItemFromStore: [],
             allItem: {
                 offset: 1,
                 limit: 36,
@@ -104,10 +100,11 @@ class Product extends Component{
         const urlParams = new URLSearchParams(queryString);
 
         this.props.getOne({id: urlParams.get('id')})
+        this.props.VisitProductShop({limit: 12, offset: 0, id: urlParams.get('id')})
     }
 
     UNSAFE_componentWillMount() {
-        const {allItem} = this.state
+        const {allItem, product} = this.state
         this.props.getAll({
             limit: allItem.limit,
             offset: allItem.offset
@@ -116,7 +113,13 @@ class Product extends Component{
 
     UNSAFE_componentWillReceiveProps(nextProps) {
         const {query, id} = nextProps.router
-        const {products} = nextProps
+        const {products, shop} = nextProps
+
+        if (products.isSuccess && products.message === ProductMessage.PRODUCTS.VISITSHOP) {
+            this.setState({
+                otherItemFromStore: products.visitProduct
+            })
+        }
 
         if (products.isSuccess) {
             this.setState({
@@ -150,6 +153,8 @@ class Product extends Component{
                 },
                 quantityEditor: products.item.product.variant ? products.item.product.variant[0].minimumPurchase : 1
             })
+
+            // this.props.VisitProductShop({limit: 12, offset: 0}, products.item.product.shop.id)
         }
     }
 
@@ -723,7 +728,7 @@ class Product extends Component{
     }
 
     renderViewProductStore = () => {
-        const {offer, limit, visibleItem, length} = this.state.otherItemFromStore
+        const {otherItemFromStore} = this.state
 
         return (
             <Box>
@@ -736,8 +741,8 @@ class Product extends Component{
                     </Button>
                 </div>
                 <Grid container spacing={4} rowSpacing={2} columnSpacing={2} sx={{marginTop: 4}}>
-                    {visibleItem.map((product) => (
-                        <Grid key={product.id} size={2}>
+                    {otherItemFromStore.map((product) => (
+                        <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
                             <Link href={{
                                 pathname: `/p/${product.name}`,
                                 query: {id: product.id}
@@ -747,17 +752,34 @@ class Product extends Component{
                                 <Card sx={{textDecoration: 'none'}}>
                                     <CardMedia
                                         component="img"
-                                        height="140"
-                                        image={product.image}
+                                        height={160}
+                                        width={160}
+                                        image={Cld.image(product.productToImage.length != 0 ? product.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
                                         alt={product.name}
                                     />
                                     <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
-                                        <Typography variant="subtitle1">{product.name}</Typography>
+                                        <Typography 
+                                            variant="subtitle1"
+                                            sx={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                display: "-webkit-box",
+                                            }}
+                                        >
+                                            {product.name}
+                                        </Typography>
                                         <Typography variant="subtitle1" fontWeight={600}>
-                                        {product.price}
+                                        {
+                                            new Intl.NumberFormat('id-ID', {
+                                                style: "currency",
+                                                currency: "IDR"
+                                            }).format(product.productToProductVariant.length != 0 ? product.productToProductVariant[0].price : product.price)
+                                        }
                                         </Typography>
                                         <Typography variant="body2" color="textSecondary">
-                                        {product.address}
+                                        {product.productToOwner.ownerToStore.name}
                                         </Typography>
                                         <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
                                             <div style={{display: 'flex', alignItems: 'center'}}>
@@ -882,13 +904,16 @@ const mapStateToProps = (state) => ({
         error: state.product.error,
         item: state.product.data,
         totalItems: state.product.totalItems,
-    }
+        visitProduct: state.product.visitProduct,
+        message: state.product.message
+    },
 })
 
 const mapDispatchToProps = {
     getAll,
     getOne,
-    insertItem
+    insertItem,
+    VisitProductShop,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Product))
