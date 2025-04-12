@@ -27,13 +27,12 @@ class Trolley extends Component {
       selectedItems: [],
       subTotalPrice: 0,
     }
+    this.theme = createTheme({
+      palette: {
+        ...palleteV1.palette
+      }
+    })
   }
-
-  theme = () => createTheme({
-    palette: {
-      ...palleteV1.palette
-    }
-  })
 
   UNSAFE_componentWillMount() {
     const {allItem} = this.state
