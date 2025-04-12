@@ -3,13 +3,14 @@ import { Box, Container, Paper, createTheme, Divider, Avatar, Chip, Grid2 as Gri
 import { withRouter } from "next/router";
 import Image from "next/image";
 import { QuantityEditor, SelectChip } from "@/components";
-import { Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
+import { ChevronLeft, ChevronRight, Favorite, FavoriteBorderOutlined, MoreVert, Share, Star, ThumbUp } from "@mui/icons-material";
 import Link from "next/link";
 import { connect } from "react-redux";
 import { getAll, getOne } from "@/store/products";
 import { insertItem } from "@/store/trolley";
 
 import React, { Component } from "react";
+import { Cld } from "@/config";
 
 const dummy_review = Array.from({ length: 34 }, (_, i) => ({
     id: i + 1,
@@ -29,8 +30,6 @@ const products = Array.from({ length: 500 }, (_, i) => ({
         currency: "IDR"
     }).format(1000 * i),
     image: "https://via.placeholder.com/150",
-    // rating: Math.floor(Math.random() * 5) + 1,
-    // sold: Math.floor(Math.random() * 100) + 1,
 }));
 
 class Product extends Component{
@@ -45,11 +44,18 @@ class Product extends Component{
                 description: '',
                 price: 0,
                 stock: 0,
+                condition: null,
+                category: null,
                 shop: {
                     id: null,
                     name: '',
                     address: ''
-                }
+                },
+                width: 0,
+                height: 0,
+                length: 0,
+                images:[],
+                variant: [],
             },
             reviewPagination: {
                 offer: 1,
@@ -70,6 +76,10 @@ class Product extends Component{
                 products: []
             },
             quantityEditor: 1,
+            indexImage: 0,
+            indexVariant: 0,
+            selectedVariant1: null,
+            selectedVariant2: null,
         }
         this.theme = createTheme({
             palette: {
@@ -123,14 +133,22 @@ class Product extends Component{
                     id: products.item.product.id,
                     name: products.item.product.name,
                     description: products.item.product.description,
-                    price: products.item.product.price,
-                    stock: products.item.product.price,
+                    price: products.item.product.variant.reduce((total, currVal) => total + (currVal.price), 0),
+                    stock: products.item.product.variant.reduce((total, currVal) => total + (currVal.stock), 0),
+                    category: `${products.item.product.category.type1 ? products.item.product.category.type2 ? products.item.product.category.type3 ? `${products.item.product.category.type1} > ${products.item.product.category.type2} > ${products.item.product.category.type3}` : `${products.item.product.category.type1} > ${products.item.product.category.type2}` : `${products.item.product.category.type1}` : '-' }`,
+                    condition: products.item.product.condition,
+                    width: products.item.product.width,
+                    height: products.item.product.height,
+                    length: products.item.product.length,
+                    images: products.item.product.images,
+                    variant: products.item.product.variant,
                     shop: {
                         id: products.item.product.shop.id,
                         name: products.item.product.shop.name,
                         address: products.item.product.shop.address
                     }
-                }
+                },
+                quantityEditor: products.item.product.variant ? products.item.product.variant[0].minimumPurchase : 1
             })
         }
     }
@@ -144,8 +162,8 @@ class Product extends Component{
     }
 
     renderProduct = () => {
-        const {query, favorite, product, quantityEditor} = this.state
-        const {id, name, description, price, stock, shop} = product
+        const {query, favorite, product, quantityEditor, indexImage, indexVariant, selectedVariant1, selectedVariant2} = this.state
+        const {id, name, description, price, stock, shop, category, condition, images, variant} = product
 
         const dummy_color = [
             {id: 0, name: 'green'},
@@ -156,10 +174,71 @@ class Product extends Component{
         return(
             <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
                 <Grid container columnSpacing={4}>
-                    <Grid size="auto">
-                        <Image width={320} height={320} src={'/assets/skeleton/product.jpg'}/>
+                    <Grid size={{lg: 3.5, xs: 4.5}}>
+                        <Box
+                            sx={{
+                                position: 'relative'
+                            }}
+                        >
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    left: 5,
+                                    top: '45%',
+                                }}
+                            >
+                                <IconButton>
+                                    <ChevronLeft/>
+                                </IconButton>
+                            </Box>
+                            <img 
+                                style={{
+                                    width: '100%',
+                                    height: 320,
+                                    objectFit: 'cover',
+                                    objectPosition: 'center',
+                                    border: '1px solid #a5a5a5'
+                                }} 
+                                src={Cld.image(images[indexImage]).toURL()}
+                            />
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    right: 5,
+                                    top: '45%',
+                                }}
+                            >
+                                <IconButton>
+                                    <ChevronRight/>
+                                </IconButton>
+                            </Box>
+                        </Box>
+                        <Stack
+                            direction={'row'}
+                            sx={{
+                                overflowX: 'scroll',
+                                marginY: 2
+                            }}
+                            spacing={2}
+                        >
+                            {
+                                images.map((image, i) => (
+                                    <img
+                                        key={i}
+                                        style={{
+                                            width: 80,
+                                            height: 80,
+                                            objectFit: 'cover',
+                                            objectPosition: 'center',
+                                            border: i === indexImage ? '1.5px solid #9b9b9b' : 'none'
+                                        }} 
+                                        src={Cld.image(image).toURL()}
+                                    />
+                                ))
+                            }
+                        </Stack>
                     </Grid>
-                    <Grid size="grow">
+                    <Grid size={{lg: 5.5, xs: 7.5}}>
                         <Box sx={{width: '100%'}}>
                             <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                                 <Typography variant="h5">{name}</Typography>
@@ -208,10 +287,10 @@ class Product extends Component{
                                     marginBottom: 1
                                 }
                             }}>
-                                <Typography variant="subtitle2">Kondisi: <b>Baru</b></Typography>
-                                <Typography variant="subtitle2">Min. Pembelian: <b>1</b> Buah</Typography>
-                                <Typography variant="subtitle2">Kategori: <b>Benda</b></Typography>
-                                <Typography variant="subtitle2">Berat benda: <b>1</b> Gram</Typography>
+                                <Typography variant="subtitle2">Kondisi: <b>{condition == 'new' ? 'Baru' : 'Bekas'}</b></Typography>
+                                <Typography variant="subtitle2">Min. Pembelian: <b>{variant.length != 0 ? variant[indexVariant].minimumPurchase : '1'}</b> Buah</Typography>
+                                <Typography variant="subtitle2">Kategori: <b>{category}</b></Typography>
+                                <Typography variant="subtitle2">Berat benda: <b>{variant.length != 0 ? variant[indexVariant].weight : '-'}</b> Gram</Typography>
                             </Box>
                             <Divider sx={{marginY: 4}}/>
                             <Stack direction={'row'} justifyContent={'space-between'}>
@@ -226,22 +305,29 @@ class Product extends Component{
                                     <Rating defaultValue={4} readOnly/>
                                 </Grid>
                             </Grid>
-                            <Grid container direction={'column'} spacing={1}>
-                                        <Grid>
-                                            <Button variant="outlined" sx={{width: 100}}>
-                                                Follow
-                                            </Button>
-                                        </Grid>
-                                        <Grid>
-                                            <Button variant="contained" sx={{width: 100}}>
-                                                Chat
-                                            </Button>
-                                        </Grid>
-                                    </Grid>
+                            {/* <Grid container direction={'column'} spacing={1}>
+                                <Grid>
+                                    <Button variant="outlined" sx={{width: 100}}>
+                                        Follow
+                                    </Button>
+                                </Grid>
+                                <Grid>
+                                    <Button variant="contained" sx={{width: 100}}>
+                                        Chat
+                                    </Button>
+                                </Grid>
+                            </Grid> */}
                             </Stack>
                         </Box>
                     </Grid>
-                    <Grid>
+                    <Grid
+                        sx={{
+                            [this.theme.breakpoints.down('lg')]: {
+                                display: 'none'
+                            }
+                        }}
+                        size={{lg: 3}}
+                    >
                         <Paper
                             sx={{p:2}}
                         >
@@ -262,16 +348,44 @@ class Product extends Component{
                                         </Typography>
                                     </Box>
                                 </Box>
-                                <Box sx={{marginBottom: 2}}>
-                                    <Typography variant="subtitle1">Pilih</Typography>
-                                    <SelectChip
-                                        options={dummy_color}
-                                    />
-                                </Box>
-                                {/* <Box>
-                                    <Typography variant="subtitle1">Pilih</Typography>
-                                    
-                                </Box> */}
+                                {
+                                    variant.length != 0 ? (
+                                        <Box>
+                                            <Box sx={{marginY: 2}}>
+                                                <Typography variant="subtitle1">Pilih {variant[0].name}</Typography>
+                                                <Stack direction="row" spacing={1}>
+                                                {
+                                                    variant[0].subtype.map((s, i) => (
+                                                        <Chip
+                                                            key={i}
+                                                            label={s.name}
+                                                            clickable
+                                                            color={s.id === selectedVariant1 ? 'primary' : 'default'}
+                                                            onClick={() => this.handleSelectVariant1(s.id)}
+                                                        />
+                                                    ))
+                                                }
+                                                </Stack>
+                                            </Box>
+                                            <Box sx={{marginY: 2}}>
+                                                <Typography variant="subtitle1">Pilih {variant[1].name}</Typography>
+                                                <Stack direction="row" spacing={1}>
+                                                {
+                                                    variant[1].subtype.map((s, i) => (
+                                                        <Chip
+                                                            key={i}
+                                                            label={s.name}
+                                                            clickable
+                                                            color={s.id === selectedVariant2 ? 'primary' : 'default'}
+                                                            onClick={() => this.handleSelectVariant2(s.id)}
+                                                        />
+                                                    ))
+                                                }
+                                                </Stack>
+                                            </Box>
+                                        </Box>
+                                    ) : ''
+                                }
                                 <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2}}>
                                     <Typography variant="subtitle1" sx={{fontWeight: 500}}>Subtotal</Typography>
                                     <Typography variant="h6" sx={{fontWeight: 600}}>
@@ -303,6 +417,102 @@ class Product extends Component{
                     items: quantityEditor
                 }
             ]
+        })
+    }
+
+    renderSetBuy = () => {
+        const {query, favorite, product, quantityEditor, indexImage, indexVariant, selectedVariant1, selectedVariant2} = this.state
+        const {id, name, description, price, stock, shop, category, condition, images, variant} = product
+
+        return (
+            <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
+                <Typography variant="h6" sx={{fontWeight: 600}}>Atur Pembelian</Typography>
+                    <Divider sx={{marginBottom: 4}}/>
+                    <Box>
+                        <Stack
+                            direction={'row'}
+                            justifyContent={'space-between'}
+                        >
+                            {
+                                variant.length != 0 ? (
+                                    <Box>
+                                        <Box sx={{marginY: 2}}>
+                                            <Typography variant="subtitle1">Pilih {variant[0].name}</Typography>
+                                            <Stack direction="row" spacing={1}>
+                                            {
+                                                variant[0].subtype.map((s, i) => (
+                                                    <Chip
+                                                        key={i}
+                                                        label={s.name}
+                                                        clickable
+                                                        color={s.id === selectedVariant1 ? 'primary' : 'default'}
+                                                        onClick={() => this.handleSelectVariant1(s.id)}
+                                                    />
+                                                ))
+                                            }
+                                            </Stack>
+                                        </Box>
+                                        <Box sx={{marginY: 2}}>
+                                            <Typography variant="subtitle1">Pilih {variant[1].name}</Typography>
+                                            <Stack direction="row" spacing={1}>
+                                            {
+                                                variant[1].subtype.map((s, i) => (
+                                                    <Chip
+                                                        key={i}
+                                                        label={s.name}
+                                                        clickable
+                                                        color={s.id === selectedVariant2 ? 'primary' : 'default'}
+                                                        onClick={() => this.handleSelectVariant2(s.id)}
+                                                    />
+                                                ))
+                                            }
+                                            </Stack>
+                                        </Box>
+                                    </Box>
+                                ) : ''
+                            }
+                            <Box>
+                                <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
+                                <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
+                                    <QuantityEditor
+                                        initialQuantity={quantityEditor}
+                                        min={variant.length != 0 ? variant[indexVariant].minimumPurchase : 1}
+                                        max={stock}
+                                        onChange={(name, value) => {this.setState({quantityEditor: value})}}
+                                    />
+                                    <Typography variant="subtitle1" sx={{marginLeft: 2}}>
+                                        Total Stok: {stock}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Stack>
+                        <Box sx={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 2}}>
+                            <Typography variant="subtitle1" sx={{fontWeight: 500}}>Subtotal</Typography>
+                            <Typography variant="h6" sx={{fontWeight: 600}}>
+                                {
+                                    new Intl.NumberFormat('id-ID', {
+                                        style: "currency",
+                                        currency: "IDR"
+                                    }).format(price * quantityEditor) 
+                                }
+                            </Typography>
+                        </Box>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley}>Tambah Ke Keranjang</Button>
+                        <Button variant="outlined" sx={{width: '100%'}}>Beli Langsung</Button>
+                    </Box>
+            </Box>
+        )
+    }
+
+    handleSelectVariant1 = (val) => {
+        this.setState({
+            selectedVariant1: val
+        })
+    }
+
+    handleSelectVariant2 = (val) => {
+        this.setState({
+            selectedVariant2: val
         })
     }
 
@@ -637,6 +847,7 @@ class Product extends Component{
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
                     <Container maxWidth="xl" sx={{marginY: 4}}>{this.renderProduct()}</Container>
+                    <Container maxWidth="xl" sx={{marginY: 4, [this.theme.breakpoints.up('lg')]: {display: 'none'}}}>{this.renderSetBuy()}</Container>
                     <Container maxWidth="xl" sx={{marginY: 4}}>
                         <Box sx={{border: '1px solid gray', borderRadius: 2, p:2}}>
                             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
