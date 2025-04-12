@@ -63,11 +63,22 @@ const initialState = {
             description: '',
             price: 0,
             stock: 0,
+            condition: null,
+            category: {
+                type1: null,
+                type2: null,
+                type3: null,
+            },
             shop: {
                 id: null,
                 name: '',
                 address: ''
-            }
+            },
+            width: 0,
+            height: 0,
+            length: 0,
+            images:[],
+            variant: [],
         }
     },
     listCategories: [],
@@ -103,6 +114,17 @@ export const productSlice = createSlice({
                 state.data.isSuccess = false
             })
             .addCase(getOne.fulfilled, (state, action) => {
+                const colors = [
+                    { id: 1, color: "blue" },
+                    { id: 2, color: "red" },
+                    { id: 3, color: "yellow" },
+                    { id: 4, color: "purple" },
+                    { id: 5, color: "green" },
+                    { id: 6, color: "orange" },
+                    { id: 7, color: "black" },
+                    { id: 8, color: "white" }
+                ];
+
                 state.data.isLoading = false
                 state.data.isSuccess = true
                 state.data.product.id = action.payload.data.id
@@ -110,6 +132,22 @@ export const productSlice = createSlice({
                 state.data.product.description = action.payload.data.description
                 state.data.product.price = action.payload.data.price
                 state.data.product.stock = action.payload.data.stock
+                state.data.product.condition = action.payload.data.condition
+                state.data.product.width = action.payload.data.width
+                state.data.product.height = action.payload.data.height
+                state.data.product.length = action.payload.data.length
+                state.data.product.category.type1 = action.payload.data.productToCategory && action.payload.data.productToCategory.productCategoryToCategory1 ? action.payload.data.productToCategory.productCategoryToCategory1.name : null
+                state.data.product.category.type2 = action.payload.data.productToCategory && action.payload.data.productToCategory.productCategoryToCategory2 ? action.payload.data.productToCategory.productCategoryToCategory2.name : null
+                state.data.product.category.type3 = action.payload.data.productToCategory && action.payload.data.productToCategory.productCategoryToCategory3 ? action.payload.data.productToCategory.productCategoryToCategory3.name : null
+                state.data.product.images = action.payload.data.productToImage.map((i) => i.public_id)
+                state.data.product.variant = action.payload.data.productToProductVariant.map((v) => ({
+                    price: v.price, 
+                    weight: v.weight, 
+                    stock: v.stock, 
+                    minimumPurchase: v.minimum_purchase, 
+                    name: v.productVariantToVariant.name,
+                    subtype: v.productVariantToSubVariant.map((s) => ({id: s.id, name: s.subVariantTosubVariant ? s.subVariantTosubVariant.name : ''}))
+                }))
                 state.data.product.shop.id = action.payload.data.productToOwner.ownerToStore.id
                 state.data.product.shop.name = action.payload.data.productToOwner.ownerToStore.name
                 state.data.product.shop.address = action.payload.data.productToOwner.ownerToStore.address
