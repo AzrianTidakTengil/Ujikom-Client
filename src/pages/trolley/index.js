@@ -55,9 +55,10 @@ class Trolley extends Component {
           id: val.id,
           quantity: val.items,
           name: val.trolleyToProduct.name,
-          price: val.trolleyToProduct.price,
-          stock: val.trolleyToProduct.stock,
+          price: val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.price), 0),
+          stock: val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.stock), 0),
           image: val.trolleyToProduct.productToImage.length != 0 ? val.trolleyToProduct.productToImage[0].public_id : 'product-not-found',
+          product_id: val.product_id,
         })
       }) 
       this.setState({
@@ -117,7 +118,20 @@ class Trolley extends Component {
                     </Grid>
                     <Grid size={5}>
                       <CardContent>
-                        <Typography variant="h6">{item.name}</Typography>
+                        <Link 
+                          href={{
+                            pathname: `/p/${item.name}`,
+                            query: {id: item.product_id}
+                            }}
+                          style={{
+                            textDecoration: 'none',
+                            color: 'black'
+                          }}
+                        >
+                          <Typography variant="h6">
+                            {item.name}
+                          </Typography>
+                        </Link>
                         <Typography variant="body2">{
                           new Intl.NumberFormat('id-ID', {
                               style: "currency",
@@ -136,7 +150,7 @@ class Trolley extends Component {
                           >
                             <QuantityEditor 
                             name={item.id}
-                            initialQuantity={item.items}
+                            initialQuantity={item.quantity}
                             min={1}
                             max={item.stock}
                             onChange={this.handleChangeQuantity}
@@ -334,9 +348,9 @@ class Trolley extends Component {
             <Grid>
               <Stack direction={'row'} spacing={3} divider={<Divider orientation='vertical' flexItem/>}>
                 <FormControlLabel control={<Checkbox color='white' onChange={this.handleCheckAllItem} checked={isItCheked}/>} label="Pilih Semua"/>
-                <FormGroup>
+                {/* <FormGroup>
                   <FormControlLabel control={<IconButton color='white'><Delete/></IconButton>} label="Hapus Semua"/>
-                </FormGroup>
+                </FormGroup> */}
               </Stack>
             </Grid>
             <Grid 
