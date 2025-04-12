@@ -57,7 +57,8 @@ class Trolley extends Component {
           quantity: val.items,
           name: val.trolleyToProduct.name,
           price: val.trolleyToProduct.price,
-          stock: val.trolleyToProduct.stock
+          stock: val.trolleyToProduct.stock,
+          image: val.trolleyToProduct.productToImage.length != 0 ? val.trolleyToProduct.productToImage[0].public_id : 'product-not-found',
         })
       }) 
       this.setState({
@@ -108,9 +109,12 @@ class Trolley extends Component {
                       />
                     </Grid>
                     <Grid size={3}>
-                      <Paper sx={{p: 2}}>
-                        Image
-                      </Paper>
+                      <img
+                        width={160}
+                        height={160}
+                        alt={item.name}
+                        src={Cld.image(item.image).resize(thumbnail().width(160).height(160)).toURL()}
+                      />
                     </Grid>
                     <Grid size={5}>
                       <CardContent>
