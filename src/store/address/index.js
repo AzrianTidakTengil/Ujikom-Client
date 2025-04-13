@@ -94,8 +94,10 @@ export const addressSlice = createSlice({
             .addCase(create.pending, (state) => {
                 state.isLoading = true
                 state.isSuccess = false
+                state.message = ''
             })
             .addCase(create.fulfilled, (state, action) => {
+                state.message = AddressMessage.ADDRESS.CREATE
                 state.isSuccess = true
                 state.isLoading = false
             })
