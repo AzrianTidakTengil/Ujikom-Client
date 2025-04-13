@@ -19,7 +19,7 @@ class CheckOut extends Component {
             products: [],
             addresses: [],
             address: {},
-            activateAddress: 0,
+            activateAddress: null,
             isOpenModalChangeAddress: false,
             methodPayment: '',
             subtype: {
@@ -90,27 +90,50 @@ class CheckOut extends Component {
 
         return(
             <Box>
-                <Paper sx={{p: 2}}>
-                <Typography variant="h6" fontWeight={600} sx={{marginBottom: 2}}>Alamat pengiriman</Typography>
-                    <Stack direction={'row'} spacing={1} sx={{marginBottom: 2}}>
-                        <LocationOn color="success"/>
-                        <Typography variant="subtitle1">{address.name}</Typography>
-                        <Typography variant="subtitle1">|</Typography>
-                        <Typography variant="subtitle1">{address.receiver}</Typography>
-                    </Stack>
-                    <Grid container>
-                        <Grid size={11}>
-                            <Typography variant="subtitle2">
-                            {`${address.address}, ${address.district}, ${address.city}, ${address.province}, ${address.postal_code} ${address.notes ? `(${address.notes})` : ''}`}
-                            </Typography>
-                    </Grid>
-                        <Grid size={1}>
-                            <Button variant="outlined" onClick={this.handleChangeModalAddress}>
-                                Ganti
-                        </Button>
-                    </Grid>
-                    </Grid>
-                </Paper>
+                {
+                    address ? (
+                        <Paper sx={{p: 2}}>
+                            <Typography variant="h6" fontWeight={600} sx={{marginBottom: 2}}>Alamat pengiriman</Typography>
+                                <Stack direction={'row'} spacing={1} sx={{marginBottom: 2}}>
+                                    <LocationOn color="success"/>
+                                    <Typography variant="subtitle1">{address.name}</Typography>
+                                    <Typography variant="subtitle1">|</Typography>
+                                    <Typography variant="subtitle1">{address.receiver}</Typography>
+                                </Stack>
+                                <Grid container>
+                                    <Grid size={11}>
+                                        <Typography variant="subtitle2">
+                                        {`${address.address}, ${address.district}, ${address.city}, ${address.province}, ${address.postal_code} ${address.notes ? `(${address.notes})` : ''}`}
+                                        </Typography>
+                                </Grid>
+                                    <Grid size={1}>
+                                        <Button variant="outlined" onClick={this.handleChangeModalAddress}>
+                                            Ganti
+                                    </Button>
+                                </Grid>
+                                </Grid>
+                        </Paper>
+                    ) : (
+                        <Paper
+                            sx={{
+                                p: 2,
+                                borderStyle: 'dashed',
+                                borderWidth: 0.5
+                            }}
+                            elevation={0}
+                        >
+                            <Typography variant="h5" textAlign={'center'} fontWeight={600}>Anda Tidak Memiliki Alamat Pengiriman Aktif</Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Button sx={{marginY: 2, textTransform: 'capitalize'}} variant="contained" color="info">Buat Alamat Pengiriman</Button>
+                            </Box>
+                        </Paper>
+                    )
+                }
             </Box>
         )
     }
@@ -188,7 +211,7 @@ class CheckOut extends Component {
                         >
                         {
                             address.isSuccess && address.message === AddressMessage.ADDRESS.ALL ? 
-                                addresses.map((val) => (
+                                addresses && Boolean(addresses[0]) ? addresses.map((val) => (
                                     <Paper
                                         key={val.id}
                                         sx={{
@@ -249,7 +272,15 @@ class CheckOut extends Component {
                                             </Grid>
                                         </Grid>
                                     </Paper>
-                                ))
+                                )) :
+                                <Box
+                                    sx={{
+                                        marginX: 'auto',
+                                        marginY: 2,
+                                    }}
+                                >
+                                    <Typography variant="h6" textTransform={'capitalize'} textAlign={'center'} fontWeight={400}>Tidak memiliki alamat</Typography>
+                                </Box>
                             : 
                                 <CircularProgress sx={{marginTop: 2}}/>
                         }
@@ -294,7 +325,7 @@ class CheckOut extends Component {
     }
 
     renderFinishCheckout = () => {
-        const {methodPayment, products} = this.state
+        const {methodPayment, products, address, subtype} = this.state
 
         const subTotalProduct = products.reduce((acc, val) => acc + (val.product.price * val.quantity), 0)
         const subTotalShipment = products.reduce((acc, val) => acc + (val.product.price * val.quantity * 0.01), 0)
@@ -399,7 +430,7 @@ class CheckOut extends Component {
                             }</Typography>
                         </Paper>
                         <Box sx={{display: 'flex', justifyContent: 'end', marginTop: 2}}>
-                            <Button variant="contained" color="success" disabled={!methodPayment} onClick={this.handleSubmitCreateTransaction} loading={this.props.transaction.isLoading}>Konfirmasi</Button>
+                            <Button variant="contained" color="success" disabled={!address ? true : !methodPayment ? methodPayment !== 'qris' ? !subtype.bank || !subtype.store ? true : false : false : false} onClick={this.handleSubmitCreateTransaction} loading={this.props.transaction.isLoading}>Konfirmasi</Button>
                         </Box>
                     </Box>
                 </Paper>
