@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { Close, LocationOn } from "@mui/icons-material";
-import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio, TextField, InputAdornment, CircularProgress, Chip, Autocomplete } from "@mui/material";
+import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio, TextField, InputAdornment, CircularProgress, Chip, Autocomplete, Backdrop } from "@mui/material";
 import { withRouter } from "next/router";
 import React, {Component} from "react";
 import { connect } from "react-redux";
@@ -8,7 +8,7 @@ import { findTrolley, clearItemsCheckout } from "@/store/trolley";
 import { createTransaction } from "@/store/transaction";
 import CryptoJS from "crypto-js";
 import { Transaction } from "@/services";
-import { getAll as getAllAddress, find, getOne } from "@/store/address";
+import { getAll as getAllAddress, find, getOne, create } from "@/store/address";
 import { SearchOutlined } from "@mui/icons-material";
 import AddressMessage from '@/store/address/message'
 import { clearMessageRegion, GetCities, GetDistrict, GetProvinces } from "@/store/region";
@@ -74,7 +74,7 @@ class CheckOut extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        const {trolley, transaction, router, address, region} = this.props
+        const {trolley, transaction, router, address, region} = nextProps
 
         if (trolley.isSuccess) {
             const cart = []
@@ -126,6 +126,13 @@ class CheckOut extends Component {
         if (region.isSuccess && region.message == RegionMessage.REGION.DISTRICT) {
             this.setState({
                 districts: region.districts
+            })
+        }
+
+        if (address.isSuccess && address.message === AddressMessage.ADDRESS.CREATE) {
+            this.setState({
+                isOpenCreateAddress: false,
+                isOpenModalChangeAddress: false,
             })
         }
     }
@@ -255,7 +262,7 @@ class CheckOut extends Component {
                             }}
                         >
                         {
-                            address.isSuccess && address.message === AddressMessage.ADDRESS.ALL ? 
+                            !address.isLoading ? 
                                 addresses && Boolean(addresses[0]) ? addresses.map((val) => (
                                     <Paper
                                         key={val.id}
@@ -975,7 +982,7 @@ class CheckOut extends Component {
             district,
         }
         
-        console.log(params)
+        this.props.create(params)
     }
 
     render() {
@@ -1003,6 +1010,15 @@ class CheckOut extends Component {
                 </Container>
                 {this.renderModalChangeAddress()}
                 {this.renderModalLocation()}
+                <Backdrop
+                    open={this.props.address.isLoading}
+                    sx={{
+                        zIndex: this.theme.zIndex.appBar + 1000,
+                        backgroundColor: 'rgba(236, 236, 236, 0.3)'
+                    }}
+                >
+                    <CircularProgress/>
+                </Backdrop>
             </ThemeProvider>
         )
     }
@@ -1050,6 +1066,7 @@ const mapDispatchToProps = {
     GetCities,
     GetDistrict,
     clearMessageRegion,
+    create,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
