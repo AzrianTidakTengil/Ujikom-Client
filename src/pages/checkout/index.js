@@ -89,7 +89,7 @@ class CheckOut extends Component {
                         name: val.trolleyToProduct.name,
                         price: val.trolleyToProduct.price + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.price), 0),
                         stock: val.trolleyToProduct.stock + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.stock), 0),
-                        image: val.trolleyToProduct.productToImage[0].public_id,
+                        image: val.trolleyToProduct.productToImage.length != 0 ? val.trolleyToProduct.productToImage[0].public_id : null,
                     },
                     store: {
                         id: val.trolleyToProduct.productToOwner.ownerToStore.id,
@@ -367,7 +367,7 @@ class CheckOut extends Component {
                                     objectPosition: 'center',
                                     border: '1px solid #a5a5a5'
                                 }} 
-                                src={Cld.image(product.image ?? 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                                src={Cld.image(product.image ? product.image : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
                                 alt={product.name}
                             />
                         </Grid>
