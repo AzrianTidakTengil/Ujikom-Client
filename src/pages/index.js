@@ -40,7 +40,7 @@ class Main extends Component {
         }
     }
 
-    UNSAFE_componentWillMount() {
+    componentDidMount() {
         const {offeringProduct, limitProduct} = this.state
         this.props.getAll({
             limit: limitProduct,
@@ -48,10 +48,10 @@ class Main extends Component {
         })
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {products} = nextProps
+    componentDidUpdate(prevProps) {
+        const {products} = this.props
 
-        if (products.isSuccess) {
+        if (products.isSuccess && (products.allProduct !== prevProps.products.allProduct || products.totalItems !== prevProps.products.totalItems)) {
             this.setState({
                 products: products.allProduct,
                 totalItems: products.totalItems
