@@ -16,6 +16,8 @@ import { clearMessageShop } from "@/store/shop";
 import RegionMessage from '@/store/region/message'
 import { City, District } from "@/services/region";
 import { NumericFormat } from "react-number-format";
+import { Cld } from "@/config";
+import { thumbnail } from "@cloudinary/url-gen/actions/resize";
 
 
 class CheckOut extends Component {
@@ -85,8 +87,9 @@ class CheckOut extends Component {
                     product: {
                         id: val.trolleyToProduct.id,
                         name: val.trolleyToProduct.name,
-                        price: val.trolleyToProduct.price,
-                        stock: val.trolleyToProduct.stock
+                        price: val.trolleyToProduct.price + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.price), 0),
+                        stock: val.trolleyToProduct.stock + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.stock), 0),
+                        image: val.trolleyToProduct.productToImage[0].public_id,
                     },
                     store: {
                         id: val.trolleyToProduct.productToOwner.ownerToStore.id,
@@ -344,7 +347,9 @@ class CheckOut extends Component {
     }
 
     renderItemCheckout = (data, index = 0) => {
-        const {id, product, store, quantity,} = data
+        const {id, product, store, quantity} = data
+
+        console.log(data)
 
         return (
             <Box>
@@ -353,10 +358,20 @@ class CheckOut extends Component {
                     <Divider sx={{marginY: 1}}/>
                     <Typography variant="h6" fontWeight={600} sx={{marginY: 1}}>{store.name}</Typography>
                     <Grid container spacing={4}>
-                        <Grid size={1.5}>
-                            <Paper>No Image</Paper>
+                        <Grid size={3}>
+                            <img
+                                style={{
+                                    width: '100%',
+                                    height: 160,
+                                    objectFit: 'cover',
+                                    objectPosition: 'center',
+                                    border: '1px solid #a5a5a5'
+                                }} 
+                                src={Cld.image(product.image ?? 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                                alt={product.name}
+                            />
                         </Grid>
-                        <Grid size={10.5} sx={{display: 'flex', justifyContent: 'space-between'}}>
+                        <Grid size={9} sx={{display: 'flex', justifyContent: 'space-between'}}>
                             <Box>
                                 <Typography variant="subtitle1">{product.name}</Typography>
                                 <Typography variant="subtitle1"></Typography>
