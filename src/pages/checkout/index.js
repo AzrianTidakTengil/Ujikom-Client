@@ -1,6 +1,6 @@
 import { palleteV1 } from "@/assets/css/template";
 import { Close, LocationOn } from "@mui/icons-material";
-import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio, TextField, InputAdornment, CircularProgress, Chip } from "@mui/material";
+import { Container, createTheme, ThemeProvider, Box, Typography, Stack, Paper, Grid2 as Grid, Button, Modal, IconButton, Divider, Avatar, AppBar, FormControl, RadioGroup, FormControlLabel, Radio, TextField, InputAdornment, CircularProgress, Chip, Autocomplete, Backdrop } from "@mui/material";
 import { withRouter } from "next/router";
 import React, {Component} from "react";
 import { connect } from "react-redux";
@@ -8,9 +8,15 @@ import { findTrolley, clearItemsCheckout } from "@/store/trolley";
 import { createTransaction } from "@/store/transaction";
 import CryptoJS from "crypto-js";
 import { Transaction } from "@/services";
-import { getAll as getAllAddress, find, getOne } from "@/store/address";
+import { getAll as getAllAddress, find, getOne, create } from "@/store/address";
 import { SearchOutlined } from "@mui/icons-material";
 import AddressMessage from '@/store/address/message'
+import { clearMessageRegion, GetCities, GetDistrict, GetProvinces } from "@/store/region";
+import { clearMessageShop } from "@/store/shop";
+import RegionMessage from '@/store/region/message'
+import { City, District } from "@/services/region";
+import { NumericFormat } from "react-number-format";
+
 
 class CheckOut extends Component {
     constructor(props) {
@@ -19,13 +25,34 @@ class CheckOut extends Component {
             products: [],
             addresses: [],
             address: {},
-            activateAddress: 0,
+            activateAddress: null,
             isOpenModalChangeAddress: false,
             methodPayment: '',
             subtype: {
                 bank: '',
                 store: ''
-            }
+            },
+            form: {
+                name: null,
+                receiver: null,
+                postal_code: null,
+                telephone: null,
+                country: null,
+                notes: null,
+                address: null,
+                province: null,
+                city: null,
+                district: null,
+            },
+            provinces: [],
+            cities: [],
+            districts: [],
+            selectAddres: {
+                province: '',
+                city: '',
+                district: ''
+            },
+            isOpenCreateAddress: false
         }
         this.theme = createTheme({
             palette: {
@@ -47,7 +74,7 @@ class CheckOut extends Component {
     }
 
     UNSAFE_componentWillReceiveProps(nextProps) {
-        const {trolley, transaction, router, address} = this.props
+        const {trolley, transaction, router, address, region} = nextProps
 
         if (trolley.isSuccess) {
             const cart = []
@@ -83,6 +110,31 @@ class CheckOut extends Component {
                 addresses: address.list.data,
             })
         }
+
+        if (region.isSuccess && region.message == RegionMessage.REGION.PROVINCES) {
+            this.setState({
+                provinces: region.provinces
+            })
+        }
+
+        if (region.isSuccess && region.message == RegionMessage.REGION.CITIES) {
+            this.setState({
+                cities: region.cities
+            })
+        }
+
+        if (region.isSuccess && region.message == RegionMessage.REGION.DISTRICT) {
+            this.setState({
+                districts: region.districts
+            })
+        }
+
+        if (address.isSuccess && address.message === AddressMessage.ADDRESS.CREATE) {
+            this.setState({
+                isOpenCreateAddress: false,
+                isOpenModalChangeAddress: false,
+            })
+        }
     }
 
     renderAddress = () => {
@@ -90,27 +142,50 @@ class CheckOut extends Component {
 
         return(
             <Box>
-                <Paper sx={{p: 2}}>
-                <Typography variant="h6" fontWeight={600} sx={{marginBottom: 2}}>Alamat pengiriman</Typography>
-                    <Stack direction={'row'} spacing={1} sx={{marginBottom: 2}}>
-                        <LocationOn color="success"/>
-                        <Typography variant="subtitle1">{address.name}</Typography>
-                        <Typography variant="subtitle1">|</Typography>
-                        <Typography variant="subtitle1">{address.receiver}</Typography>
-                    </Stack>
-                    <Grid container>
-                        <Grid size={11}>
-                            <Typography variant="subtitle2">
-                            {`${address.address}, ${address.district}, ${address.city}, ${address.province}, ${address.postal_code} ${address.notes ? `(${address.notes})` : ''}`}
-                            </Typography>
-                    </Grid>
-                        <Grid size={1}>
-                            <Button variant="outlined" onClick={this.handleChangeModalAddress}>
-                                Ganti
-                        </Button>
-                    </Grid>
-                    </Grid>
-                </Paper>
+                {
+                    address ? (
+                        <Paper sx={{p: 2}}>
+                            <Typography variant="h6" fontWeight={600} sx={{marginBottom: 2}}>Alamat pengiriman</Typography>
+                                <Stack direction={'row'} spacing={1} sx={{marginBottom: 2}}>
+                                    <LocationOn color="success"/>
+                                    <Typography variant="subtitle1">{address.name}</Typography>
+                                    <Typography variant="subtitle1">|</Typography>
+                                    <Typography variant="subtitle1">{address.receiver}</Typography>
+                                </Stack>
+                                <Grid container>
+                                    <Grid size={11}>
+                                        <Typography variant="subtitle2">
+                                        {`${address.address}, ${address.district}, ${address.city}, ${address.province}, ${address.postal_code} ${address.notes ? `(${address.notes})` : ''}`}
+                                        </Typography>
+                                </Grid>
+                                    <Grid size={1}>
+                                        <Button variant="outlined" onClick={this.handleChangeModalAddress}>
+                                            Ganti
+                                    </Button>
+                                </Grid>
+                                </Grid>
+                        </Paper>
+                    ) : (
+                        <Paper
+                            sx={{
+                                p: 2,
+                                borderStyle: 'dashed',
+                                borderWidth: 0.5
+                            }}
+                            elevation={0}
+                        >
+                            <Typography variant="h5" textAlign={'center'} fontWeight={600}>Anda Tidak Memiliki Alamat Pengiriman Aktif</Typography>
+                            <Box
+                                sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center'
+                                }}
+                            >
+                                <Button sx={{marginY: 2, textTransform: 'capitalize'}} variant="contained" color="info" onClick={this.handleChangeModalCreateAddress}>Buat Alamat Pengiriman</Button>
+                            </Box>
+                        </Paper>
+                    )
+                }
             </Box>
         )
     }
@@ -174,7 +249,7 @@ class CheckOut extends Component {
                                 alignItems: 'center'
                             }}
                             >
-                            <Button variant="contained" fullWidth>
+                            <Button variant="contained" fullWidth onClick={this.handleChangeModalCreateAddress}>
                                 Tambah Alamat
                             </Button>
                             </Grid>
@@ -187,8 +262,8 @@ class CheckOut extends Component {
                             }}
                         >
                         {
-                            address.isSuccess && address.message === AddressMessage.ADDRESS.ALL ? 
-                                addresses.map((val) => (
+                            !address.isLoading ? 
+                                addresses && Boolean(addresses[0]) ? addresses.map((val) => (
                                     <Paper
                                         key={val.id}
                                         sx={{
@@ -249,7 +324,15 @@ class CheckOut extends Component {
                                             </Grid>
                                         </Grid>
                                     </Paper>
-                                ))
+                                )) :
+                                <Box
+                                    sx={{
+                                        marginX: 'auto',
+                                        marginY: 2,
+                                    }}
+                                >
+                                    <Typography variant="h6" textTransform={'capitalize'} textAlign={'center'} fontWeight={400}>Tidak memiliki alamat</Typography>
+                                </Box>
                             : 
                                 <CircularProgress sx={{marginTop: 2}}/>
                         }
@@ -294,7 +377,7 @@ class CheckOut extends Component {
     }
 
     renderFinishCheckout = () => {
-        const {methodPayment, products} = this.state
+        const {methodPayment, products, address, subtype} = this.state
 
         const subTotalProduct = products.reduce((acc, val) => acc + (val.product.price * val.quantity), 0)
         const subTotalShipment = products.reduce((acc, val) => acc + (val.product.price * val.quantity * 0.01), 0)
@@ -399,7 +482,7 @@ class CheckOut extends Component {
                             }</Typography>
                         </Paper>
                         <Box sx={{display: 'flex', justifyContent: 'end', marginTop: 2}}>
-                            <Button variant="contained" color="success" disabled={!methodPayment} onClick={this.handleSubmitCreateTransaction} loading={this.props.transaction.isLoading}>Konfirmasi</Button>
+                            <Button variant="contained" color="success" disabled={!address ? true : !methodPayment ? methodPayment !== 'qris' ? !subtype.bank || !subtype.store ? true : false : false : false} onClick={this.handleSubmitCreateTransaction} loading={this.props.transaction.isLoading}>Konfirmasi</Button>
                         </Box>
                     </Box>
                 </Paper>
@@ -476,6 +559,432 @@ class CheckOut extends Component {
         }
     }
 
+    renderModalLocation = () => {
+        const {provinces, cities, districts, selectAddres, isOpenCreateAddress} = this.state
+        const {address, province, city, district} = this.state.form
+
+        return (
+            <Modal
+                open={isOpenCreateAddress}
+                onClose={this.handleChangeModalCreateAddress}
+                sx={{
+                    width: '100%',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                }}
+            >
+                <Container 
+                    maxWidth="md"
+                >
+                    <Box
+                        sx={{
+                            borderRadius: 2,
+                            border: '1px solid #ababab',
+                            bgcolor: '#fff',
+                            p: 2,
+                        }}
+                    >
+                        <Stack
+                            direction={'row'}
+                            justifyContent={'space-between'}
+                            alignItems={'center'}
+                        >
+                            <Typography variant="h5" fontWeight={600}>Buat Alamat Pengiriman</Typography>
+                            <IconButton onClick={this.handleChangeModalCreateAddress}>
+                                <Close/>
+                            </IconButton>
+                        </Stack>
+                        <Divider sx={{marginY: 2}}/>
+                        <form onSubmit={this.handleSubmitCreateAddress}>
+                            <Box
+                                sx={{
+                                    height: 400,
+                                    overflowY: 'auto'
+                                }}
+                            >
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Nama Alamat</Typography>
+                                    <TextField 
+                                        name="name"
+                                        variant='outlined'
+                                        size="small"
+                                        fullWidth
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        onChange={this.handleChangeAddress}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Nama Penerima</Typography>
+                                    <TextField 
+                                        name="receiver"
+                                        variant='outlined'
+                                        size="small"
+                                        fullWidth
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        onChange={this.handleChangeAddress}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Detail Alamat</Typography>
+                                    <TextField 
+                                        name="address"
+                                        variant='outlined'
+                                        size="small"
+                                        fullWidth
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        onChange={this.handleChangeAddress}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Kode Pos</Typography>
+                                    <NumericFormat
+                                        customInput={TextField} 
+                                        name="postal_code"
+                                        variant='outlined'
+                                        size="small"
+                                        fullWidth
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        onChange={this.handleChangeAddress}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Nomer Telephone</Typography>
+                                    <NumericFormat
+                                        customInput={TextField} 
+                                        name="telephone"
+                                        variant='outlined'
+                                        size="small"
+                                        fullWidth
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        slotProps={{
+                                            input: {
+                                                startAdornment: <InputAdornment position="start">+62</InputAdornment>
+                                            }
+                                        }}
+                                        onChange={this.handleChangeAddress}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Provinsi</Typography>
+                                    <Autocomplete
+                                        name="province"
+                                        disableClearable
+                                        freeSolo
+                                        options={provinces}
+                                        getOptionLabel={(province) => province.name}
+                                        renderInput={(params) => {
+                                            return (
+                                                <TextField
+                                                    {...params}
+                                                    slotProps={{
+                                                        input: {
+                                                            ...params.InputProps,
+                                                            type: 'search',
+                                                        },
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                        sx={{
+                                            marginY: 1,
+                                            textTransform: 'capitalize'
+                                        }}
+                                        onChange={this.handleSelectProvince}
+                                        onOpen={() => {this.props.GetProvinces()}}
+                                        loading={this.props.region.isLoading}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Kota / Kabupaten</Typography>
+                                    <Autocomplete 
+                                        name="city"
+                                        disableClearable
+                                        freeSolo
+                                        options={cities}
+                                        getOptionLabel={(city) => city.name}
+                                        renderInput={(params) => {
+                                            return (
+                                                <TextField
+                                                    {...params}
+                                                    slotProps={{
+                                                        input: {
+                                                            ...params.InputProps,
+                                                            type: 'search',
+                                                        },
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        disabled={!selectAddres.province && !cities ? true : false}
+                                        loading={!cities}
+                                        onChange={this.handleSelectCity}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Kecamatan</Typography>
+                                    <Autocomplete
+                                        name="district"
+                                        disableClearable
+                                        freeSolo
+                                        options={districts}
+                                        getOptionLabel={(district) => district.name}
+                                        renderInput={(params) => {
+                                            return (
+                                                <TextField
+                                                    {...params}
+                                                    slotProps={{
+                                                        input: {
+                                                            ...params.InputProps,
+                                                            type: 'search',
+                                                        },
+                                                    }}
+                                                />
+                                            )
+                                        }}
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        disabled={!selectAddres.province && !selectAddres.city && !districts ? true: false}
+                                        onChange={this.handleSelectDistrict}
+                                    />
+                                </Box>
+                                <Box
+                                    sx={{
+                                        marginY: 2
+                                    }}
+                                >
+                                    <Typography variant='body1'>Catatan</Typography>
+                                    <TextField 
+                                        name="notes"
+                                        variant='outlined'
+                                        size="small"
+                                        fullWidth
+                                        sx={{
+                                            marginY: 1
+                                        }}
+                                        onChange={this.handleChangeAddress}
+                                    />
+                                </Box>
+                                </Box>
+                                <Box
+                                    sx={{
+                                        display: 'flex',
+                                        justifyContent: 'end',
+                                        alignItems: 'center',
+                                        marginY: 4
+                                    }}
+                                >
+                                <Button
+                                    type='submit'
+                                    variant="contained"
+                                >
+                                    Simpan
+                                </Button>
+                            </Box>
+                        </form>
+                    </Box>
+                </Container>
+            </Modal>
+        )
+    }
+
+    handleChangeModalCreateAddress = () => {
+        this.setState((state) => ({
+            isOpenCreateAddress: !state.isOpenCreateAddress
+        }))
+    }
+
+    handleChangeAddress = (event) => {
+        const {value, name} = event.target
+
+        if (name === 'name') {
+            if (value.length != 0) {
+                this.setState({
+                    form: {
+                        ...this.state.form,
+                        name: value
+                    }
+                })
+            }
+        } else if (name === 'receiver') {
+            if (value.length != 0) {
+                this.setState({
+                    form: {
+                        ...this.state.form,
+                        receiver: value
+                    }
+                })
+            }
+        } else if (name === 'postal_code') {
+            if (value.length != 0) {
+                this.setState({
+                    form: {
+                        ...this.state.form,
+                        postal_code: value
+                    }
+                })
+            }
+        } else if (name === 'telephone') {
+            if (value.length != 0) {
+                this.setState({
+                    form: {
+                        ...this.state.form,
+                        telephone: value.startsWith("62") ? value : value.startsWith("0") ? `62${value.slice(1)}` : `62${value}`
+                    }
+                })
+            }
+        } else if (name === 'notes') {
+            if (value.length != 0) {
+                this.setState({
+                    form: {
+                        ...this.state.form,
+                        notes: value
+                    }
+                })
+            }
+        } else if (name === 'address') {
+            if (value.length != 0) {
+                this.setState({
+                    form: {
+                        ...this.state.form,
+                        address: value
+                    }
+                })
+            }
+        }
+    }
+
+    handleSelectProvince = (event, newValue) => {
+        const {id, name} = newValue
+
+        this.setState({
+            selectAddres: {
+                ...this.state.selectAddres,
+                province: id
+            },
+            form: {
+                ...this.state.form,
+                province: name
+            }
+        })
+        
+        this.serviceGetCity({province_id: id})
+    }
+
+    serviceGetCity = async (params) => {
+        const response = await City(params)
+
+        this.setState({
+            cities: response.data
+        })
+    }
+
+    handleSelectCity = (event, newValue) => {
+        const {id, name} = newValue
+
+        this.setState({
+            selectAddres: {
+                ...this.state.selectAddres,
+                city: id
+            },
+            form: {
+                ...this.state.form,
+                city: name
+            }
+        })
+
+        this.serviceGetDistrict({city_id: id})
+    }
+
+    serviceGetDistrict = async (params) => {
+        const response = await District(params)
+        
+        this.setState({
+            districts: response.data
+        })
+    }
+
+    handleSelectDistrict = (event, newValue) => {
+        const {id, name} = newValue
+
+        this.setState({
+            selectAddres: {
+                ...this.state.selectAddres,
+                district: id
+            },
+            form: {
+                ...this.state.form,
+                district: name
+            }
+        })
+    }
+
+    handleSubmitCreateAddress = (e) => {
+        e.preventDefault()
+        const {address, province, city, district, name, receiver, postal_code, telephone, notes} = this.state.form
+
+        const params = {
+            name,
+            receiver,
+            postal_code,
+            telephone,
+            country: 'Indonesia',
+            notes,
+            address,
+            province,
+            city,
+            district,
+        }
+        
+        this.props.create(params)
+    }
+
     render() {
         const {products} = this.state
 
@@ -500,6 +1009,16 @@ class CheckOut extends Component {
                     {this.renderFinishCheckout()}
                 </Container>
                 {this.renderModalChangeAddress()}
+                {this.renderModalLocation()}
+                <Backdrop
+                    open={this.props.address.isLoading}
+                    sx={{
+                        zIndex: this.theme.zIndex.appBar + 1000,
+                        backgroundColor: 'rgba(236, 236, 236, 0.3)'
+                    }}
+                >
+                    <CircularProgress/>
+                </Backdrop>
             </ThemeProvider>
         )
     }
@@ -524,7 +1043,16 @@ const mapStateToProps = (state) => ({
         address: state.address.address,
         error: state.address.list,
         message: state.address.message,
-      }
+    },
+    region: {
+        isSuccess: state.region.isSuccess,
+        isLoading: state.region.isLoading,
+        message: state.region.message,
+        error: state.region.error,
+        districts: state.region.district,
+        provinces: state.region.provinces,
+        cities: state.region.cities,
+    },
 })
 
 const mapDispatchToProps = {
@@ -533,7 +1061,12 @@ const mapDispatchToProps = {
     clearItemsCheckout,
     getAllAddress,
     find,
-    getOne
+    getOne,
+    GetProvinces,
+    GetCities,
+    GetDistrict,
+    clearMessageRegion,
+    create,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(CheckOut))
