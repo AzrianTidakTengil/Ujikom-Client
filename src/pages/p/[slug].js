@@ -141,7 +141,7 @@ class Product extends Component{
               id: currItem.id,
               name: currItem.name,
               description: currItem.description,
-              price: currItem.variant.reduce((total, curr) => total + curr.price, 0),
+              price: currItem.price + currItem.variant.reduce((total, curr) => total + curr.price, 0),
               stock: currItem.variant.reduce((total, curr) => total + curr.stock, 0),
               category: categoryPath,
               condition: currItem.condition,
@@ -207,7 +207,7 @@ class Product extends Component{
                                     objectPosition: 'center',
                                     border: '1px solid #a5a5a5'
                                 }} 
-                                src={Cld.image(images[indexImage]).toURL()}
+                                src={Cld.image(images.length != 0 ? images[indexImage] : 'product-not-found').toURL()}
                             />
                             <Box
                                 sx={{
