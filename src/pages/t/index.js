@@ -127,11 +127,18 @@ class ItemsTransaction extends Component {
                         }
                     </Grid>
                     <Grid size={12} display={'flex'} justifyContent={'center'}>
-                        <Chip color="primary" sx={{fontSize:'1.2rem'}} label={status}/>
+                        <Chip color="primary" sx={{fontSize:'1.2rem'}} {...this.handleAttributeChipStatus(status)}/>
                     </Grid>
                 </Grid>
             </Box>
         )
+    }
+
+    handleAttributeChipStatus = (status) => {
+        return {
+            label: status === 'settlement' ? 'menunggu konfirmasi' : status === 'onSeller' ? 'sedang proses' : status === 'delivery' ? 'sedang diantar' : status === 'expired' ? 'kadaluarsa' : status === 'rejectedBySeller' ? 'ditolak' : status === 'success' ? 'diterima' : 'menunggu',
+            color: status === 'settlement' ? 'warning' : status === 'onSeller' ? 'primary' : status === 'delivery' ? 'info' : status === 'expired' ? 'error' : status === 'rejectedBySeller' ? 'error' : status === 'success' ? 'success' : 'default',
+        }
     }
 
     handleTitle = (val) => {
