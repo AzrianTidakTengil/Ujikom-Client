@@ -63,81 +63,65 @@ class CheckOut extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        const {router, trolley} = this.props
-        this.props.getOne()
-        this.props.getAllAddress()
+    componentDidMount() {
+        const { trolley } = this.props;
+        this.props.getOne();
+        this.props.getAllAddress();
 
         if (trolley.itemsCheckout) {
             this.props.findTrolley({
-                id: trolley.itemsCheckout
-            })
+            id: trolley.itemsCheckout
+            });
         }
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {trolley, transaction, router, address, region} = nextProps
+    componentDidUpdate(prevProps) {
+    const { trolley, address, region } = this.props;
 
-        if (trolley.isSuccess) {
-            const cart = []
-            trolley.checkout.map((val) => {
-                cart.push({
-                    id: val.id,
-                    quantity: val.items,
-                    product: {
-                        id: val.trolleyToProduct.id,
-                        name: val.trolleyToProduct.name,
-                        price: val.trolleyToProduct.price + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.price), 0),
-                        stock: val.trolleyToProduct.stock + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.stock), 0),
-                        image: val.trolleyToProduct.productToImage.length != 0 ? val.trolleyToProduct.productToImage[0].public_id : null,
-                    },
-                    store: {
-                        id: val.trolleyToProduct.productToOwner.ownerToStore.id,
-                        name: val.trolleyToProduct.productToOwner.ownerToStore.name
-                    }
-                })
-            })
-            this.setState({
-                products: cart
-            })
-        }
+    // Trolley update
+    if (trolley !== prevProps.trolley && trolley.isSuccess) {
+        const cart = trolley.checkout.map(val => ({
+            id: val.id,
+            quantity: val.items,
+            product: {
+                id: val.trolleyToProduct.id,
+                name: val.trolleyToProduct.name,
+                price: val.trolleyToProduct.price + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + currVal.price, 0),
+                stock: val.trolleyToProduct.stock + val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + currVal.stock, 0),
+                image: val.trolleyToProduct.productToImage.length !== 0 ? val.trolleyToProduct.productToImage[0].public_id : null
+            },
+            store: {
+                id: val.trolleyToProduct.productToOwner.ownerToStore.id,
+                name: val.trolleyToProduct.productToOwner.ownerToStore.name
+            }
+        }));
+        this.setState({ products: cart });
+    }
 
-        if (address.isSuccess) {
-            this.setState({
-                address: address.address.data
-            })
-        }
-
-        if (address.isSuccess && address.message === AddressMessage.ADDRESS.ALL) {
-            this.setState({
-                addresses: address.list.data,
-            })
-        }
-
-        if (region.isSuccess && region.message == RegionMessage.REGION.PROVINCES) {
-            this.setState({
-                provinces: region.provinces
-            })
-        }
-
-        if (region.isSuccess && region.message == RegionMessage.REGION.CITIES) {
-            this.setState({
-                cities: region.cities
-            })
-        }
-
-        if (region.isSuccess && region.message == RegionMessage.REGION.DISTRICT) {
-            this.setState({
-                districts: region.districts
-            })
-        }
-
-        if (address.isSuccess && address.message === AddressMessage.ADDRESS.CREATE) {
+    // Address updates
+    if (address !== prevProps.address && address.isSuccess) {
+        if (address.message === AddressMessage.ADDRESS.ALL) {
+            this.setState({ addresses: address.list.data });
+        } else if (address.message === AddressMessage.ADDRESS.CREATE) {
             this.setState({
                 isOpenCreateAddress: false,
-                isOpenModalChangeAddress: false,
-            })
+                isOpenModalChangeAddress: false
+            });
+        } else {
+            this.setState({ address: address.address.data });
         }
+    }
+
+    // Region updates
+    if (region !== prevProps.region && region.isSuccess) {
+        if (region.message === RegionMessage.REGION.PROVINCES) {
+            this.setState({ provinces: region.provinces });
+        } else if (region.message === RegionMessage.REGION.CITIES) {
+            this.setState({ cities: region.cities });
+        } else if (region.message === RegionMessage.REGION.DISTRICT) {
+            this.setState({ districts: region.districts });
+        }
+    }
     }
 
     renderAddress = () => {

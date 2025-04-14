@@ -28,23 +28,27 @@ class ItemsTransaction extends Component {
         }
     })
 
-    UNSAFE_componentWillMount() {
-        const {router} = this.props
-        const idPath = router.asPath.match(/id=(\d+)/)
-
-        if (router.query.id) {
-            this.props.getTransaction({id: parseInt(router.query.id)})
-        } else if (idPath) {
-            if (idPath[1]) {
-                this.props.getTransaction({id: parseInt(idPath[1])})
-            }
+    componentDidMount() {
+        const { router } = this.props;
+        const idPath = router.asPath.match(/id=(\d+)/);
+        const queryId = router.query?.id;
+    
+        if (queryId) {
+            this.props.getTransaction({ id: parseInt(queryId) });
+        } else if (idPath && idPath[1]) {
+            this.props.getTransaction({ id: parseInt(idPath[1]) });
         }
     }
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {transaction} = this.props
-
-        if (transaction.isSuccess) {
+    
+    componentDidUpdate(prevProps) {
+        const { transaction } = this.props;
+    
+        // Only update if transaction has changed
+        if (
+            transaction !== prevProps.transaction &&
+            transaction?.isSuccess &&
+            transaction?.data?.transaction
+        ) {
             this.setState({
                 payment: {
                     id: transaction.data.transaction.id,
@@ -55,9 +59,9 @@ class ItemsTransaction extends Component {
                     status: transaction.data.transaction.transactionToPayment.status,
                     amount: transaction.data.transaction.total_price
                 }
-            })
+            });
         }
-    }
+    }    
 
     renderPayment = () => {
         const {id, code, method, type, order, status, amount} = this.state.payment

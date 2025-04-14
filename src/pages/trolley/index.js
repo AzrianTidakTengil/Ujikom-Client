@@ -34,51 +34,55 @@ class Trolley extends Component {
     })
   }
 
-  UNSAFE_componentWillMount() {
-    const {allItem} = this.state
-    this.props.getAllItemTrolley()
+  componentDidMount() {
+    const { allItem } = this.state;
+  
+    this.props.getAllItemTrolley();
     this.props.getAll({
       limit: allItem.limit,
-      offer: allItem.offer
-    })
+      offer: allItem.offer,
+    });
   }
-
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const {trolley, products, transaction} = nextProps
-    const {allItem, cart} = this.state
-
-    if (trolley.isSuccess) {
-      const cartItem = []
-      trolley.data.map((val) => {
-        cartItem.push({
-          id: val.id,
-          quantity: val.items,
-          name: val.trolleyToProduct.name,
-          price: val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.price), 0),
-          stock: val.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + (currVal.stock), 0),
-          image: val.trolleyToProduct.productToImage.length != 0 ? val.trolleyToProduct.productToImage[0].public_id : 'product-not-found',
-          product_id: val.product_id,
-        })
-      }) 
+  
+  componentDidUpdate(prevProps) {
+    const { trolley, products } = this.props;
+    const { allItem } = this.state;
+  
+    if (trolley !== prevProps.trolley && trolley.isSuccess) {
+      const cartItem = trolley.data.map((val) => ({
+        id: val.id,
+        quantity: val.items,
+        name: val.trolleyToProduct.name,
+        price: val.trolleyToProduct.productToProductVariant.reduce(
+          (total, currVal) => total + currVal.price,
+          0
+        ),
+        stock: val.trolleyToProduct.productToProductVariant.reduce(
+          (total, currVal) => total + currVal.stock,
+          0
+        ),
+        image:
+          val.trolleyToProduct.productToImage.length !== 0
+            ? val.trolleyToProduct.productToImage[0].public_id
+            : 'product-not-found',
+        product_id: val.product_id,
+      }));
+  
       this.setState({
-        cart: cartItem
-      })
+        cart: cartItem,
+      });
     }
-
-    if (products.isSuccess) {
+  
+    if (products !== prevProps.products && products.isSuccess) {
       this.setState({
         allItem: {
           ...allItem,
-          products: products.allProduct
-        }
-      })
-    }
-
-    if (transaction.isSuccess) {
-      // console.log(transaction.data)
+          products: products.allProduct,
+        },
+      });
     }
   }
+  
 
   renderTrolley = () => {
     const { cart, selectedItems } = this.state

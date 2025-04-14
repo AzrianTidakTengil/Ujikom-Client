@@ -44,56 +44,81 @@ class SellerProductAdd extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        this.props.listCategoriesProduct()
-        this.props.listVariantProduct()
+    componentDidMount() {
+        this.props.listCategoriesProduct();
+        this.props.listVariantProduct();
     }
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {isLoading, isSuccess, error, listCategories, listVariant, listSubVariant, message, router} = nextProps
-
-        if (isSuccess && listCategories) {
-            this.setState({
-                categories: listCategories
-            })
+      
+    componentDidUpdate(prevProps) {
+        const {
+          isLoading,
+          isSuccess,
+          listCategories,
+          listVariant,
+          listSubVariant,
+          message,
+          router
+        } = this.props;
+      
+        if (
+          isSuccess &&
+          listCategories !== prevProps.listCategories &&
+          listCategories
+        ) {
+          this.setState({ categories: listCategories });
         }
-
-        if (isSuccess && listVariant) {
-            this.setState({
-                variants: [
-                    ...listVariant,
-                    {
-                        id: 0,
-                        name: 'Tambah Opsi'
-                    }
-                ]
-            })
+      
+        if (
+          isSuccess &&
+          listVariant !== prevProps.listVariant &&
+          listVariant
+        ) {
+          this.setState({
+            variants: [
+              ...listVariant,
+              {
+                id: 0,
+                name: 'Tambah Opsi'
+              }
+            ]
+          });
         }
-
-        if (isSuccess && listSubVariant) {
-            this.setState({
-                subvariants: [
-                    ...listSubVariant,
-                    {
-                        id: 0,
-                        name: 'Tambah Opsi'
-                    }
-                ]
-            })
+      
+        if (
+          isSuccess &&
+          listSubVariant !== prevProps.listSubVariant &&
+          listSubVariant
+        ) {
+          this.setState({
+            subvariants: [
+              ...listSubVariant,
+              {
+                id: 0,
+                name: 'Tambah Opsi'
+              }
+            ]
+          });
         }
-
-        if (isSuccess && message === ProductMessage.PRODUCTS.CREATE) {
-            router.push({
-                pathname: '/seller/product'
-            })
+      
+        if (
+          isSuccess &&
+          message === ProductMessage.PRODUCTS.CREATE &&
+          message !== prevProps.message
+        ) {
+          router.push({
+            pathname: '/seller/product'
+          });
         }
-
-        if (isLoading && message === ProductMessage.PRODUCTS.CREATE) {
-            this.setState({
-                loading: true
-            })
+      
+        if (
+          isLoading &&
+          message === ProductMessage.PRODUCTS.CREATE &&
+          (isLoading !== prevProps.isLoading || message !== prevProps.message)
+        ) {
+          this.setState({ loading: true });
         }
     }
+      
 
     renderFormInformationProduct = () => {
         const {useVariant, categories} = this.state

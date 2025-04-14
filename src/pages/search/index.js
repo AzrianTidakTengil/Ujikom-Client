@@ -27,27 +27,30 @@ class Search extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        const {router} = this.props
-
-        this.props.findProduct({keyword: router.query.keyword})
-    }
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {router, products} = nextProps
-
-        if (router.query) {
-            this.setState({
-                keyword: router.query.keyword
-            })
-        }
-
-        if (products.isSuccess) {
-            this.setState({
-                listProduct: products.show
-            })
+    componentDidMount() {
+        const { router } = this.props;
+      
+        if (router.query.keyword) {
+          this.props.findProduct({ keyword: router.query.keyword });
+          this.setState({ keyword: router.query.keyword });
         }
     }
+      
+    componentDidUpdate(prevProps) {
+        const { router, products } = this.props;
+      
+        // Check if the keyword in the query has changed
+        if (router.query.keyword !== prevProps.router.query.keyword) {
+          this.props.findProduct({ keyword: router.query.keyword });
+          this.setState({ keyword: router.query.keyword });
+        }
+      
+        // Check if product results have changed
+        if (products.isSuccess && products !== prevProps.products) {
+          this.setState({ listProduct: products.show });
+        }
+      }
+      
 
     renderProducts = () => {
         const {visibleProducts, offeringProduct, limitProduct, keyword, listProduct} = this.state

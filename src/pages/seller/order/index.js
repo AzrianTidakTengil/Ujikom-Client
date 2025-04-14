@@ -24,15 +24,18 @@ class SellerOrder extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        const {limit, offset, status} = this.state
-
-        this.props.Order({limit, offset, status})
+    componentDidMount() {
+        const { limit, offset, status } = this.state;
+        this.props.Order({ limit, offset, status });
     }
+      
+    componentDidUpdate(prevProps) {
+        const { shop } = this.props;
+      
+        if (shop !== prevProps.shop && shop.isSuccess) {
 
-    UNSAFE_componentWillReceiveProps() {
-        const {shop} = this.props
-    }
+        }
+      }
 
     renderFilterMethodOrder = () => {
         const {status} = this.state

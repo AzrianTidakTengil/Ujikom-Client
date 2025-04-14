@@ -52,93 +52,102 @@ class SellerSetting extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        const {region, shop} = this.props
+    componentDidMount() {
+        const { region, shop } = this.props;
 
-        this.props.getSeller()
-        this.props.OperationShop()
-        this.props.ShopAddress()
-        this.props.GetProvinces()
+        this.props.getSeller();
+        this.props.OperationShop();
+        this.props.ShopAddress();
+        this.props.GetProvinces();
     }
-
-    UNSAFE_componentWillReceiveProps() {
-        const {shop, region} = this.props
-        const {provinces, selectAddres, address, cities} = this.state
-
-        if (shop.isSuccess) {
-            this.setState({
-                information: {
-                    name: shop.seller.name,
-                    description: shop.seller.description
-                }
-            })
-            this.props.clearMessageShop()
+      
+    componentDidUpdate(prevProps, prevState) {
+        const { shop, region } = this.props;
+        const { provinces, selectAddres, address, cities } = this.state;
+      
+        // Check if shop data has changed and update state accordingly
+        if (shop.isSuccess && shop !== prevProps.shop) {
+          this.setState({
+            information: {
+              name: shop.seller.name,
+              description: shop.seller.description,
+            },
+          });
+          this.props.clearMessageShop();
         }
-
-        if (shop.isSuccess && shop.message === ShopMessage.STORE.ADDRESS.GET) {
-            this.setState({
-                address: {
-                    address: shop.address.address,
-                    district: shop.address.district,
-                    city: shop.address.city,
-                    province: shop.address.province,
-                    country: shop.address.country,
-                    postal_code: shop.address.postal_code,
-                    latitude: shop.address.latitude,
-                    longtitude: shop.address.longtitude,
-                }
-            })
-            this.props.clearMessageShop()
+      
+        // If the address is retrieved, set the state with the new address information
+        if (shop.isSuccess && shop.message === ShopMessage.STORE.ADDRESS.GET && shop !== prevProps.shop) {
+          this.setState({
+            address: {
+              address: shop.address.address,
+              district: shop.address.district,
+              city: shop.address.city,
+              province: shop.address.province,
+              country: shop.address.country,
+              postal_code: shop.address.postal_code,
+              latitude: shop.address.latitude,
+              longtitude: shop.address.longtitude,
+            },
+          });
+          this.props.clearMessageShop();
         }
-
-        if (region.isSuccess && region.message == RegionMessage.REGION.PROVINCES) {
-            this.setState({
-                provinces: region.provinces
-            })
-
-            if (address && address.province) {
-                const provinceId = region.provinces.find((province) => province.name == address.province.toUpperCase())
-
-                if (provinceId && provinceId.id) {
-                    this.setState({
-                        selectAddres: {
-                            ...selectAddres,
-                            province: provinceId.id
-                        },
-                    })
-
-                    this.props.GetCities({province_id: provinceId.id})
-                }
+      
+        // Handle provinces change
+        if (region.isSuccess && region.message === RegionMessage.REGION.PROVINCES && region !== prevProps.region) {
+          this.setState({
+            provinces: region.provinces,
+          });
+      
+          if (address && address.province) {
+            const provinceId = region.provinces.find(
+              (province) => province.name === address.province.toUpperCase()
+            );
+      
+            if (provinceId && provinceId.id) {
+              this.setState({
+                selectAddres: {
+                  ...selectAddres,
+                  province: provinceId.id,
+                },
+              });
+      
+              this.props.GetCities({ province_id: provinceId.id });
             }
+          }
         }
-
-        if (region.isSuccess && region.message == RegionMessage.REGION.CITIES) {
-            this.setState({
-                cities: region.cities
-            })
-
-            if (address && address.city) {
-                const cityId = region.cities.find((city) => city.name == address.city.toUpperCase())
-
-                if (cityId && cityId.id) {
-                    this.setState({
-                        selectAddres: {
-                            ...selectAddres,
-                            city: cityId.id
-                        },
-                    })
-                    
-                    this.props.GetDistrict({city_id: cityId.id})
-                }
+      
+        // Handle cities change
+        if (region.isSuccess && region.message === RegionMessage.REGION.CITIES && region !== prevProps.region) {
+          this.setState({
+            cities: region.cities,
+          });
+      
+          if (address && address.city) {
+            const cityId = region.cities.find(
+              (city) => city.name === address.city.toUpperCase()
+            );
+      
+            if (cityId && cityId.id) {
+              this.setState({
+                selectAddres: {
+                  ...selectAddres,
+                  city: cityId.id,
+                },
+              });
+      
+              this.props.GetDistrict({ city_id: cityId.id });
             }
+          }
         }
-
-        if (region.isSuccess && region.message == RegionMessage.REGION.DISTRICT) {
-            this.setState({
-                districts: region.districts
-            })
+      
+        // Handle districts change
+        if (region.isSuccess && region.message === RegionMessage.REGION.DISTRICT && region !== prevProps.region) {
+          this.setState({
+            districts: region.districts,
+          });
         }
-    }
+    } 
 
     renderInformation = () => {
         const {information} = this.state
