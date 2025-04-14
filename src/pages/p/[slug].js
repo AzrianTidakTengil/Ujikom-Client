@@ -132,7 +132,7 @@ class Product extends Component{
                         address: products.item.product.shop.address
                     }
                 },
-                quantityEditor: products.item.product.variant ? products.item.product.variant[0].minimumPurchase : 1
+                quantityEditor: products.item.product.variant.length != 0 ? products.item.product.variant[0].minimumPurchase : 1
             })
 
             // this.props.VisitProductShop({limit: 12, offset: 0}, products.item.product.shop.id)
@@ -353,22 +353,26 @@ class Product extends Component{
                                                 }
                                                 </Stack>
                                             </Box>
-                                            <Box sx={{marginY: 2}}>
-                                                <Typography variant="subtitle1">Pilih {variant[1].name}</Typography>
-                                                <Stack direction="row" spacing={1}>
-                                                {
-                                                    variant[1].subtype.map((s, i) => (
-                                                        <Chip
-                                                            key={i}
-                                                            label={s.name}
-                                                            clickable
-                                                            color={s.id === selectedVariant2 ? 'primary' : 'default'}
-                                                            onClick={() => this.handleSelectVariant2(s.id)}
-                                                        />
-                                                    ))
-                                                }
-                                                </Stack>
-                                            </Box>
+                                            {
+                                                variant.length > 1 ? (
+                                                    <Box sx={{marginY: 2}}>
+                                                        <Typography variant="subtitle1">Pilih {variant[1].name}</Typography>
+                                                        <Stack direction="row" spacing={1}>
+                                                        {
+                                                            variant[1].subtype.map((s, i) => (
+                                                                <Chip
+                                                                    key={i}
+                                                                    label={s.name}
+                                                                    clickable
+                                                                    color={s.id === selectedVariant2 ? 'primary' : 'default'}
+                                                                    onClick={() => this.handleSelectVariant2(s.id)}
+                                                                />
+                                                            ))
+                                                        }
+                                                        </Stack>
+                                                    </Box>
+                                                ) : ''
+                                            }
                                         </Box>
                                     ) : ''
                                 }
@@ -438,22 +442,26 @@ class Product extends Component{
                                             }
                                             </Stack>
                                         </Box>
-                                        <Box sx={{marginY: 2}}>
-                                            <Typography variant="subtitle1">Pilih {variant[1].name}</Typography>
-                                            <Stack direction="row" spacing={1}>
-                                            {
-                                                variant[1].subtype.map((s, i) => (
-                                                    <Chip
-                                                        key={i}
-                                                        label={s.name}
-                                                        clickable
-                                                        color={s.id === selectedVariant2 ? 'primary' : 'default'}
-                                                        onClick={() => this.handleSelectVariant2(s.id)}
-                                                    />
-                                                ))
-                                            }
-                                            </Stack>
-                                        </Box>
+                                        {
+                                            variant.length > 1 ? (
+                                                <Box sx={{marginY: 2}}>
+                                                    <Typography variant="subtitle1">Pilih {variant[1].name}</Typography>
+                                                    <Stack direction="row" spacing={1}>
+                                                    {
+                                                        variant[1].subtype.map((s, i) => (
+                                                            <Chip
+                                                                key={i}
+                                                                label={s.name}
+                                                                clickable
+                                                                color={s.id === selectedVariant2 ? 'primary' : 'default'}
+                                                                onClick={() => this.handleSelectVariant2(s.id)}
+                                                            />
+                                                        ))
+                                                    }
+                                                    </Stack>
+                                                </Box>
+                                            ) : ''
+                                        }
                                     </Box>
                                 ) : ''
                             }
