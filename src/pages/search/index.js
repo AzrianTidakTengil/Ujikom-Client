@@ -80,7 +80,7 @@ class Search extends Component {
                     {listProduct.map((product) => (
                        <Grid key={product.id} size={{xs: 6, sm: 4, md:2.5, lg: 2}}>
                             <Link href={{
-                                pathname: `/p/${product.name}`,
+                                pathname: `/p/${encodeURIComponent(product.name)}`,
                                 query: {id: product.id}
                                 }}
                                 style={{textDecoration: 'none'}}

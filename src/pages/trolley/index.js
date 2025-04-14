@@ -124,7 +124,7 @@ class Trolley extends Component {
                       <CardContent>
                         <Link 
                           href={{
-                            pathname: `/p/${item.name}`,
+                            pathname: `/p/${encodeURIComponent(item.name)}`,
                             query: {id: item.product_id}
                             }}
                           style={{
@@ -265,7 +265,7 @@ class Trolley extends Component {
           {products.map((product) => (
             <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
                 <Link href={{
-                    pathname: `/p/${product.name}`,
+                    pathname: `/p/${encodeURIComponent(product.name)}`,
                     query: {id: product.id}
                     }}
                     style={{textDecoration: 'none'}}
