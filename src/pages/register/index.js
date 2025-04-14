@@ -40,18 +40,19 @@ class Register extends React.Component{
         })
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {auth} = nextProps
-
-        if (auth.error) {
-            this.setState({
-                errorMessage: {
-                    ...this.state.errorMessage,
-                    ...auth.error
-                }
-            })
+    componentDidUpdate(prevProps) {
+        const { auth } = this.props;
+      
+        if (auth.error && auth.error !== prevProps.auth.error) {
+          this.setState((prevState) => ({
+            errorMessage: {
+              ...prevState.errorMessage,
+              ...auth.error,
+            },
+          }));
         }
     }
+      
 
     handleNextBox = () => {
         const {boxIndex} = this.state

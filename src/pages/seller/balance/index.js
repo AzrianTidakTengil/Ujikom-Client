@@ -23,15 +23,18 @@ class Balance extends Component {
         })
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {seller, user} = nextProps
-
-        if (seller.isSuccess) {
-            this.setState({
-                seller: {
-                    name: seller.data.name
-                }
-            })
+    componentDidUpdate(prevProps) {
+        const { seller } = this.props;
+      
+        if (
+          seller.isSuccess &&
+          seller !== prevProps.seller
+        ) {
+          this.setState({
+            seller: {
+              name: seller.data.name,
+            },
+          });
         }
     }
 

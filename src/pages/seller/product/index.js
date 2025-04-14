@@ -30,22 +30,25 @@ class SellerProduct extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        const {limit, offset} = this.state
-
-        this.props.MyProductShop({limit, offset})
+    componentDidMount() {
+        const { limit, offset } = this.state;
+        this.props.MyProductShop({ limit, offset });
     }
-
-    UNSAFE_componentWillReceiveProps() {
-        const {shop} = this.props
-
-        if (shop.isSuccess && shop.lengthProduct) {
-            this.setState({
-                length: shop.lengthProduct,
-                product: shop.product
-            })
+      
+    componentDidUpdate(prevProps) {
+        const { shop } = this.props;
+      
+        if (
+          shop !== prevProps.shop &&
+          shop.isSuccess &&
+          shop.lengthProduct
+        ) {
+          this.setState({
+            length: shop.lengthProduct,
+            product: shop.product
+          });
         }
-    }
+      }
 
     handleSelectRow = (newRowSelectionModel) => {
         this.setState({ selectRow: newRowSelectionModel })

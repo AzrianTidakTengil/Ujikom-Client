@@ -45,14 +45,15 @@ class Profile extends Component {
     })
   }
 
-  UNSAFE_componentWillMount() {
-    this.props.getAllAddress()
+  componentDidMount() {
+    this.props.getAllAddress();
   }
-
-  UNSAFE_componentWillReceiveProps() {
-    const {user, address, transaction} = this.props
-
-    if (user.isSuccess) {
+  
+  componentDidUpdate(prevProps) {
+    const { user, address, transaction } = this.props;
+  
+    // User updated
+    if (user !== prevProps.user && user.isSuccess) {
       this.setState({
         user: {
           ...this.state.user,
@@ -60,26 +61,28 @@ class Profile extends Component {
           fullname: `${user.firstname} ${user.lastname}`,
           email: user.email,
           telephone: user.telephone,
-          avatar: user.avatar
-        }
-      })
+          avatar: user.avatar,
+        },
+      });
     }
-
-    if (address.isSuccess) {
+  
+    // Address updated
+    if (address !== prevProps.address && address.isSuccess) {
       this.setState({
-        addresses: address.list.data
-      })
+        addresses: address.list.data,
+      });
     }
-
-    if (transaction.isSuccess) {
+  
+    // Transaction updated
+    if (transaction !== prevProps.transaction && transaction.isSuccess) {
       this.setState({
         transaction: {
           ...this.state.transaction,
-          data: transaction.list.data
-        }
-      })
+          data: transaction.list.data,
+        },
+      });
     }
-  }
+  }  
 
   renderMoreAddress = () => {
     const {addresses} = this.state

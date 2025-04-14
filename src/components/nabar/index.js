@@ -118,14 +118,15 @@ class Navbar extends React.Component {
     }
   }
 
-  UNSAFE_componentWillMount() {
-    this.props.getUser()
-    this.props.getAllItemTrolley()
+  componentDidMount() {
+    this.props.getUser();
+    this.props.getAllItemTrolley();
   }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const {auth, user, trolley, keyword} = nextProps
-    if (user.isSuccess) {
+  
+  componentDidUpdate(prevProps) {
+    const { user, trolley, keyword } = this.props;
+  
+    if (user !== prevProps.user && user.isSuccess) {
       this.setState({
         user: {
           username: user.username,
@@ -136,20 +137,22 @@ class Navbar extends React.Component {
           avatar: user.avatar
         },
         isSeller: user.isSeller
-      })
+      });
     }
-    if (trolley.isSuccess) {
+  
+    if (trolley !== prevProps.trolley && trolley.isSuccess) {
       this.setState({
         badgeTrolley: trolley.data.length
-      })
+      });
     }
-    if (keyword.isSuccess) {
+  
+    if (keyword !== prevProps.keyword && keyword.isSuccess) {
       this.setState({
         keyword: {
-          list: keyword.data.filter((d) => d.status != 'popular'),
-          popular: keyword.data.filter((d) => d.status == 'popular'),
+          list: keyword.data.filter(d => d.status !== 'popular'),
+          popular: keyword.data.filter(d => d.status === 'popular'),
         }
-      })
+      });
     }
   }
 
