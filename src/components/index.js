@@ -1,5 +1,5 @@
 import { Auth } from "./form/form";
-import Navbar from "./nabar";
+import Navbar from "./nav";
 import Layout from "./layout";
 import Carousel from "./carousel";
 import QuantityEditor from "./quantityEditor";
