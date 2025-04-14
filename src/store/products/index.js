@@ -151,7 +151,7 @@ export const productSlice = createSlice({
                     weight: v.weight, 
                     stock: v.stock, 
                     minimumPurchase: v.minimum_purchase, 
-                    name: v.productVariantToVariant.name,
+                    name: v.productVariantToVariant ? v.productVariantToVariant.name : '',
                     subtype: v.productVariantToSubVariant.map((s) => ({id: s.id, name: s.subVariantTosubVariant ? s.subVariantTosubVariant.name : ''}))
                 }))
                 state.data.product.shop.id = action.payload.data.productToOwner.ownerToStore.id
