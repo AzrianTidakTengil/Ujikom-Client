@@ -68,10 +68,14 @@ class CheckOut extends Component {
         this.props.getOne();
         this.props.getAllAddress();
 
-        if (trolley.itemsCheckout) {
+        if (trolley.itemsCheckout.length != 0) {
             this.props.findTrolley({
             id: trolley.itemsCheckout
             });
+        } else {
+            this.props.router.push({
+                pathname: '/trolley'
+            })
         }
     }
 
