@@ -6,6 +6,7 @@ export default {
         LOGOUT: '/auth/logout',
         SENDOTP: '/auth/otp',
         VERIFYOTP: '/auth/otp/verify',
+        CHANGETOROLE: '/auth/openshop',
     },
     PRODUCTS: {
         ALL: '/items',

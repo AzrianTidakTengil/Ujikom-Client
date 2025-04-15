@@ -7,10 +7,10 @@ import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import Image from "next/image";
 
 const images = [
-  "/assets/carousel/img1.jpg",
-  "/assets/carousel/img2.jpg",
-  "/assets/carousel/img1.jpg",
-  "/assets/carousel/img3.jpg",
+  "/assets/carousel/img1.jpeg",
+  "/assets/carousel/img2.jpeg",
+  "/assets/carousel/img3.jpeg",
+  "/assets/carousel/img4.jpeg",
 ];
 
 const Carousel = () => {

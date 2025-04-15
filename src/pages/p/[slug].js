@@ -142,7 +142,7 @@ class Product extends Component{
               name: currItem.name,
               description: currItem.description,
               price: currItem.price + currItem.variant.reduce((total, curr) => total + curr.price, 0),
-              stock: currItem.variant.reduce((total, curr) => total + curr.stock, 0),
+              stock: currItem.stock + currItem.variant.reduce((total, curr) => total + curr.stock, 0),
               category: categoryPath,
               condition: currItem.condition,
               width: currItem.width,
@@ -409,8 +409,8 @@ class Product extends Component{
                                         }
                                     </Typography>
                                 </Box>
-                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
-                                <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
+                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading}>Tambah Ke Keranjang</Button>
+                                <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading}>Beli Langsung</Button>
                             </Box>
                         </Paper>
                     </Grid>
@@ -513,8 +513,8 @@ class Product extends Component{
                                 }
                             </Typography>
                         </Box>
-                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
-                        <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading}>Tambah Ke Keranjang</Button>
+                        <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading}>Beli Langsung</Button>
                     </Box>
             </Box>
         )
