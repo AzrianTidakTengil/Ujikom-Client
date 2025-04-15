@@ -26,7 +26,7 @@ import {
 } from "@mui/material";
 import styles from "./style.module.css";
 import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { AccountCircle, HistoryOutlined, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined, TrendingUp } from "@mui/icons-material";
+import { AccountCircle, AddBusiness, HistoryOutlined, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined, TrendingUp } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
@@ -302,7 +302,11 @@ class Navbar extends React.Component {
                     <IconButton href="/seller/">
                       <StoreOutlined />
                     </IconButton>
-                  ) : ''
+                  ) : (
+                    <IconButton href="/register/openshop">
+                      <AddBusiness />
+                    </IconButton>
+                  )
                 }
                 <Grid>
                   <div style={{cursor: 'pointer'}} onClick={this.handleOpenPopever}>
@@ -330,7 +334,7 @@ class Navbar extends React.Component {
                         divider={<Divider flexItem />}
                         spacing={2}
                       >
-                        <Button onClick={() => this.handlePush('/profile')} startIcon={<AccountCircle/>}>
+                        <Button href="/profile" startIcon={<AccountCircle/>}>
                           Profile
                         </Button>
                         <Button startIcon={<Logout/>} onClick={this.handleLogOut}>

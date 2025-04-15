@@ -56,11 +56,11 @@ class Trolley extends Component {
         price: val.trolleyToProduct.productToProductVariant.reduce(
           (total, currVal) => total + currVal.price,
           0
-        ),
+        ) + val.trolleyToProduct.price,
         stock: val.trolleyToProduct.productToProductVariant.reduce(
           (total, currVal) => total + currVal.stock,
           0
-        ),
+        ) + val.trolleyToProduct.stock,
         image:
           val.trolleyToProduct.productToImage.length !== 0
             ? val.trolleyToProduct.productToImage[0].public_id

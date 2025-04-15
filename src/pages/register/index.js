@@ -170,7 +170,7 @@ class Register extends React.Component{
                             <ArrowBackIosNew/>
                         </IconButton>
                     </Grid2>
-                    <Grid2 size={6} display={'flex'} alignItems={'center'}>
+                    <Grid2 size={6} display={'flex'} justifyContent={'center'}>
                         <Typography variant="h5" textAlign={'center'} fontWeight={600}>Kode Verifikasi</Typography>
                     </Grid2>
                     <Grid2 size={3}>
@@ -246,6 +246,7 @@ class Register extends React.Component{
                             sx={{
                                 marginY: 2
                             }}
+                            required
                             error={errorMessage && errorMessage.username ? errorMessage.username : undefined}
                         />
                         <Button variant="contained" color="success" fullWidth type="submit" sx={{marginY: 4}}>Selanjutnya</Button>
@@ -306,7 +307,19 @@ class Register extends React.Component{
         const {firstname, lastname, gender} = this.state.form
         return (
             <>
-                <Typography variant="h5" textAlign={'center'} fontWeight={600} sx={{marginY: 2}}>Lengkapi Data Diri</Typography>
+                <Grid2 container spacing={2}>
+                    <Grid2 size={3}>
+                        <IconButton onClick={() => this.handleBackBox()}>
+                            <ArrowBackIosNew/>
+                        </IconButton>
+                    </Grid2>
+                    <Grid2 size={6} display={'flex'} justifyContent={'center'}>
+                        <Typography variant="h5" textAlign={'center'} fontWeight={600}>Lengkapi Data Diri</Typography>
+                    </Grid2>
+                    <Grid2 size={3}>
+
+                    </Grid2>
+                </Grid2>
                 <Box
                     sx={{
                         marginY: 2,
@@ -416,7 +429,7 @@ class Register extends React.Component{
                         spacing={2}
                     >
                         <Button variant="contained" color="success" href="/">Login</Button>
-                        <Button variant="outlined" href="/register/shop">Buka Toko</Button>
+                        {/* <Button variant="outlined" href="/register/shop">Buka Toko</Button> */}
                     </Stack>
                 </div>
             </>

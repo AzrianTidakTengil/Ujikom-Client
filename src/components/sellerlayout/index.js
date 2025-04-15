@@ -130,11 +130,11 @@ class SellerLayout extends Component {
         router: '/seller/order',
         label: 'Pesanan'
       },
-      {
-        icon: <Feedback/>,
-        router: '/seller/feedback',
-        label: 'Feedback'
-      },
+      // {
+      //   icon: <Feedback/>,
+      //   router: '/seller/feedback',
+      //   label: 'Feedback'
+      // },
       {
         icon: <AccountBalanceWallet/>,
         router: '/seller/balance',

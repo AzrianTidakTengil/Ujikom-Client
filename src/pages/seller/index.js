@@ -233,7 +233,7 @@ class Seller extends Component {
                                             {val.name}
                                         </TableCell>
                                         <TableCell>
-                                            {val.productToCategory ? `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name} > ${val.productToCategory.productCategoryToCategory3.name}` : '-'}
+                                            {val.productToCategory ? val.productToCategory.productCategoryToCategory2 ? val.productToCategory.productCategoryToCategory3 ? `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name} > ${val.productToCategory.productCategoryToCategory3.name}` : `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name}` : `${val.productToCategory.productCategoryToCategory1.name}` : '-'}
                                         </TableCell>
                                         <TableCell>
                                             <Button variant="contained" color="primary" onClick={() => alert(`Visiting products in Tier ${val.name}`)} size="small">

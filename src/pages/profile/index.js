@@ -128,7 +128,7 @@ class Profile extends Component {
           {
             address.isLoading ? (
               <CircularProgress sx={{marginTop: 2}}/>
-            ) : addresses.map((val) => (
+            ) : addresses[0] ? addresses.map((val) => (
               <Paper
                 key={val.id}
                 sx={{
@@ -145,7 +145,7 @@ class Profile extends Component {
                       divider={<Divider orientation="vertical" flexItem />}
                       spacing={2} 
                     >
-                      <Typography variant="body1" fontWeight={600}>{val.receiver}</Typography>
+                      <Typography variant="body1" fontWeight={600}>{val.receiver ? val.receiver : ''}</Typography>
                       <Typography variant="body1">{val.name}</Typography>
                       {
                         val.selectedAddressUser ? (
@@ -189,7 +189,7 @@ class Profile extends Component {
                   </Grid>
                 </Grid>
               </Paper>
-            ))
+            )) : ''
           }
         </Box>
       </Box>
