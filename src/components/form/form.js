@@ -65,6 +65,18 @@ class Auth extends Component {
     }
   }
 
+  renderCustomBackDrop = (props) => {
+    return (
+      <Backdrop
+        {...props}
+        sx={(theme) => ({ color: '#fff', zIndex: this.props.isLoading ? theme.zIndex.appBar + 1000 + theme.zIndex.modal : -1 })}
+        open={true}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    )
+  }
+
   render() {
     const {open} = this.state
     
@@ -72,13 +84,17 @@ class Auth extends Component {
       <ThemeProvider theme={theme}>
         <Button variant="outlined" onClick={this.handleModal} color="white" sx={{marginRight: 1}}>Login</Button>
         <Modal 
-        open={open} 
+        open={open}
         sx={container}
         onClose={this.handleModal}
         keepMounted
+        BackdropComponent={this.renderCustomBackDrop}
         >
           <Box
-            sx={mainItem}
+            sx={{
+              ...mainItem,
+              zIndex: theme.zIndex.modal
+            }}
           >
               <div className={styles.head}>
                   <h2>Login</h2>
@@ -99,12 +115,6 @@ class Auth extends Component {
               </div>
           </Box>
         </Modal>
-        <Backdrop
-          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.appBar + 1000 })}
-          open={this.props.isLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
       </ThemeProvider>
     )
   }

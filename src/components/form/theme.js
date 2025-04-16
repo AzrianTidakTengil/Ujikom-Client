@@ -3,7 +3,7 @@ const container = {
     height: '100vh',
     display: 'flex',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'start',
 }
 
 const mainItem = {
@@ -11,8 +11,7 @@ const mainItem = {
     borderRadius: 2,
     border: '1px solid #ababab',
     bgcolor: '#fff',
-    position: 'absolute',
-    top: '10%',
+    marginTop: '5rem',
 }
 
 const input = {
