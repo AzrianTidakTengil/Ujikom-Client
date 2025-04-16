@@ -58,7 +58,10 @@ export const authSlice = createSlice({
         },
         downProgress: (state) => {
             state.progressIndex = state.progressIndex - 1
-        }
+        },
+        setProgress: (state, action) => {
+            state.progressIndex = action.payload
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -132,6 +135,6 @@ export const authSlice = createSlice({
     }
 })
 
-export const {logout, upProgress, resetProgress, downProgress} = authSlice.actions
+export const {logout, upProgress, resetProgress, downProgress, setProgress} = authSlice.actions
 
 export default authSlice.reducer
