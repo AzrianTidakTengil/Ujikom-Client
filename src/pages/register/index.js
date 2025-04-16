@@ -11,7 +11,7 @@ import { Playfair_Display, Poppins } from "next/font/google";
 import { LoginGoogle } from "@/services/auth";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
-import { RegisterUser, SendCodeOtp, upProgress, VerifyCodeOtp } from "@/store/auth";
+import { downProgress, RegisterUser, resetProgress, SendCodeOtp, setProgress, upProgress, VerifyCodeOtp } from "@/store/auth";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
@@ -41,7 +41,7 @@ class Register extends React.Component{
     }
 
     componentDidUpdate(prevProps) {
-        const { auth } = this.props;
+        const { auth, router } = this.props;
       
         if (auth.error && auth.error !== prevProps.auth.error) {
           this.setState((prevState) => ({
@@ -50,6 +50,14 @@ class Register extends React.Component{
               ...auth.error,
             },
           }));
+        }
+
+        if (router.query) {
+            if (router.query.success && router.query.success === 'true') {
+                this.props.setProgress(4)
+            } else {
+                this.props.resetProgress()
+            }
         }
     }
       
@@ -63,11 +71,7 @@ class Register extends React.Component{
     }
 
     handleBackBox = () => {
-        const {boxIndex} = this.state
-
-        this.setState({
-            boxIndex: boxIndex-1 < 0 ? 0 : boxIndex-1
-        })
+        this.props.downProgress()
     }
 
     renderInputEmailOrTelp = () => {
@@ -501,6 +505,9 @@ const mapDispatchToProps = {
     VerifyCodeOtp,
     upProgress,
     RegisterUser,
+    resetProgress,
+    setProgress,
+    downProgress,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Register))
