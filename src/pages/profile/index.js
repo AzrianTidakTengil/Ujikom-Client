@@ -10,6 +10,8 @@ import { palleteV1 } from '@/assets/css/template'
 import { deleteAvatarUser, updateAvatarUser } from "@/store/user";
 import { Cld } from "@/config";
 import UserMessage from '@/store/user/message'
+import { thumbnail } from "@cloudinary/url-gen/actions/resize";
+import { withRouter } from "next/router";
 
 class Profile extends Component {
   constructor(props) {
@@ -29,7 +31,8 @@ class Profile extends Component {
       transaction: {
         limit: 10,
         offset: 0,
-        data: []
+        data: [],
+        status: 'pending',
       },
       image: null,
       previewImage: null,
@@ -208,20 +211,32 @@ class Profile extends Component {
 
     const optionFilter = [
       {
-        label: 'Berhasil',
-        value: 'berhasil'
+        label: 'menunggu pembayaran',
+        value: 'pending'
       },
       {
-        label: 'Diantar',
-        value: 'diantar'
+        label: 'menunggu konfirmasi',
+        value: 'settlement'
       },
       {
-        label: 'Menunggu',
-        value: 'menunggu'
+        label: 'sedang proses',
+        value: 'onSeller'
       },
       {
-        label: 'Dibatalkan',
-        value: 'dibatalkan'
+        label: 'sedang diantar',
+        value: 'delivery'
+      },
+      {
+        label: 'kadaluarsa',
+        value: 'expired'
+      },
+      {
+        label: 'ditolak',
+        value: 'rejectedBySeller'
+      },
+      {
+        label: 'diterima',
+        value: 'success'
       },
     ]
 
@@ -255,6 +270,8 @@ class Profile extends Component {
                 label={'Status'}
                 options={optionFilter}
                 size="small"
+                value={this.state.transaction.status}
+                onChange={this.handleChangeDropDown}
               />
           </Grid>
         </Grid>
@@ -287,9 +304,9 @@ class Profile extends Component {
                     // divider={<Divider orientation="vertical" flexItem />}
                     spacing={2}  
                   >
-                    <Chip label={this.handleTitlePayment({method: val.payment_type, type: val.subtype})}/>
+                    <Chip label={this.handleTitlePayment({method: val.transactionToPayment.payment_method, type: val.transactionToPayment.subtype})}/>
                     <Chip label={dayjs(val.createdAt).format('dddd, DD-MM-YYYY')}/>
-                    <Chip label="pending" color="primary"/>
+                    <Chip {...this.handleAttributeChipStatus(val.transactionToPayment.status)}/>
                   </Stack>
                 </Box>
                 <Divider sx={{marginY: 2}}/>
@@ -298,9 +315,12 @@ class Profile extends Component {
                     <>
                       <Grid container direction={'row'} spacing={2} sx={{marginY: 2}}>
                         <Grid size={3}>
-                          <Paper sx={{p:2}}>
-                            Image
-                          </Paper>
+                          <img
+                            width={160}
+                            height={160}
+                            alt={trolley.trolleyToProduct.name}
+                            src={Cld.image(trolley.trolleyToProduct.productToImage[0] ? trolley.trolleyToProduct.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                          />
                         </Grid>
                         <Grid size={6} textAlign={'left'}>
                           <Typography variant="h6">{trolley.trolleyToProduct.name}</Typography>
@@ -312,7 +332,7 @@ class Profile extends Component {
                               new Intl.NumberFormat('id-ID', {
                                   style: "currency",
                                   currency: "IDR"
-                              }).format(trolley.trolleyToProduct.price)
+                              }).format(trolley.trolleyToProduct.price + trolley.trolleyToProduct.productToProductVariant.reduce((total, currVal) => total + currVal.price, 0))
                             }
                           </Typography>
                         </Grid>
@@ -343,23 +363,52 @@ class Profile extends Component {
                   }
                   </Typography>
                 </Box>
-                <Box
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'end',
-                    marginTop: 2
-                  }}
+                <Stack
+                  direction={'row'}
+                  spacing={2}
+                  justifySelf={'end'}
+                  marginTop={2}
                 >
-                  <Button variant="outlined" sx={{marginRight: 2}}>Ulas</Button>
-                  <Button variant="contained">Beli Lagi</Button>
-                </Box>
+                  {
+                    val.transactionToPayment.status == 'success' ? (
+                      <>
+                        <Button variant="outlined">Ulas</Button>
+                        <Button variant="contained">Beli Lagi</Button>
+                      </>
+                    ) : val.transactionToPayment.status == 'expired' || val.transactionToPayment.status == 'rejectedBySeller' ? (
+                      <>
+                      </>
+                    ) : (
+                      <>
+                        <Button 
+                          variant="outlined"
+                          onClick={() => this.props.router.push({
+                            pathname: `/t`,
+                            query: {
+                              id: val.id
+                            }
+                          })
+                          }
+                        >
+                          Pembayaran
+                        </Button>
+                      </>
+                    )
+                  }
+                </Stack>
               </Paper>
             ))
           }
         </Box>
       </Box>
     )
+  }
+
+  handleAttributeChipStatus = (status) => {
+    return {
+        label: status === 'pending' ? 'menunggu pembayaran' : status === 'settlement' ? 'menunggu konfirmasi' : status === 'onSeller' ? 'sedang proses' : status === 'delivery' ? 'sedang diantar' : status === 'expired' ? 'kadaluarsa' : status === 'rejectedBySeller' ? 'ditolak' : status === 'success' ? 'diterima' : 'menunggu',
+        color: status === 'pending' ? 'secondary' : status === 'settlement' ? 'warning' : status === 'onSeller' ? 'primary' : status === 'delivery' ? 'info' : status === 'expired' ? 'error' : status === 'rejectedBySeller' ? 'error' : status === 'success' ? 'success' : 'default',
+    }
   }
 
   handleTitlePayment = (val) => {
@@ -394,12 +443,25 @@ class Profile extends Component {
     const {transaction} = this.state
 
     if (newValue === 'transaction') {
-      this.props.getAllTransaction({limit: transaction.limit, offset: transaction.offset})
+      this.props.getAllTransaction({limit: transaction.limit, offset: transaction.offset, status: transaction.status})
     }
 
     this.setState({
       renderTabs: newValue
     })
+  }
+
+  handleChangeDropDown = (event) => {
+    const {transaction} = this.state
+
+    this.setState({
+      transaction: {
+        ...this.state.transaction,
+        status: event.target.value
+      }
+    })
+
+    this.props.getAllTransaction({limit: transaction.limit, offset: transaction.offset, status: event.target.value})
   }
 
   handleFileChange = (event) => {
@@ -625,4 +687,4 @@ const mapDispatchToProps = {
   deleteAvatarUser,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Profile);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Profile));
