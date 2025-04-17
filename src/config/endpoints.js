@@ -37,6 +37,7 @@ export default {
         FIND: '/transactions/find',
         CREATE: '/transaction/create',
         DELETE: '/transaction/delete',
+        ISAPPROVE: '/transaction/isapprove',
     },
     LABEL: {
         CREATE: '/label/create',
