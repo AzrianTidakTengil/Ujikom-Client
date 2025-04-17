@@ -537,7 +537,10 @@ class CheckOut extends Component {
                 method_payment: subtype.bank,
             }).then(({data}) => {
                 this.props.router.push({
-                    pathname: `/t/${data.data.transaction.id}`
+                    pathname: `/t`,
+                    query: {
+                        id: data.data.transaction.id
+                    }
                 })
                 this.props.clearItemsCheckout()
             })
