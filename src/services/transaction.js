@@ -27,3 +27,10 @@ export const find = (params) => {
         params
     )
 }
+
+export const isApprove = (params) => {
+    return apiServiceV1.post(
+        endpoints.TRANSACTION.ISAPPROVE,
+        params
+    )
+}
