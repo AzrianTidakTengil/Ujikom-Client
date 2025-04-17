@@ -21,6 +21,11 @@ export const findTransaction = createAsyncThunk('transaction/findTransaction', a
     return response.data
 })
 
+export const approveOrRejected = createAsyncThunk('transactionSlice/approveOrRejected', async (params) => {
+    const response = await Transaction.isApprove(params)
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     isSuccess: false,
@@ -88,6 +93,18 @@ export const transactionSlice = createSlice({
             .addCase(findTransaction.rejected, (state, action) => {
                 state.isLoading = true
                 state.error = action.error.message
+            })
+            .addCase(approveOrRejected.pending, (state, action) => {
+                state.isLoading = true
+                state.isSuccess = false
+            })
+            .addCase(approveOrRejected.rejected, (state, action) => {
+                state.isLoading = false
+                state.error = action.error.message
+            })
+            .addCase(approveOrRejected.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccess = true
             })
     }
 })
