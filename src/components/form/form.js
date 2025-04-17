@@ -4,7 +4,7 @@ import { Box, Button, createTheme, Divider, IconButton, Modal, ThemeProvider, Ba
 import { buttonPrimary, container, input, mainItem } from "./theme";
 import { useState, Component } from "react";
 import styles from './style.module.css'
-import { Close } from "@mui/icons-material";
+import { Close, Google } from "@mui/icons-material";
 import { Input, InputEmail, InputPassword } from "../input";
 import { Poppins } from "next/font/google";
 import { palleteV1 } from "@/assets/css/template";
@@ -102,14 +102,33 @@ class Auth extends Component {
                     <Close/>
                   </IconButton>
               </div>
+            <Box
+              sx={{
+                paddingX: 2,
+              }}
+            >
               <form className={styles.body} onSubmit={this.handleSubmit}>
-                <InputEmail name="email" type="text" label="Email" style={input} onBlur={(event) => this.handleInput(event)}/>
-                <InputPassword name="password" type="password" label="Password" style={input} onBlur={(event) => this.handleInput(event)}/>
+                <InputEmail name="email" type="text" label="Email" fullWidth={true} onBlur={(event) => this.handleInput(event)}/>
+                <InputPassword name="password" type="password" label="Password" fullWidth onBlur={(event) => this.handleInput(event)}/>
                 <p>Forgot Password</p>
-                <Button variant="contained" color="success" sx={{width: '85%', marginTop: 6}} type="submit">
+                <Button variant="contained" color="success" fullWidth sx={{marginY: 4}} type="submit">
                     Submit
                 </Button>
               </form>
+              <Divider/>
+              <Button
+                startIcon={<Google/>}
+                variant="contained"
+                fullWidth
+                sx={{
+                  textTransform: 'capitalize',
+                  marginY: 4,
+                }}
+                href="http://localhost:3001/api/auth/google"
+              >
+                Google
+              </Button>
+            </Box>
               <div className={styles.footer}>
                     <p>Tidak memiliki Akun? <Link href="/register">Daftar sekarang</Link></p>
               </div>
