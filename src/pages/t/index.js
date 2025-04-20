@@ -34,9 +34,9 @@ class ItemsTransaction extends Component {
         const queryId = router.query?.id;
     
         if (queryId) {
-            this.props.getTransaction({ id: parseInt(queryId) });
+            this.props.getTransaction({ id: queryId });
         } else if (idPath && idPath[1]) {
-            this.props.getTransaction({ id: parseInt(idPath[1]) });
+            this.props.getTransaction({ id: idPath[1] });
         }
     }
     
