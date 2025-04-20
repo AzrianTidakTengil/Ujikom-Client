@@ -28,16 +28,15 @@ class ItemsTransaction extends Component {
         }
     })
 
-    UNSAFE_componentWillMount() {
-        const {router} = this.props
-        const idPath = router.asPath.match(/id=(\d+)/)
-
-        if (router.query.id) {
-            this.props.getTransaction({id: parseInt(router.query.id)})
-        } else if (idPath) {
-            if (idPath[1]) {
-                this.props.getTransaction({id: parseInt(idPath[1])})
-            }
+    componentDidMount() {
+        const { router } = this.props;
+        const idPath = router.asPath.match(/id=(\d+)/);
+        const queryId = router.query?.id;
+    
+        if (queryId) {
+            this.props.getTransaction({ id: queryId });
+        } else if (idPath && idPath[1]) {
+            this.props.getTransaction({ id: idPath[1] });
         }
     }
 
