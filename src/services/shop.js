@@ -70,3 +70,9 @@ export const CreateOrUpdateShopAddress = (params) => {
         params
     )
 }
+
+export const FindSeller = (params) => {
+    return apiServiceV1.get(
+        `${endpoints.STORE.SELLER}/${params.id}`
+    )
+}

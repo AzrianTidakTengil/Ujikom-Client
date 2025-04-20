@@ -5,7 +5,13 @@ const jwt = require('jsonwebtoken')
 const protectedRoutes = [
     '/profile',
     '/store',
-    '/trolley'
+    '/trolley',
+    '/seller/setting',
+    '/seller/balance',
+    '/seller/order',
+    '/seller/product',
+    '/seller/product/add',
+    '/seller',
 ]
 
 export default async function middleware(req) {

@@ -44,56 +44,81 @@ class SellerProductAdd extends Component {
         })
     }
 
-    UNSAFE_componentWillMount() {
-        this.props.listCategoriesProduct()
-        this.props.listVariantProduct()
+    componentDidMount() {
+        this.props.listCategoriesProduct();
+        this.props.listVariantProduct();
     }
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {isLoading, isSuccess, error, listCategories, listVariant, listSubVariant, message, router} = nextProps
-
-        if (isSuccess && listCategories) {
-            this.setState({
-                categories: listCategories
-            })
+      
+    componentDidUpdate(prevProps) {
+        const {
+          isLoading,
+          isSuccess,
+          listCategories,
+          listVariant,
+          listSubVariant,
+          message,
+          router
+        } = this.props;
+      
+        if (
+          isSuccess &&
+          listCategories !== prevProps.listCategories &&
+          listCategories
+        ) {
+          this.setState({ categories: listCategories });
         }
-
-        if (isSuccess && listVariant) {
-            this.setState({
-                variants: [
-                    ...listVariant,
-                    {
-                        id: 0,
-                        name: 'Tambah Opsi'
-                    }
-                ]
-            })
+      
+        if (
+          isSuccess &&
+          listVariant !== prevProps.listVariant &&
+          listVariant
+        ) {
+          this.setState({
+            variants: [
+              ...listVariant,
+              {
+                id: 0,
+                name: 'Tambah Opsi'
+              }
+            ]
+          });
         }
-
-        if (isSuccess && listSubVariant) {
-            this.setState({
-                subvariants: [
-                    ...listSubVariant,
-                    {
-                        id: 0,
-                        name: 'Tambah Opsi'
-                    }
-                ]
-            })
+      
+        if (
+          isSuccess &&
+          listSubVariant !== prevProps.listSubVariant &&
+          listSubVariant
+        ) {
+          this.setState({
+            subvariants: [
+              ...listSubVariant,
+              {
+                id: 0,
+                name: 'Tambah Opsi'
+              }
+            ]
+          });
         }
-
-        if (isSuccess && message === ProductMessage.PRODUCTS.CREATE) {
-            router.push({
-                pathname: '/seller/product'
-            })
+      
+        if (
+          isSuccess &&
+          message == ProductMessage.PRODUCTS.CREATE &&
+          (isSuccess !== prevProps.isSuccess || message !== prevProps.message)
+        ) {
+          router.push({
+            pathname: '/seller/product'
+          });
         }
-
-        if (isLoading && message === ProductMessage.PRODUCTS.CREATE) {
-            this.setState({
-                loading: true
-            })
+      
+        if (
+          isLoading &&
+          message === ProductMessage.PRODUCTS.CREATE &&
+          (isLoading !== prevProps.isLoading || message !== prevProps.message)
+        ) {
+          this.setState({ loading: true });
         }
-    }
+      }
+      
 
     renderFormInformationProduct = () => {
         const {useVariant, categories} = this.state
@@ -286,276 +311,78 @@ class SellerProductAdd extends Component {
                     p: 2
                 }}
             >
-                {
-                    useVariant ? (
-                        <Box
-                            sx={{
-                                marginY: 4
-                            }}
-                        >
-                            <Box
-                                sx={{
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Typography variant="h6" fontWeight={600}>Varian Produk</Typography>
-                                <Box
-                                    sx={{ display: 'flex', alignItems: 'center' }}
-                                >
-                                    <Button variant="contained" size="small" onClick={this.handleAddVariant} sx={{marginRight: 2}}>Tambah Varian</Button>
-                                    <Button variant="outlined" size="small" onClick={this.handleVariantProduct}>Hapus Semua Varian</Button>
-                                </Box>
-                            </Box>
-                            <Divider sx={{marginY: 2}}/>
-                            <Box>
-                                {
-                                    variant.map((val, index) => (
-                                        <Box
-                                            key={index}
-                                        >
-                                            <Box
-                                                sx={{
-                                                    display: 'flex',
-                                                    justifyContent: 'space-between',
-                                                    alignItems: 'center'
-                                                }}
-                                            >
-                                                <Typography variant="body1" fontWeight={600}>Tipe Varian {index + 1}</Typography>
-                                                <IconButton
-                                                    onClick={() => this.handleDeleteVariant(index)}
-                                                >
-                                                    <Delete/>
-                                                </IconButton>
-                                            </Box>
-                                            <Grid container spacing={2}>
-                                                <Grid size={4}>
-                                                    <Autocomplete
-                                                        disableClearable
-                                                        freeSolo
-                                                        options={variants}
-                                                        getOptionLabel={(variant) => variant.name}
-                                                        renderInput={(params) => {
-                                                            return (
-                                                                <TextField
-                                                                    {...params}
-                                                                    slotProps={{
-                                                                        input: {
-                                                                            ...params.InputProps,
-                                                                            type: 'search',
-                                                                        },
-                                                                    }}
-                                                                />
-                                                            )
-                                                        }}
-                                                        onChange={(event, newValue) => {
-                                                            if (newValue.id === 0) {
-                                                                alert('tambah opsi')
-                                                            } else {
-                                                                val.id = newValue.id
-                                                                if (!newValue.shop_id) {
-                                                                    this.handleChangeSelectVariant(newValue.id)
-                                                                } else {
-                                                                    this.props.listSubVariantProduct({variant_id: newValue.id})
-                                                                }
-                                                            }
-                                                        }}
-                                                    />
-                                                </Grid>
-                                                <Grid size={8}>
-                                                    <Autocomplete
-                                                        freeSolo
-                                                        multiple
-                                                        options={subvariants}
-                                                        getOptionLabel={(subvariant) => subvariant.name}
-                                                        renderInput={(params) => (
-                                                            <TextField
-                                                                {...params}
-                                                                slotProps={{
-                                                                    input: {
-                                                                        ...params.InputProps,
-                                                                        type: 'search',
-                                                                    },
-                                                                }}
-                                                            />
-                                                        )}
-                                                        onChange={(event, newValue) => {
-                                                            val.type = newValue.map((v) => v.id)
-                                                        }}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                            <Grid container sx={{marginY: 2}} spacing={2}>
-                                                <Grid size={3}>
-                                                    <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Harga</Typography>
-                                                    <NumericFormat
-                                                        name="price"
-                                                        thousandSeparator="."
-                                                        decimalSeparator=","
-                                                        prefix="Rp "
-                                                        variant="outlined"
-                                                        customInput={TextField}
-                                                        fullWidth
-                                                        onValueChange={(values) => {
-                                                            val.price = parseInt(values.value)
-                                                        }}
-                                                    />
-                                                </Grid>
-                                                <Grid size={3}>
-                                                    <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Minimal Pembelian</Typography>
-                                                    <NumericFormat
-                                                        name="minimumPurchase"
-                                                        // thousandSeparator
-                                                        // prefix="Rp."
-                                                        variant="outlined"
-                                                        customInput={TextField}
-                                                        fullWidth
-                                                        onChange={(event) => {
-                                                            val.minimumPurchase = parseInt(event.target.value)
-                                                        }}
-                                                    />
-                                                </Grid>
-                                                <Grid size={3}>
-                                                    <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Stok Produk</Typography>
-                                                    <NumericFormat
-                                                        name="stock"
-                                                        // thousandSeparator
-                                                        // prefix="Rp."
-                                                        variant="outlined"
-                                                        customInput={TextField}
-                                                        fullWidth
-                                                        onChange={(event) => {
-                                                            val.stock = parseInt(event.target.value)
-                                                        }}
-                                                    />
-                                                </Grid>
-                                                <Grid size={3}>
-                                                    <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Berat</Typography>
-                                                    <NumericFormat
-                                                        name="weight"
-                                                        thousandSeparator
-                                                        // prefix="Rp."
-                                                        variant="outlined"
-                                                        customInput={TextField}
-                                                        fullWidth
-                                                        slotProps={{
-                                                            input: {
-                                                                endAdornment: <InputAdornment position="end">gram</InputAdornment>,
-                                                            },
-                                                        }}
-                                                        onChange={(event) => {
-                                                            val.weight = parseInt(event.target.value)
-                                                        }}
-                                                    />
-                                                </Grid>
-                                            </Grid>
-                                        </Box>
-                                    ))
-                                }
-                            </Box>
-                        </Box>
-                    )
-                    : (
-                        <>
-                            <Box
-                                sx={{
-                                    marginY: 4,
-                                    p: 2,
-                                    borderWidth: '2px',
-                                    borderStyle: 'dashed',
-                                    borderColor: '#888888',
-                                    display: 'flex',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center'
-                                }}
-                            >
-                                <Box>
-                                    <Typography variant="h6" fontWeight={600}>Varian Produk</Typography>
-                                    <Typography variant="subtitle1">
-                                        Tambahkan varian maksimal 2 tipe
-                                    </Typography>
-                                </Box>
-                                <Button 
-                                    variant="contained"
-                                    onClick={this.handleVariantProduct}
-                                >
-                                    Tambahkan
-                                </Button>
-                            </Box>
-                            <Box
-                                sx={{
-                                    marginY: 2
-                                }}
-                            >
-                                <Typography variant="h6" fontWeight={600}>Pembelian Produk</Typography>
-                                <Grid container sx={{marginY: 2}} spacing={2}>
-                                    <Grid size={3}>
-                                        <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Harga</Typography>
-                                        <NumericFormat
-                                            name="price"
-                                            thousandSeparator="."
-                                            decimalSeparator=","
-                                            prefix="Rp "
-                                            variant="outlined"
-                                            customInput={TextField}
-                                            fullWidth
-                                            onValueChange={(values) => {
-                                                this.setState({
-                                                    form: {
-                                                        ...this.state.form,
-                                                        price: parseInt(values.value)
-                                                    }
-                                                })
-                                            }}
-                                        />
-                                    </Grid>
-                                    <Grid size={3}>
-                                        <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Minimal Pembelian</Typography>
-                                        <NumericFormat
-                                            name="minimumPurchase"
-                                            // thousandSeparator
-                                            // prefix="Rp."
-                                            variant="outlined"
-                                            customInput={TextField}
-                                            fullWidth
-                                            onChange={this.handleChangeNoVariant}
-                                        />
-                                    </Grid>
-                                    <Grid size={3}>
-                                        <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Stok Produk</Typography>
-                                        <NumericFormat
-                                            name="stock"
-                                            // thousandSeparator
-                                            // prefix="Rp."
-                                            variant="outlined"
-                                            customInput={TextField}
-                                            fullWidth
-                                            onChange={this.handleChangeNoVariant}
-                                        />
-                                    </Grid>
-                                    <Grid size={3}>
-                                        <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Berat</Typography>
-                                        <NumericFormat
-                                            name="weight"
-                                            thousandSeparator
-                                            // prefix="Rp."
-                                            variant="outlined"
-                                            customInput={TextField}
-                                            fullWidth
-                                            slotProps={{
-                                                input: {
-                                                    endAdornment: <InputAdornment position="end">gram</InputAdornment>,
-                                                },
-                                            }}
-                                            onChange={this.handleChangeNoVariant}
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Box>
-                        </>
-                    )
-                }
+                <>
+                    <Box
+                        sx={{
+                            marginY: 2
+                        }}
+                    >
+                        <Typography variant="h6" fontWeight={600}>Pembelian Produk</Typography>
+                        <Grid container sx={{marginY: 2}} spacing={2}>
+                            <Grid size={3}>
+                                <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Harga</Typography>
+                                <NumericFormat
+                                    name="price"
+                                    thousandSeparator="."
+                                    decimalSeparator=","
+                                    prefix="Rp "
+                                    variant="outlined"
+                                    customInput={TextField}
+                                    fullWidth
+                                    onValueChange={(values) => {
+                                        this.setState({
+                                            form: {
+                                                ...this.state.form,
+                                                price: parseInt(values.value)
+                                            }
+                                        })
+                                    }}
+                                />
+                            </Grid>
+                            <Grid size={3}>
+                                <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Minimal Pembelian</Typography>
+                                <NumericFormat
+                                    name="minimumPurchase"
+                                    // thousandSeparator
+                                    // prefix="Rp."
+                                    variant="outlined"
+                                    customInput={TextField}
+                                    fullWidth
+                                    onChange={this.handleChangeNoVariant}
+                                />
+                            </Grid>
+                            <Grid size={3}>
+                                <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Stok Produk</Typography>
+                                <NumericFormat
+                                    name="stock"
+                                    // thousandSeparator
+                                    // prefix="Rp."
+                                    variant="outlined"
+                                    customInput={TextField}
+                                    fullWidth
+                                    onChange={this.handleChangeNoVariant}
+                                />
+                            </Grid>
+                            <Grid size={3}>
+                                <Typography variant="body1" fontWeight={500} sx={{marginBottom: 1}}>Berat</Typography>
+                                <NumericFormat
+                                    name="weight"
+                                    thousandSeparator
+                                    // prefix="Rp."
+                                    variant="outlined"
+                                    customInput={TextField}
+                                    fullWidth
+                                    slotProps={{
+                                        input: {
+                                            endAdornment: <InputAdornment position="end">gram</InputAdornment>,
+                                        },
+                                    }}
+                                    onChange={this.handleChangeNoVariant}
+                                />
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </>
             </Paper>
         )
     }

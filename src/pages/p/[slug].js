@@ -80,64 +80,86 @@ class Product extends Component{
     }
 
     componentDidMount() {
+        const {allItem, product} = this.state
         const queryString = window.location.search
         const urlParams = new URLSearchParams(queryString);
 
-        this.props.getOne({id: urlParams.get('id')})
+        this.props.getOne({id: this.props.router.query.id})
         this.props.VisitProductShop({limit: 12, offset: 0, id: urlParams.get('id')})
-    }
 
-    UNSAFE_componentWillMount() {
-        const {allItem, product} = this.state
         this.props.getAll({
             limit: 36,
             offset: 0
         })
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {query, id} = nextProps.router
-        const {products, shop} = nextProps
+    componentDidUpdate(prevProps) {
+        const { products } = this.props;
+        const prevId = prevProps.router.query.id;
+        const currentId = this.props.router.query.id;
 
-        if (products.isSuccess && products.message === ProductMessage.PRODUCTS.VISITSHOP) {
-            this.setState({
-                otherItemFromStore: products.visitProduct
-            })
+        if (currentId && prevId !== currentId) {
+            this.props.getOne({ id: currentId })
         }
 
-        if (products.isSuccess) {
-            this.setState({
-                allItem: products.allProduct
-            })
+        if (
+          products.isSuccess &&
+          products.message === ProductMessage.PRODUCTS.VISITSHOP &&
+          products.visitProduct !== prevProps.products.visitProduct
+        ) {
+          this.setState({
+            otherItemFromStore: products.visitProduct
+          });
         }
 
-        if (products.item.isSuccess) {
-            this.setState({
-                product: {
-                    id: products.item.product.id,
-                    name: products.item.product.name,
-                    description: products.item.product.description,
-                    price: products.item.product.variant.reduce((total, currVal) => total + (currVal.price), 0),
-                    stock: products.item.product.variant.reduce((total, currVal) => total + (currVal.stock), 0),
-                    category: `${products.item.product.category.type1 ? products.item.product.category.type2 ? products.item.product.category.type3 ? `${products.item.product.category.type1} > ${products.item.product.category.type2} > ${products.item.product.category.type3}` : `${products.item.product.category.type1} > ${products.item.product.category.type2}` : `${products.item.product.category.type1}` : '-' }`,
-                    condition: products.item.product.condition,
-                    width: products.item.product.width,
-                    height: products.item.product.height,
-                    length: products.item.product.length,
-                    images: products.item.product.images,
-                    variant: products.item.product.variant,
-                    shop: {
-                        id: products.item.product.shop.id,
-                        name: products.item.product.shop.name,
-                        address: products.item.product.shop.address
-                    }
-                },
-                quantityEditor: products.item.product.variant.length != 0 ? products.item.product.variant[0].minimumPurchase : 1
-            })
-
-            // this.props.VisitProductShop({limit: 12, offset: 0}, products.item.product.shop.id)
+        if (
+          products.isSuccess &&
+          products.allProduct !== prevProps.products.allProduct
+        ) {
+          this.setState({
+            allItem: products.allProduct
+          });
         }
-    }
+
+        const currItem = products.item?.product;
+        const prevItem = prevProps.products.item?.product;
+      
+        if (
+          products.item.isSuccess &&
+          currItem &&
+          currItem !== prevItem
+        ) {
+          const category = currItem.category;
+          const categoryPath = [
+            category.type1,
+            category.type2,
+            category.type3
+          ].filter(Boolean).join(' > ') || '-';
+      
+          this.setState({
+            product: {
+              id: currItem.id,
+              name: currItem.name,
+              description: currItem.description,
+              price: currItem.price + currItem.variant.reduce((total, curr) => total + curr.price, 0),
+              stock: currItem.stock + currItem.variant.reduce((total, curr) => total + curr.stock, 0),
+              category: categoryPath,
+              condition: currItem.condition,
+              width: currItem.width,
+              height: currItem.height,
+              length: currItem.length,
+              images: currItem.images,
+              variant: currItem.variant,
+              shop: {
+                id: currItem.shop.id,
+                name: currItem.shop.name,
+                address: currItem.shop.address
+              }
+            },
+            quantityEditor: currItem.variant.length !== 0 ? currItem.variant[0].minimumPurchase : 1
+          });
+        }
+      }      
 
     handleFavorite = () => {
         const {favorite} = this.state
@@ -185,7 +207,7 @@ class Product extends Component{
                                     objectPosition: 'center',
                                     border: '1px solid #a5a5a5'
                                 }} 
-                                src={Cld.image(images[indexImage]).toURL()}
+                                src={Cld.image(images.length != 0 ? images[indexImage] : 'product-not-found').toURL()}
                             />
                             <Box
                                 sx={{
@@ -387,8 +409,8 @@ class Product extends Component{
                                         }
                                     </Typography>
                                 </Box>
-                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
-                                <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
+                                <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading}>Tambah Ke Keranjang</Button>
+                                <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading}>Beli Langsung</Button>
                             </Box>
                         </Paper>
                     </Grid>
@@ -491,8 +513,8 @@ class Product extends Component{
                                 }
                             </Typography>
                         </Box>
-                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Tambah Ke Keranjang</Button>
-                        <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading} disabled={variant.length == 0 ? false : selectedVariant1 && selectedVariant2 ? false : true }>Beli Langsung</Button>
+                        <Button variant="contained" sx={{marginBottom: 1, width: '100%'}} onClick={this.handleInsertItemToTrolley} loading={this.props.trolley.isLoading}>Tambah Ke Keranjang</Button>
+                        <Button variant="outlined" sx={{width: '100%'}} loading={this.props.trolley.isLoading}>Beli Langsung</Button>
                     </Box>
             </Box>
         )
@@ -733,7 +755,7 @@ class Product extends Component{
                     {otherItemFromStore.map((product) => (
                         <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
                             <Link href={{
-                                pathname: `/p/${product.name}`,
+                                pathname: `/p/${encodeURIComponent(product.name)}`,
                                 query: {id: product.id}
                                 }}
                                 style={{textDecoration: 'none'}}
@@ -808,7 +830,7 @@ class Product extends Component{
                     {allItem.map((product) => (
                         <Grid key={product.id} size={{xs: 6, sm: 4, md:3, lg: 2}}>
                             <Link href={{
-                                pathname: `/p/${product.name}`,
+                                pathname: `/p/${encodeURIComponent(product.name)}`,
                                 query: {id: product.id}
                                 }}
                                 style={{textDecoration: 'none'}}

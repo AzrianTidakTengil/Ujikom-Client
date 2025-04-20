@@ -22,6 +22,11 @@ export const RegisterUser = createAsyncThunk('authSlice/RegisterUser', async (pa
     return response.data
 })
 
+export const ChangeRoleShop = createAsyncThunk('authSlice/ChangeRoleShop', async (params) => {
+    const response = await Auth.PostChangeRole(params)
+    return response.data
+})
+
 const initialState = {
     isLoading: false,
     error: null,
@@ -47,7 +52,16 @@ export const authSlice = createSlice({
         },
         upProgress: (state) => {
             state.progressIndex = state.progressIndex + 1
-        }
+        },
+        resetProgress: (state) => {
+            state.progressIndex = 0
+        },
+        downProgress: (state) => {
+            state.progressIndex = state.progressIndex - 1
+        },
+        setProgress: (state, action) => {
+            state.progressIndex = action.payload
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -106,9 +120,21 @@ export const authSlice = createSlice({
                 state.isSuccessRegister = true
                 state.progressIndex = 4
             })
+            .addCase(ChangeRoleShop.pending, (state, action) => {
+                state.isLoading = true
+                state.isSuccessRegister = false
+            })
+            .addCase(ChangeRoleShop.rejected, (state, action) => {
+                state.isLoading = false
+            })
+            .addCase(ChangeRoleShop.fulfilled, (state, action) => {
+                state.isLoading = false
+                state.isSuccessRegister = true
+                state.progressIndex = 3
+            })
     }
 })
 
-export const {logout, upProgress} = authSlice.actions
+export const {logout, upProgress, resetProgress, downProgress, setProgress} = authSlice.actions
 
 export default authSlice.reducer

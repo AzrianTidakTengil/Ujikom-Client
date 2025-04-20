@@ -6,6 +6,7 @@ import { connect } from 'react-redux'
 import { Visibility, VisibilityOff, SearchOutlined, Edit, FileDownload } from '@mui/icons-material'
 import { DataGrid } from '@mui/x-data-grid'
 import { DateRangePicker } from '@/components'
+import { BalanceInformation } from '@/store/shop'
 
 class Balance extends Component {
     constructor(props) {
@@ -14,7 +15,9 @@ class Balance extends Component {
             showBalance: false,
             seller: {
                 name: ''
-            }
+            },
+            balance: '',
+            history: [],
         }
         this.theme = createTheme({
             palette: {
@@ -23,20 +26,37 @@ class Balance extends Component {
         })
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {seller, user} = nextProps
+    componentDidMount() {
+        this.props.BalanceInformation();
+    }
 
-        if (seller.isSuccess) {
-            this.setState({
-                seller: {
-                    name: seller.data.name
-                }
-            })
+    componentDidUpdate(prevProps) {
+        const { seller, shop } = this.props;
+      
+        if (
+          seller.isSuccess &&
+          seller !== prevProps.seller
+        ) {
+          this.setState({
+            seller: {
+              name: seller.data.name,
+            },
+          });
         }
+
+        if (shop.isSuccess && shop !== prevProps.shop) {        
+            if (shop.balance) {
+              this.setState({ balance: shop.balance });
+            }
+
+            if (shop.history) {
+                this.setState({ history: shop.history });
+            }
+          }
     }
 
     renderBalance = () => {
-        const { seller, showBalance } = this.state
+        const { seller, showBalance, balance } = this.state
 
         return (
             <Box
@@ -64,7 +84,7 @@ class Balance extends Component {
                             new Intl.NumberFormat('id-ID', {
                                 style: "currency",
                                 currency: "IDR"
-                            }).format(100000) 
+                            }).format(balance) 
                             :
                             `Rp ********`
                         }
@@ -103,6 +123,8 @@ class Balance extends Component {
     }
 
     renderDataGrid = () => {
+        const {history} = this.state
+
         const columns = [
             {
                 field: 'id',
@@ -123,36 +145,20 @@ class Balance extends Component {
                 headerName: 'Banyak Barang',
                 width: 120,
             },
-            {
-                field: 'amount',
-                headerName: 'Total Harga',
-                width: 300,
-            },
         ]
 
-        const rows = [
-            {
-                id: 0,
-                name: 'Handphone',
-                price: 2000,
-                quantity: 100,
-                amount: 200000
-            },
-            {
-                id: 1,
-                name: 'Test 12',
-                price: 10000,
-                quantity: 100,
-                amount: 200000
-            },
-            {
-                id: 2,
-                name: 'asdasd',
-                price: 10000,
-                quantity: 100,
-                amount: 200000
-            },
-        ]
+        const rows = []
+
+        const datas = history.map((transaction) => 
+            transaction.transactionToTrolley.map((trolley) => {
+                rows.push({
+                    id: trolley.product_id,
+                    name: trolley.trolleyToProduct.name,
+                    price: trolley.trolleyToProduct.price,
+                    quantity: trolley.items
+                })
+            })
+        )
         
         return (
             <Box
@@ -243,11 +249,24 @@ const mapStateToProps = (state) => ({
         isSuccess: state.shop.isSuccess,
         data: state.shop.seller,
         error: state.shop.error
-    }
+    },
+    shop: {
+        isLoading: state.shop.isLoading,
+        isSuccess: state.shop.isSuccess,
+        seller: state.shop.seller,
+        balance: state.shop.balanceInformation.balance,
+        history: state.shop.balanceInformation.history,
+        transaction: state.shop.balanceInformation.history,
+        inTrolley: state.shop.LengthProductInTrolley,
+        order: state.shop.order,
+        product: state.shop.product,
+        popularProduct: state.shop.popularProduct,
+        error: state.shop.error
+    },
 })
 
 const mapDispatchToProps = {
-
+    BalanceInformation,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Balance))

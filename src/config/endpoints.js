@@ -6,6 +6,7 @@ export default {
         LOGOUT: '/auth/logout',
         SENDOTP: '/auth/otp',
         VERIFYOTP: '/auth/otp/verify',
+        CHANGETOROLE: '/auth/openshop',
     },
     PRODUCTS: {
         ALL: '/items',
@@ -36,6 +37,7 @@ export default {
         FIND: '/transactions/find',
         CREATE: '/transaction/create',
         DELETE: '/transaction/delete',
+        ISAPPROVE: '/transaction/isapprove',
     },
     LABEL: {
         CREATE: '/label/create',

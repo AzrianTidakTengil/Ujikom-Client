@@ -82,14 +82,15 @@ class SellerLayout extends Component {
     })
   }
 
-  UNSAFE_componentWillMount() {
-    this.props.getUser()
-    this.props.getSeller()
+  componentDidMount() {
+    this.props.getUser();
+    this.props.getSeller();
   }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    const {seller, user} = nextProps
-    if (user.isSuccess) {
+  
+  componentDidUpdate(prevProps) {
+    const { user, seller } = this.props;
+  
+    if (user !== prevProps.user && user.isSuccess) {
       this.setState({
         user: {
           username: user.username,
@@ -99,15 +100,15 @@ class SellerLayout extends Component {
           telephone: user.telephone,
           avatar: user.avatar,
         }
-      })
+      });
     }
-
-    if (seller.isSuccess) {
+  
+    if (seller !== prevProps.seller && seller.isSuccess) {
       this.setState({
         seller: {
           name: seller.data.name
         }
-      })
+      });
     }
   }
 
@@ -129,11 +130,11 @@ class SellerLayout extends Component {
         router: '/seller/order',
         label: 'Pesanan'
       },
-      {
-        icon: <Feedback/>,
-        router: '/seller/feedback',
-        label: 'Feedback'
-      },
+      // {
+      //   icon: <Feedback/>,
+      //   router: '/seller/feedback',
+      //   label: 'Feedback'
+      // },
       {
         icon: <AccountBalanceWallet/>,
         router: '/seller/balance',

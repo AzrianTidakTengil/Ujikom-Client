@@ -20,33 +20,29 @@ class Seller extends Component {
         }
     }
 
-    UNSAFE_componentWillMount() {
-        this.props.BalanceInformation()
-        this.props.MyProductInTrolley()
-        this.props.PopularAnalysisProduct()
+    componentDidMount() {
+        this.props.BalanceInformation();
+        this.props.MyProductInTrolley();
+        this.props.PopularAnalysisProduct();
     }
-
-    UNSAFE_componentWillReceiveProps() {
-        const {router, shop} = this.props
-        
-        if (shop.isSuccess && shop.popularProduct) {
-            this.setState({
-                product: shop.popularProduct
-            })
+      
+    componentDidUpdate(prevProps) {
+        const { shop } = this.props;
+      
+        if (shop.isSuccess && shop !== prevProps.shop) {
+          if (shop.popularProduct) {
+            this.setState({ product: shop.popularProduct });
+          }
+      
+          if (shop.balance) {
+            this.setState({ balance: shop.balance });
+          }
+      
+          if (shop.inTrolley) {
+            this.setState({ lengthInTrolley: shop.inTrolley });
+          }
         }
-
-        if (shop.isSuccess && shop.balance) {
-            this.setState({
-                balance: shop.balance
-            })
-        }
-
-        if (shop.isSuccess && shop.inTrolley) {
-            this.setState({
-                lengthInTrolley: shop.inTrolley
-            })
-        }
-    }
+      }
 
     renderBalance = () => {
         const {showBalance, balance} = this.state
@@ -237,7 +233,7 @@ class Seller extends Component {
                                             {val.name}
                                         </TableCell>
                                         <TableCell>
-                                            {val.productToCategory ? `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name} > ${val.productToCategory.productCategoryToCategory3.name}` : '-'}
+                                            {val.productToCategory ? val.productToCategory.productCategoryToCategory2 ? val.productToCategory.productCategoryToCategory3 ? `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name} > ${val.productToCategory.productCategoryToCategory3.name}` : `${val.productToCategory.productCategoryToCategory1.name} > ${val.productToCategory.productCategoryToCategory2.name}` : `${val.productToCategory.productCategoryToCategory1.name}` : '-'}
                                         </TableCell>
                                         <TableCell>
                                             <Button variant="contained" color="primary" onClick={() => alert(`Visiting products in Tier ${val.name}`)} size="small">

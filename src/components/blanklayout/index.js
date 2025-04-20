@@ -1,4 +1,4 @@
-import Navbar from "../nabar";
+import Navbar from "../nav";
 import Footer from "../footer";
 import Link from "next/link";
 import { AppBar, Toolbar, Typography, Box } from "@mui/material";

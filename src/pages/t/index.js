@@ -39,11 +39,16 @@ class ItemsTransaction extends Component {
             this.props.getTransaction({ id: idPath[1] });
         }
     }
-
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {transaction} = this.props
-
-        if (transaction.isSuccess) {
+    
+    componentDidUpdate(prevProps) {
+        const { transaction } = this.props;
+    
+        // Only update if transaction has changed
+        if (
+            transaction !== prevProps.transaction &&
+            transaction?.isSuccess &&
+            transaction?.data?.transaction
+        ) {
             this.setState({
                 payment: {
                     id: transaction.data.transaction.id,
@@ -54,9 +59,9 @@ class ItemsTransaction extends Component {
                     status: transaction.data.transaction.transactionToPayment.status,
                     amount: transaction.data.transaction.total_price
                 }
-            })
+            });
         }
-    }
+    }    
 
     renderPayment = () => {
         const {id, code, method, type, order, status, amount} = this.state.payment

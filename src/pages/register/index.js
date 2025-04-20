@@ -11,7 +11,7 @@ import { Playfair_Display, Poppins } from "next/font/google";
 import { LoginGoogle } from "@/services/auth";
 import { connect } from "react-redux";
 import { withRouter } from "next/router";
-import { RegisterUser, SendCodeOtp, upProgress, VerifyCodeOtp } from "@/store/auth";
+import { downProgress, RegisterUser, resetProgress, SendCodeOtp, setProgress, upProgress, VerifyCodeOtp } from "@/store/auth";
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
@@ -40,18 +40,27 @@ class Register extends React.Component{
         })
     }
 
-    UNSAFE_componentWillReceiveProps(nextProps) {
-        const {auth} = nextProps
+    componentDidUpdate(prevProps) {
+        const { auth, router } = this.props;
+      
+        if (auth.error && auth.error !== prevProps.auth.error) {
+          this.setState((prevState) => ({
+            errorMessage: {
+              ...prevState.errorMessage,
+              ...auth.error,
+            },
+          }));
+        }
 
-        if (auth.error) {
-            this.setState({
-                errorMessage: {
-                    ...this.state.errorMessage,
-                    ...auth.error
-                }
-            })
+        if (router.query) {
+            if (router.query.success && router.query.success === 'true') {
+                this.props.setProgress(4)
+            } else {
+                this.props.resetProgress()
+            }
         }
     }
+      
 
     handleNextBox = () => {
         const {boxIndex} = this.state
@@ -62,11 +71,7 @@ class Register extends React.Component{
     }
 
     handleBackBox = () => {
-        const {boxIndex} = this.state
-
-        this.setState({
-            boxIndex: boxIndex-1 < 0 ? 0 : boxIndex-1
-        })
+        this.props.downProgress()
     }
 
     renderInputEmailOrTelp = () => {
@@ -169,7 +174,7 @@ class Register extends React.Component{
                             <ArrowBackIosNew/>
                         </IconButton>
                     </Grid2>
-                    <Grid2 size={6} display={'flex'} alignItems={'center'}>
+                    <Grid2 size={6} display={'flex'} justifyContent={'center'}>
                         <Typography variant="h5" textAlign={'center'} fontWeight={600}>Kode Verifikasi</Typography>
                     </Grid2>
                     <Grid2 size={3}>
@@ -245,6 +250,7 @@ class Register extends React.Component{
                             sx={{
                                 marginY: 2
                             }}
+                            required
                             error={errorMessage && errorMessage.username ? errorMessage.username : undefined}
                         />
                         <Button variant="contained" color="success" fullWidth type="submit" sx={{marginY: 4}}>Selanjutnya</Button>
@@ -305,7 +311,19 @@ class Register extends React.Component{
         const {firstname, lastname, gender} = this.state.form
         return (
             <>
-                <Typography variant="h5" textAlign={'center'} fontWeight={600} sx={{marginY: 2}}>Lengkapi Data Diri</Typography>
+                <Grid2 container spacing={2}>
+                    <Grid2 size={3}>
+                        <IconButton onClick={() => this.handleBackBox()}>
+                            <ArrowBackIosNew/>
+                        </IconButton>
+                    </Grid2>
+                    <Grid2 size={6} display={'flex'} justifyContent={'center'}>
+                        <Typography variant="h5" textAlign={'center'} fontWeight={600}>Lengkapi Data Diri</Typography>
+                    </Grid2>
+                    <Grid2 size={3}>
+
+                    </Grid2>
+                </Grid2>
                 <Box
                     sx={{
                         marginY: 2,
@@ -415,7 +433,7 @@ class Register extends React.Component{
                         spacing={2}
                     >
                         <Button variant="contained" color="success" href="/">Login</Button>
-                        <Button variant="outlined" href="/register/shop">Buka Toko</Button>
+                        {/* <Button variant="outlined" href="/register/shop">Buka Toko</Button> */}
                     </Stack>
                 </div>
             </>
@@ -487,6 +505,9 @@ const mapDispatchToProps = {
     VerifyCodeOtp,
     upProgress,
     RegisterUser,
+    resetProgress,
+    setProgress,
+    downProgress,
 }
 
 export default connect(mapStateToProps, mapDispatchToProps) (withRouter(Register))

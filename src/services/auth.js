@@ -33,3 +33,10 @@ export const test = () => {
         endpoints.TEST
    )
 }
+
+export const PostChangeRole = (params) => {
+    return apiServiceV1.post(
+        endpoints.AUTH.CHANGETOROLE,
+        params
+    )
+}

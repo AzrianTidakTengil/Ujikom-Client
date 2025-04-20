@@ -4,7 +4,7 @@ import { Box, Button, createTheme, Divider, IconButton, Modal, ThemeProvider, Ba
 import { buttonPrimary, container, input, mainItem } from "./theme";
 import { useState, Component } from "react";
 import styles from './style.module.css'
-import { Close } from "@mui/icons-material";
+import { Close, Google } from "@mui/icons-material";
 import { Input, InputEmail, InputPassword } from "../input";
 import { Poppins } from "next/font/google";
 import { palleteV1 } from "@/assets/css/template";
@@ -65,6 +65,18 @@ class Auth extends Component {
     }
   }
 
+  renderCustomBackDrop = (props) => {
+    return (
+      <Backdrop
+        {...props}
+        sx={(theme) => ({ color: '#fff', zIndex: this.props.isLoading ? theme.zIndex.appBar + 1000 + theme.zIndex.modal : -1 })}
+        open={true}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    )
+  }
+
   render() {
     const {open} = this.state
     
@@ -72,13 +84,17 @@ class Auth extends Component {
       <ThemeProvider theme={theme}>
         <Button variant="outlined" onClick={this.handleModal} color="white" sx={{marginRight: 1}}>Login</Button>
         <Modal 
-        open={open} 
+        open={open}
         sx={container}
         onClose={this.handleModal}
         keepMounted
+        BackdropComponent={this.renderCustomBackDrop}
         >
           <Box
-            sx={mainItem}
+            sx={{
+              ...mainItem,
+              zIndex: theme.zIndex.modal
+            }}
           >
               <div className={styles.head}>
                   <h2>Login</h2>
@@ -86,25 +102,38 @@ class Auth extends Component {
                     <Close/>
                   </IconButton>
               </div>
+            <Box
+              sx={{
+                paddingX: 2,
+              }}
+            >
               <form className={styles.body} onSubmit={this.handleSubmit}>
-                <InputEmail name="email" type="text" label="Email" style={input} onBlur={(event) => this.handleInput(event)}/>
-                <InputPassword name="password" type="password" label="Password" style={input} onBlur={(event) => this.handleInput(event)}/>
+                <InputEmail name="email" type="text" label="Email" fullWidth={true} onBlur={(event) => this.handleInput(event)}/>
+                <InputPassword name="password" type="password" label="Password" fullWidth onBlur={(event) => this.handleInput(event)}/>
                 <p>Forgot Password</p>
-                <Button variant="contained" color="success" sx={{width: '85%', marginTop: 6}} type="submit">
+                <Button variant="contained" color="success" fullWidth sx={{marginY: 4}} type="submit">
                     Submit
                 </Button>
               </form>
+              <Divider/>
+              <Button
+                startIcon={<Google/>}
+                variant="contained"
+                fullWidth
+                sx={{
+                  textTransform: 'capitalize',
+                  marginY: 4,
+                }}
+                href="http://localhost:3001/api/auth/google"
+              >
+                Google
+              </Button>
+            </Box>
               <div className={styles.footer}>
                     <p>Tidak memiliki Akun? <Link href="/register">Daftar sekarang</Link></p>
               </div>
           </Box>
         </Modal>
-        <Backdrop
-          sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.appBar + 1000 })}
-          open={this.props.isLoading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
       </ThemeProvider>
     )
   }
