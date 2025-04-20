@@ -152,6 +152,7 @@ class SellerProductAdd extends Component {
                                 sx={{
                                     marginY: 1
                                 }}
+                                required
                             />
                             <Box
                                 position="absolute"
@@ -185,6 +186,7 @@ class SellerProductAdd extends Component {
                                             type: 'search',
                                         },
                                     }}
+                                    required
                                 />
                             )}
                         />
@@ -233,6 +235,7 @@ class SellerProductAdd extends Component {
                                 sx={{
                                     marginY: 1
                                 }}
+                                required
                             />
                             <Box
                                 position="absolute"
@@ -337,6 +340,7 @@ class SellerProductAdd extends Component {
                                             }
                                         })
                                     }}
+                                    required
                                 />
                             </Grid>
                             <Grid size={3}>
@@ -349,6 +353,7 @@ class SellerProductAdd extends Component {
                                     customInput={TextField}
                                     fullWidth
                                     onChange={this.handleChangeNoVariant}
+                                    required
                                 />
                             </Grid>
                             <Grid size={3}>
@@ -361,6 +366,7 @@ class SellerProductAdd extends Component {
                                     customInput={TextField}
                                     fullWidth
                                     onChange={this.handleChangeNoVariant}
+                                    required
                                 />
                             </Grid>
                             <Grid size={3}>
@@ -378,6 +384,7 @@ class SellerProductAdd extends Component {
                                         },
                                     }}
                                     onChange={this.handleChangeNoVariant}
+                                    required
                                 />
                             </Grid>
                         </Grid>
@@ -538,6 +545,7 @@ class SellerProductAdd extends Component {
                                     endAdornment: <InputAdornment position="end">cm</InputAdornment>,
                                 },
                             }}
+                            required
                         />
                     </Grid>
                     <Grid size={4}>
@@ -556,6 +564,7 @@ class SellerProductAdd extends Component {
                                     endAdornment: <InputAdornment position="end">cm</InputAdornment>,
                                 },
                             }}
+                            required
                         />
                     </Grid>
                     <Grid size={4}>
@@ -574,6 +583,7 @@ class SellerProductAdd extends Component {
                                     endAdornment: <InputAdornment position="end">cm</InputAdornment>,
                                 },
                             }}
+                            required
                         />
                     </Grid>
                 </Grid>
