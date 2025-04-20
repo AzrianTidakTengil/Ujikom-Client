@@ -485,7 +485,7 @@ class RegisterOpenShop extends Component {
                     <Grid2 container>
                         <Grid2 size={6} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                             <Box>
-                                <Typography textAlign={'center'} variant="h3" className={playfair.className}>Popping E-Commerce</Typography>
+                                <Typography textAlign={'center'} variant="h3" className={playfair.className}>Popping Marketplace</Typography>
                                 <Typography textAlign={'center'} variant="body1" marginY={2} className={playfair.className}>Tempat berbelanja secara daring</Typography>
                             </Box>
                         </Grid2>
