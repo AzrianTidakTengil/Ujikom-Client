@@ -513,51 +513,6 @@ class Register extends React.Component {
     });
   };
 
-<<<<<<< Updated upstream
-        return(
-            <ThemeProvider theme={this.theme}>
-                <Container sx={{paddingY: 8}}>
-                    <Grid2 container>
-                        <Grid2 size={6} sx={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                            <Box>
-                                <Typography textAlign={'center'} variant="h3" className={playfair.className}>Popping Marketplace</Typography>
-                                <Typography textAlign={'center'} variant="body1" marginY={2} className={playfair.className}>Tempat berbelanja secara daring</Typography>
-                            </Box>
-                        </Grid2>
-                        <Grid2 size={6} sx={{paddingX: 8}}>
-                            <Paper
-                                sx={{
-                                    p: 2,
-                                    position: 'relative'
-                                }}
-                            >
-                                <Backdrop
-                                    open={this.props.auth.isLoading}
-                                    sx={{
-                                        position: 'absolute',
-                                        top: 0,
-                                        left: 0,
-                                        zIndex: this.theme.zIndex.modal + 1,
-                                        backgroundColor: 'rgba(236, 236, 236, 0.3)'
-                                    }}
-                                >
-                                    <CircularProgress color="white"/>
-                                </Backdrop>
-                                {
-                                    progressIndex === 0 ? this.renderInputEmailOrTelp() :
-                                    progressIndex === 1 ? this.renderCodeOTP() :
-                                    progressIndex === 2 ? this.renderInformation() :
-                                    progressIndex === 3 ? this.renderMoreInformation() :
-                                    this.renderSuccess()
-                                }
-                            </Paper>
-                        </Grid2>
-                    </Grid2>
-                </Container>
-            </ThemeProvider>
-        )
-    }
-=======
   handleSubmitMoreInformation = (e) => {
     e.preventDefault();
     const { errorMessage, form } = this.state;
@@ -693,7 +648,6 @@ class Register extends React.Component {
       </ThemeProvider>
     );
   }
->>>>>>> Stashed changes
 }
 
 const mapStateToProps = (state) => ({
