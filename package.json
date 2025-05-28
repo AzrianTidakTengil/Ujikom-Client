@@ -19,8 +19,7 @@
     "@mui/x-date-pickers": "^7.27.1",
     "@react-native-async-storage/async-storage": "^2.1.1",
     "@reduxjs/toolkit": "^2.5.1",
-    "@tailwindcss/postcss": "^4.0.3",
-    "@tailwindcss/vite": "^4.0.1",
+    "@tailwindcss/postcss": "^4.1.7",
     "axios": "^1.7.9",
     "cropperjs": "^2.0.0",
     "crypto-js": "^4.2.0",
@@ -50,13 +49,14 @@
     "redux-thunk": "^3.1.0",
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.15.10",
-    "sweetalert2-react-content": "^5.1.0"
+    "sweetalert2-react-content": "^5.1.0",
+    "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "autoprefixer": "^10.4.20",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
-    "postcss": "^8.5.1"
+    "postcss": "^8.5.3"
   }
 }
