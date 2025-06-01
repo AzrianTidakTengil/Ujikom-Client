@@ -479,7 +479,7 @@ class Register extends React.Component {
   };
 
   renderMoreInformation = () => {
-    const { firstname, lastname, gender } = this.state.form;
+    const { errorMessage } = this.state;
     return (
       <div className="flex flex-col items-center">
         <div className="relative w-full my-4 md:text-3xl text-2xl">
@@ -504,6 +504,16 @@ class Register extends React.Component {
                 marginY: 2,
               }}
               onBlur={(event) => this.handleInputMoreInformation(event)}
+              error={
+                errorMessage && errorMessage.firstname
+                  ? errorMessage.firstname
+                  : undefined
+              }
+              helperText={
+                errorMessage && errorMessage.firstname
+                  ? errorMessage.firstname
+                  : ""
+              }
             />
             <InputText
               name="lastname"
@@ -514,6 +524,16 @@ class Register extends React.Component {
                 marginY: 2,
               }}
               onBlur={(event) => this.handleInputMoreInformation(event)}
+                            error={
+                errorMessage && errorMessage.lastname
+                  ? errorMessage.lastname
+                  : undefined
+              }
+              helperText={
+                errorMessage && errorMessage.lastname
+                  ? errorMessage.lastname
+                  : ""
+              }
             />
             <InputGender
               fullWidth
@@ -546,27 +566,33 @@ class Register extends React.Component {
     const { name, value } = event.target;
 
     if (name === "firstname") {
-      if (value.length < 3) {
-        console.log("error");
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-        });
-      }
+      this.handleDetectorError({
+        value,
+        name,
+        minLength: 3,
+        maxLength: 50,
+        required: true,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     } else if (name === "lastname") {
-      if (value.length < 3) {
-        console.log("error");
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-        });
-      }
+      this.handleDetectorError({
+        value,
+        name,
+        minLength: 3,
+        maxLength: 100,
+        required: true,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     }
   };
 
@@ -583,22 +609,42 @@ class Register extends React.Component {
     e.preventDefault();
     const { errorMessage, form } = this.state;
 
-    const params = {
-      role: "user",
-      email: form.credential,
-      username: form.username,
-      firstname: form.firstname || form.username,
-      lastname: form.lastname,
-      password: form.password,
-      gender:
-        form.gender == "1"
-          ? "Perempuan"
-          : form.gender == "2"
-          ? "Laki laki"
-          : "Tidak tau",
-    };
+    this.handleDetectorError({
+      value: form.firstname || form.username,
+      name: "firstname",
+      minLength: 3,
+      maxLength: 50,
+      required: true,
+    });
 
-    this.props.RegisterUser(params);
+    this.handleDetectorError({
+      value: form.lastname,
+      name: "lastname",
+      minLength: 3,
+      maxLength: 100,
+      required: true,
+    });
+
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
+
+    if (hasNoErrors) {
+      const params = {
+        role: "user",
+        email: form.credential,
+        username: form.username,
+        firstname: form.firstname || form.username,
+        lastname: form.lastname,
+        password: form.password,
+        gender:
+          form.gender == "1"
+            ? "Perempuan"
+            : form.gender == "2"
+            ? "Laki laki"
+            : "Tidak tau",
+      };
+
+      this.props.RegisterUser(params);
+    }
   };
 
   renderSuccess = () => {
