@@ -271,7 +271,7 @@ class Register extends React.Component {
       name: "credential",
     });
 
-    const hasNoErrors = Object.values(errorMessage).every((v) => v !== null);
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
 
     if (hasNoErrors) {
       this.props.upProgress();
@@ -438,8 +438,8 @@ class Register extends React.Component {
       this.handleDetectorError({
         value,
         required: true,
-        minLength: 8,
-        maxLength: 8,
+        minLength: 9,
+        maxLength: 9,
         name,
       });
       this.setState({
@@ -471,7 +471,7 @@ class Register extends React.Component {
       name: "password",
     });
 
-    const hasNoErrors = Object.values(errorMessage).every((v) => v !== null);
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
 
     if (hasNoErrors) {
       this.props.upProgress();
