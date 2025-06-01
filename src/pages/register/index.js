@@ -115,7 +115,7 @@ class Register extends React.Component {
 
     return (
       <div className="flex flex-col items-center">
-        <h5 className="text-center font-medium my-4 text-4xl">
+        <h5 className="text-center font-medium my-4 md:text-3xl text-2xl">
           Daftar Alamat Email
         </h5>
         <div className="px-2 w-11/12">
@@ -163,13 +163,13 @@ class Register extends React.Component {
             </Button>
             {/* Add Button */}
           </div>
-          <p className="text-sm">
+          <p className="text-sm md:text-md text-center">
             Dengan mendaftar, anda dinyatakan menyetujui{" "}
             <b>Syarat dan Ketentuan</b> serta <b>Kebijakan Privasi Popping</b>
           </p>
         </div>
         <div className="mt-6 p-2 flex items-center justify-center flex-col">
-          <p className="text-md">
+          <p className="text-md text-center">
             Sudah Memiliki Akun?{" "}
             <Link href="/" className="font-bold">
               Login sekarang
@@ -284,8 +284,8 @@ class Register extends React.Component {
 
     return (
       <div className="flex flex-col items-center">
-        <div className="relative w-full my-4 lg:text-4xl md:text-3xl text-xl">
-          <div className="absolute left-0">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          <div className="absolute left-0 max-[321px]:hidden">
             <IconButton onClick={() => this.handleBackBox()}>
               <ArrowBackIosNew />
             </IconButton>
@@ -294,7 +294,7 @@ class Register extends React.Component {
         </div>
         <div className="px-2 w-full">
           <form onSubmit={this.handleSubmitOTP} className="flex flex-col">
-            <p className="text-md text-center">
+            <p className="text-sm md:text-md text-center">
               Kode telah dikirimkan ke email{" "}
               <b>{`${this.state.form.credential}`}</b>. Silahkan cek email
               tersebut
