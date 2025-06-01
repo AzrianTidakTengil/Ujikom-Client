@@ -188,7 +188,7 @@ class Register extends React.Component {
       minLength: 3,
       maxLength: 255,
       value,
-      name: "crendetial",
+      name: "credential",
     });
     this.setState({
       form: {
@@ -271,7 +271,7 @@ class Register extends React.Component {
       name: "credential",
     });
 
-    const hasNoErrors = Object.values(this.state.errorMessage).every((v) => v !== null);
+    const hasNoErrors = Object.values(errorMessage).every((v) => v !== null);
 
     if (hasNoErrors) {
       alert("next")
