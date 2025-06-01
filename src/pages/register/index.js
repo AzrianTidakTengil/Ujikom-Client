@@ -274,8 +274,7 @@ class Register extends React.Component {
     const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
 
     if (hasNoErrors) {
-      this.props.upProgress();
-      // this.props.SendCodeOtp({ email: form.credential });
+      this.props.SendCodeOtp({ email: form.credential });
     }
   };
 
@@ -341,8 +340,7 @@ class Register extends React.Component {
     e.preventDefault();
     const { otp } = this.state;
 
-    this.props.upProgress();
-    // this.props.VerifyCodeOtp({ code: otp });
+    this.props.VerifyCodeOtp({ code: otp });
   };
 
   renderInformation = () => {
@@ -643,8 +641,7 @@ class Register extends React.Component {
             : "Tidak tau",
       };
 
-      // this.props.RegisterUser(params);
-      this.props.upProgress()
+      this.props.RegisterUser(params);
     }
   };
 
