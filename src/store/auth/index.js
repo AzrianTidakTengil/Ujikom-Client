@@ -86,9 +86,6 @@ export const authSlice = createSlice({
             })
             .addCase(SendCodeOtp.rejected, (state, action) => {
                 state.isLoading = false
-                state.error = {
-                    credential: `Email has been registered`
-                }
             })
             .addCase(SendCodeOtp.fulfilled, (state, action) => {
                 state.isLoading = false
