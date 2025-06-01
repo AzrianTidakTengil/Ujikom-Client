@@ -283,93 +283,46 @@ class Register extends React.Component {
     const { otp } = this.state;
 
     return (
-      <>
-        {/* <Grid2 container spacing={2}>
-          <Grid2 size={3}>
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 lg:text-4xl md:text-3xl text-xl">
+          <div className="absolute left-0">
             <IconButton onClick={() => this.handleBackBox()}>
               <ArrowBackIosNew />
             </IconButton>
-          </Grid2>
-          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
-            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
-              Kode Verifikasi
-            </Typography>
-          </Grid2>
-          <Grid2 size={3}></Grid2>
-        </Grid2>
-        <div className={styles.Box_main}>
-          <p>
-            Kode telah dikirimkan ke email {`${this.state.form.credential}`}.
-            Silahkan cek email tersebut
-          </p>
-          <form onSubmit={this.handleSubmitOTP} className={styles.Box_main}>
-            <InputOTP
-              value={otp}
-              name="otp"
-              onChange={(event) => this.handleOTPinput(event)}
-              style={{
-                marginBottom: 50,
-              }}
-            />
-            <Button
-              variant="contained"
-              color="success"
-              sx={{ width: "85%" }}
-              type="submit"
-              loading={this.props.auth.isLoading}
-            >
-              Selanjutnya
-            </Button>
-          </form>
-        </div>
-        <div className={styles.Box_footer}>
-          <p>Tidak mendapat token? Klik disini</p>
-        </div> */}
-        <div className="flex flex-col items-center">
-          <div className="relative w-full my-4 lg:text-4xl md:text-3xl text-xl">
-            <div className="absolute left-0">
-              <IconButton onClick={() => this.handleBackBox()}>
-                <ArrowBackIosNew />
-              </IconButton>
-            </div>
-            <h5 className="text-center font-medium ">
-              Kode Verifikasi
-            </h5>
           </div>
-          <div className="px-2 w-full">
-            <form onSubmit={this.handleSubmitOTP} className="flex flex-col">
-              <p className="text-md text-center">
-                Kode telah dikirimkan ke email{" "}
-                <b>{`${this.state.form.credential}`}</b>. Silahkan cek email
-                tersebut
-              </p>
-              <div className="self-center">
-                <InputOTP
+          <h5 className="text-center font-medium ">Kode Verifikasi</h5>
+        </div>
+        <div className="px-2 w-full">
+          <form onSubmit={this.handleSubmitOTP} className="flex flex-col">
+            <p className="text-md text-center">
+              Kode telah dikirimkan ke email{" "}
+              <b>{`${this.state.form.credential}`}</b>. Silahkan cek email
+              tersebut
+            </p>
+            <div className="self-center">
+              <InputOTP
                 value={otp}
                 name="otp"
                 onChange={(event) => this.handleOTPinput(event)}
               />
-              </div>
-              <div className="my-4">
-                <Button
-                  variant="contained"
-                  color="success"
-                  type="submit"
-                  fullWidth
-                  loading={this.props.auth.isLoading}
-                >
-                  Selanjutnya
-                </Button>
-              </div>
-            </form>
-          </div>
-          <div className="mt-4 p-2 flex items-center justify-center flex-col">
-            <p className="text-md">
-              Tidak mendapat token? Klik disini
-            </p>
-          </div>
+            </div>
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                type="submit"
+                fullWidth
+                loading={this.props.auth.isLoading}
+              >
+                Selanjutnya
+              </Button>
+            </div>
+          </form>
         </div>
-      </>
+        <div className="mt-4 p-2 flex items-center justify-center flex-col">
+          <p className="text-md">Tidak mendapat token? Klik disini</p>
+        </div>
+      </div>
     );
   };
 
