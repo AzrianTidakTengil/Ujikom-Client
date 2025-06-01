@@ -114,28 +114,12 @@ class Register extends React.Component {
     const { credential, errorMessage } = this.state;
 
     return (
-      <Box
-        sx={{
-          px: 2,
-        }}
-      >
-        <Typography
-          variant="h5"
-          textAlign={"center"}
-          fontWeight={600}
-          marginY={2}
-        >
+      <div className="flex flex-col items-center">
+        <h5 className="text-center font-medium my-4 text-4xl">
           Daftar Alamat Email
-        </Typography>
-        <Box
-          sx={{
-            paddingX: 2,
-          }}
-        >
-          <form
-            onSubmit={this.handleSubmitCredential}
-            className={styles.Box_main}
-          >
+        </h5>
+        <div className="px-2 w-11/12">
+          <form onSubmit={this.handleSubmitCredential}>
             <InputText
               name="credential"
               label="Email *"
@@ -153,68 +137,473 @@ class Register extends React.Component {
               }
               fullWidth={true}
             />
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                type="submit"
+              >
+                Selanjutnya
+              </Button>
+            </div>
+          </form>
+          <hr className="my-2 bg-gray-400" />
+          <div className="my-4 flex flex-col space-y-2">
+            <Button
+              variant="contained"
+              startIcon={<Google />}
+              fullWidth
+              sx={{
+                textTransform: "capitalize",
+              }}
+              href="http://localhost:3001/api/auth/google"
+            >
+              Google
+            </Button>
+            {/* Add Button */}
+          </div>
+          <p className="text-sm">
+            Dengan mendaftar, anda dinyatakan menyetujui{" "}
+            <b>Syarat dan Ketentuan</b> serta <b>Kebijakan Privasi Popping</b>
+          </p>
+        </div>
+        <div className="mt-6 p-2 flex items-center justify-center flex-col">
+          <p className="text-md">
+            Sudah Memiliki Akun?{" "}
+            <Link href="/" className="font-bold">
+              Login sekarang
+            </Link>
+          </p>
+        </div>
+      </div>
+    );
+  };
+
+  handleInputCredential = (event) => {
+    const { name, value } = event.target;
+    this.handleDetectorError({
+      type: "email",
+      required: true,
+      minLength: 3,
+      maxLength: 255,
+      value,
+      name: "crendetial",
+    });
+    this.setState({
+      form: {
+        ...this.state.form,
+        credential: value,
+      },
+    });
+  };
+
+  handleDetectorError = ({
+    type,
+    value,
+    required = true,
+    minLength = 1,
+    maxLength = 255,
+    name,
+  }) => {
+    const trimmedValue = value?.toString().trim() || "";
+    let error = "";
+
+    // Required check
+    if (required && trimmedValue.length === 0) {
+      error = `${name} is required`;
+    }
+    // Whitespace-only check
+    else if (/^\s+$/.test(value)) {
+      error = `${name} cannot be only whitespace`;
+    }
+    // Length check
+    else if (trimmedValue.length < minLength) {
+      error = `Minimum length is ${minLength} characters`;
+    } else if (trimmedValue.length > maxLength) {
+      error = `Maximum length is ${maxLength} characters`;
+    }
+    // Dangerous content check
+    else {
+      const dangerousPatterns = [
+        /</g,
+        />/g,
+        /<script.*?>.*?<\/script>/gi,
+        /--/,
+        /;/g,
+        /\b(DROP|SELECT|INSERT|DELETE)\b/gi,
+      ];
+      if (dangerousPatterns.some((pattern) => pattern.test(trimmedValue))) {
+        error = `Input contains potentially dangerous characters`;
+      }
+      // Type-specific validation
+      else if (type === "email") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedValue)) {
+          error = `Invalid email format`;
+        }
+      } else if (type === "number") {
+        if (isNaN(Number(trimmedValue))) {
+          error = `Input must be a valid number`;
+        }
+      }
+    }
+
+    // Set or clear error
+    this.setState((prevState) => ({
+      errorMessage: {
+        ...prevState.errorMessage,
+        [name]: error,
+      },
+    }));
+  };
+
+  handleSubmitCredential = (e) => {
+    e.preventDefault();
+    const { errorMessage, form } = this.state;
+
+    this.handleDetectorError({
+      type: "email",
+      value: form.credential,
+      required: true,
+      minLength: 3,
+      maxLength: 255,
+      name: "credential",
+    });
+
+    const hasNoErrors = Object.values(this.state.errorMessage).every((v) => v !== null);
+
+    if (hasNoErrors) {
+      alert("next")
+      // this.props.SendCodeOtp({ email: form.credential });
+    }
+  };
+
+  renderCodeOTP = () => {
+    const { otp } = this.state;
+
+    return (
+      <>
+        <Grid2 container spacing={2}>
+          <Grid2 size={3}>
+            <IconButton onClick={() => this.handleBackBox()}>
+              <ArrowBackIosNew />
+            </IconButton>
+          </Grid2>
+          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
+            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
+              Kode Verifikasi
+            </Typography>
+          </Grid2>
+          <Grid2 size={3}></Grid2>
+        </Grid2>
+        <div className={styles.Box_main}>
+          <p>
+            Kode telah dikirimkan ke email {`${this.state.form.credential}`}.
+            Silahkan cek email tersebut
+          </p>
+          <form onSubmit={this.handleSubmitOTP} className={styles.Box_main}>
+            <InputOTP
+              value={otp}
+              name="otp"
+              onChange={(event) => this.handleOTPinput(event)}
+              style={{
+                marginBottom: 50,
+              }}
+            />
+            <Button
+              variant="contained"
+              color="success"
+              sx={{ width: "85%" }}
+              type="submit"
+              loading={this.props.auth.isLoading}
+            >
+              Selanjutnya
+            </Button>
+          </form>
+        </div>
+        <div className={styles.Box_footer}>
+          <p>Tidak mendapat token? Klik disini</p>
+        </div>
+      </>
+    );
+  };
+
+  handleOTPinput = (event) => {
+    const { name, value } = event.target;
+    const { otp } = this.state;
+
+    if (!value.match("\\D", "g")) {
+      this.setState({
+        otp: value,
+      });
+    }
+  };
+
+  handleSubmitOTP = (e) => {
+    e.preventDefault();
+    const { otp } = this.state;
+
+    this.props.VerifyCodeOtp({ code: otp });
+  };
+
+  renderInformation = () => {
+    const { errorMessage } = this.state;
+
+    return (
+      <>
+        <Typography
+          variant="h5"
+          textAlign={"center"}
+          fontWeight={600}
+          sx={{ marginY: 2 }}
+        >
+          Informasi Penting
+        </Typography>
+        <Box
+          sx={{
+            paddingX: 2,
+          }}
+        >
+          <form
+            onSubmit={this.handleSubmitInformation}
+            className={styles.Box_main}
+          >
+            <InputText
+              name="username"
+              label="Username *"
+              fullWidth
+              onBlur={(event) => this.handleInputInformation(event)}
+              sx={{
+                marginY: 2,
+              }}
+              error={
+                errorMessage && errorMessage.username
+                  ? errorMessage.username
+                  : undefined
+              }
+            />
+            <InputPassword
+              name="password"
+              label="Password *"
+              onBlur={(event) => this.handleInputInformation(event)}
+              fullWidth
+              sx={{
+                marginY: 2,
+              }}
+              required
+              error={
+                errorMessage && errorMessage.username
+                  ? errorMessage.username
+                  : undefined
+              }
+            />
             <Button
               variant="contained"
               color="success"
               fullWidth
               type="submit"
-              sx={{ marginTop: 2 }}
+              sx={{ marginY: 4 }}
             >
               Selanjutnya
             </Button>
           </form>
         </Box>
-        <Divider />
+        <div className={styles.Box_footer}></div>
+      </>
+    );
+  };
+
+  handleInputInformation = (event) => {
+    const { name, value } = event.target;
+    if (name === "username") {
+      if (value.length < 3) {
+        this.setState({
+          errorMessage: {
+            [name]: `Username must have more 3 character`,
+          },
+        });
+      } else {
+        this.setState({
+          form: {
+            ...this.state.form,
+            [name]: value,
+          },
+          errorMessage: null,
+        });
+      }
+    }
+    if (name === "password") {
+      if (value.length < 8) {
+        this.setState({
+          errorMessage: {
+            [name]: `Username must have more 3 character`,
+          },
+        });
+      } else {
+        this.setState({
+          form: {
+            ...this.state.form,
+            [name]: value,
+          },
+          errorMessage: null,
+        });
+      }
+    }
+  };
+
+  handleSubmitInformation = (e) => {
+    e.preventDefault();
+    const { errorMessage, form } = this.state;
+
+    this.props.upProgress();
+  };
+
+  renderMoreInformation = () => {
+    const { firstname, lastname, gender } = this.state.form;
+    return (
+      <>
+        <Grid2 container spacing={2}>
+          <Grid2 size={3}>
+            <IconButton onClick={() => this.handleBackBox()}>
+              <ArrowBackIosNew />
+            </IconButton>
+          </Grid2>
+          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
+            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
+              Lengkapi Data Diri
+            </Typography>
+          </Grid2>
+          <Grid2 size={3}></Grid2>
+        </Grid2>
         <Box
           sx={{
             marginY: 2,
             paddingX: 2,
           }}
         >
-          <Button
-            variant="contained"
-            startIcon={<Google />}
-            fullWidth
-            sx={{
-              textTransform: "capitalize",
-            }}
-            href="http://localhost:3001/api/auth/google"
+          <form
+            onSubmit={this.handleSubmitMoreInformation}
+            className={styles.Box_main}
           >
-            Google
-          </Button>
+            <InputText
+              name="firstname"
+              label="Nama depan *"
+              fullWidth
+              sx={{
+                marginY: 2,
+              }}
+              onBlur={(event) => this.handleInputMoreInformation(event)}
+            />
+            <InputText
+              name="lastname"
+              label="Nama akhir *"
+              fullWidth
+              sx={{
+                marginY: 2,
+              }}
+              onBlur={(event) => this.handleInputMoreInformation(event)}
+            />
+            <InputGender
+              fullWidth
+              sx={{
+                marginY: 2,
+              }}
+              change={(event) => this.handleChangeRadioGender(event)}
+            />
+            <Button
+              variant="contained"
+              color="success"
+              fullWidth
+              type="submit"
+              sx={{ marginY: 4 }}
+            >
+              Kirim
+            </Button>
+          </form>
         </Box>
-        <Typography sx={{ fontSize: "0.75rem" }} textAlign={"center"}>
-          Dengan mendaftar, anda dinyatakan menyetujui{" "}
-          <b>Syarat dan Ketentuan</b> serta <b>Kebijakan Privasi Popping</b>
-        </Typography>
-        <div className={styles.Box_footer}>
-          <p>
-            Sudah Memiliki Akun? <Link href="/">Login sekarang</Link>{" "}
-          </p>
+        <div className={styles.Box_footer} style={{ marginTop: "0.5rem" }}>
+          {/* <p style={{color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Lewati isi data tersebut</p> */}
         </div>
-      </Box>
+      </>
     );
   };
 
-  handleInputCredential = (event) => {
+  handleInputMoreInformation = (event) => {
     const { name, value } = event.target;
-    if (value.length < 3 && value.length > 0) {
-      this.setState({
-        errorMessage: {
-          credential: "Email must have more 3 character",
-        },
-      });
-    } else {
-      this.setState({
-        form: {
-          ...this.state.form,
-          credential: value,
-        },
-        errorMessage: {
-          credential: null,
-        },
-      });
+
+    if (name === "firstname") {
+      if (value.length < 3) {
+        console.log("error");
+      } else {
+        this.setState({
+          form: {
+            ...this.state.form,
+            [name]: value,
+          },
+        });
+      }
+    } else if (name === "lastname") {
+      if (value.length < 3) {
+        console.log("error");
+      } else {
+        this.setState({
+          form: {
+            ...this.state.form,
+            [name]: value,
+          },
+        });
+      }
     }
+  };
+
+  handleChangeRadioGender = (event) => {
+    this.setState({
+      form: {
+        ...this.state.form,
+        gender: event.target.value,
+      },
+    });
+  };
+
+  handleSubmitMoreInformation = (e) => {
+    e.preventDefault();
+    const { errorMessage, form } = this.state;
+
+    const params = {
+      role: "user",
+      email: form.credential,
+      username: form.username,
+      firstname: form.firstname || form.username,
+      lastname: form.lastname,
+      password: form.password,
+      gender:
+        form.gender == "1"
+          ? "Perempuan"
+          : form.gender == "2"
+          ? "Laki laki"
+          : "Tidak tau",
+    };
+
+    this.props.RegisterUser(params);
+  };
+
+  renderSuccess = () => {
+    return (
+      <>
+        <div className={styles.Box_title}></div>
+        <div className={styles.Box_main}>
+          <CheckCircleRounded color="success" sx={{ fontSize: "5rem" }} />
+          <p>Anda telah berhasil membuat akun. Lanjutkan ke menu Login</p>
+          <Stack direction={"row"} spacing={2}>
+            <Button variant="contained" color="success" href="/">
+              Login
+            </Button>
+            {/* <Button variant="outlined" href="/register/shop">Buka Toko</Button> */}
+          </Stack>
+        </div>
+      </>
+    );
   };
 
   handleSubmitCredential = (e) => {
