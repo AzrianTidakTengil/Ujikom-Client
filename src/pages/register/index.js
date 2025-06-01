@@ -89,13 +89,13 @@ class Register extends React.Component {
       }));
     }
 
-    if (router.query) {
-      if (router.query.success && router.query.success === "true") {
-        this.props.setProgress(4);
-      } else {
-        this.props.resetProgress();
-      }
-    }
+    // if (router.query) {
+    //   if (router.query.success && router.query.success === "true") {
+    //     this.props.setProgress(4);
+    //   } else {
+    //     this.props.resetProgress();
+    //   }
+    // }
   }
 
   handleNextBox = () => {
@@ -115,7 +115,7 @@ class Register extends React.Component {
 
     return (
       <div className="flex flex-col items-center">
-        <h5 className="text-center font-medium my-4 text-4xl">
+        <h5 className="text-center font-medium my-4 md:text-3xl text-2xl">
           Daftar Alamat Email
         </h5>
         <div className="px-2 w-11/12">
@@ -163,13 +163,13 @@ class Register extends React.Component {
             </Button>
             {/* Add Button */}
           </div>
-          <p className="text-sm">
+          <p className="text-sm md:text-md text-center">
             Dengan mendaftar, anda dinyatakan menyetujui{" "}
             <b>Syarat dan Ketentuan</b> serta <b>Kebijakan Privasi Popping</b>
           </p>
         </div>
         <div className="mt-6 p-2 flex items-center justify-center flex-col">
-          <p className="text-md">
+          <p className="text-md text-center">
             Sudah Memiliki Akun?{" "}
             <Link href="/" className="font-bold">
               Login sekarang
@@ -207,7 +207,7 @@ class Register extends React.Component {
     name,
   }) => {
     const trimmedValue = value?.toString().trim() || "";
-    let error = "";
+    let error = null;
 
     // Required check
     if (required && trimmedValue.length === 0) {
@@ -271,346 +271,9 @@ class Register extends React.Component {
       name: "credential",
     });
 
-    const hasNoErrors = Object.values(errorMessage).every((v) => v !== null);
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
 
     if (hasNoErrors) {
-      alert("next")
-      // this.props.SendCodeOtp({ email: form.credential });
-    }
-  };
-
-  renderCodeOTP = () => {
-    const { otp } = this.state;
-
-    return (
-      <>
-        <Grid2 container spacing={2}>
-          <Grid2 size={3}>
-            <IconButton onClick={() => this.handleBackBox()}>
-              <ArrowBackIosNew />
-            </IconButton>
-          </Grid2>
-          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
-            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
-              Kode Verifikasi
-            </Typography>
-          </Grid2>
-          <Grid2 size={3}></Grid2>
-        </Grid2>
-        <div className={styles.Box_main}>
-          <p>
-            Kode telah dikirimkan ke email {`${this.state.form.credential}`}.
-            Silahkan cek email tersebut
-          </p>
-          <form onSubmit={this.handleSubmitOTP} className={styles.Box_main}>
-            <InputOTP
-              value={otp}
-              name="otp"
-              onChange={(event) => this.handleOTPinput(event)}
-              style={{
-                marginBottom: 50,
-              }}
-            />
-            <Button
-              variant="contained"
-              color="success"
-              sx={{ width: "85%" }}
-              type="submit"
-              loading={this.props.auth.isLoading}
-            >
-              Selanjutnya
-            </Button>
-          </form>
-        </div>
-        <div className={styles.Box_footer}>
-          <p>Tidak mendapat token? Klik disini</p>
-        </div>
-      </>
-    );
-  };
-
-  handleOTPinput = (event) => {
-    const { name, value } = event.target;
-    const { otp } = this.state;
-
-    if (!value.match("\\D", "g")) {
-      this.setState({
-        otp: value,
-      });
-    }
-  };
-
-  handleSubmitOTP = (e) => {
-    e.preventDefault();
-    const { otp } = this.state;
-
-    this.props.VerifyCodeOtp({ code: otp });
-  };
-
-  renderInformation = () => {
-    const { errorMessage } = this.state;
-
-    return (
-      <>
-        <Typography
-          variant="h5"
-          textAlign={"center"}
-          fontWeight={600}
-          sx={{ marginY: 2 }}
-        >
-          Informasi Penting
-        </Typography>
-        <Box
-          sx={{
-            paddingX: 2,
-          }}
-        >
-          <form
-            onSubmit={this.handleSubmitInformation}
-            className={styles.Box_main}
-          >
-            <InputText
-              name="username"
-              label="Username *"
-              fullWidth
-              onBlur={(event) => this.handleInputInformation(event)}
-              sx={{
-                marginY: 2,
-              }}
-              error={
-                errorMessage && errorMessage.username
-                  ? errorMessage.username
-                  : undefined
-              }
-            />
-            <InputPassword
-              name="password"
-              label="Password *"
-              onBlur={(event) => this.handleInputInformation(event)}
-              fullWidth
-              sx={{
-                marginY: 2,
-              }}
-              required
-              error={
-                errorMessage && errorMessage.username
-                  ? errorMessage.username
-                  : undefined
-              }
-            />
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              type="submit"
-              sx={{ marginY: 4 }}
-            >
-              Selanjutnya
-            </Button>
-          </form>
-        </Box>
-        <div className={styles.Box_footer}></div>
-      </>
-    );
-  };
-
-  handleInputInformation = (event) => {
-    const { name, value } = event.target;
-    if (name === "username") {
-      if (value.length < 3) {
-        this.setState({
-          errorMessage: {
-            [name]: `Username must have more 3 character`,
-          },
-        });
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-          errorMessage: null,
-        });
-      }
-    }
-    if (name === "password") {
-      if (value.length < 8) {
-        this.setState({
-          errorMessage: {
-            [name]: `Username must have more 3 character`,
-          },
-        });
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-          errorMessage: null,
-        });
-      }
-    }
-  };
-
-  handleSubmitInformation = (e) => {
-    e.preventDefault();
-    const { errorMessage, form } = this.state;
-
-    this.props.upProgress();
-  };
-
-  renderMoreInformation = () => {
-    const { firstname, lastname, gender } = this.state.form;
-    return (
-      <>
-        <Grid2 container spacing={2}>
-          <Grid2 size={3}>
-            <IconButton onClick={() => this.handleBackBox()}>
-              <ArrowBackIosNew />
-            </IconButton>
-          </Grid2>
-          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
-            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
-              Lengkapi Data Diri
-            </Typography>
-          </Grid2>
-          <Grid2 size={3}></Grid2>
-        </Grid2>
-        <Box
-          sx={{
-            marginY: 2,
-            paddingX: 2,
-          }}
-        >
-          <form
-            onSubmit={this.handleSubmitMoreInformation}
-            className={styles.Box_main}
-          >
-            <InputText
-              name="firstname"
-              label="Nama depan *"
-              fullWidth
-              sx={{
-                marginY: 2,
-              }}
-              onBlur={(event) => this.handleInputMoreInformation(event)}
-            />
-            <InputText
-              name="lastname"
-              label="Nama akhir *"
-              fullWidth
-              sx={{
-                marginY: 2,
-              }}
-              onBlur={(event) => this.handleInputMoreInformation(event)}
-            />
-            <InputGender
-              fullWidth
-              sx={{
-                marginY: 2,
-              }}
-              change={(event) => this.handleChangeRadioGender(event)}
-            />
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              type="submit"
-              sx={{ marginY: 4 }}
-            >
-              Kirim
-            </Button>
-          </form>
-        </Box>
-        <div className={styles.Box_footer} style={{ marginTop: "0.5rem" }}>
-          {/* <p style={{color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Lewati isi data tersebut</p> */}
-        </div>
-      </>
-    );
-  };
-
-  handleInputMoreInformation = (event) => {
-    const { name, value } = event.target;
-
-    if (name === "firstname") {
-      if (value.length < 3) {
-        console.log("error");
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-        });
-      }
-    } else if (name === "lastname") {
-      if (value.length < 3) {
-        console.log("error");
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-        });
-      }
-    }
-  };
-
-  handleChangeRadioGender = (event) => {
-    this.setState({
-      form: {
-        ...this.state.form,
-        gender: event.target.value,
-      },
-    });
-  };
-
-  handleSubmitMoreInformation = (e) => {
-    e.preventDefault();
-    const { errorMessage, form } = this.state;
-
-    const params = {
-      role: "user",
-      email: form.credential,
-      username: form.username,
-      firstname: form.firstname || form.username,
-      lastname: form.lastname,
-      password: form.password,
-      gender:
-        form.gender == "1"
-          ? "Perempuan"
-          : form.gender == "2"
-          ? "Laki laki"
-          : "Tidak tau",
-    };
-
-    this.props.RegisterUser(params);
-  };
-
-  renderSuccess = () => {
-    return (
-      <>
-        <div className={styles.Box_title}></div>
-        <div className={styles.Box_main}>
-          <CheckCircleRounded color="success" sx={{ fontSize: "5rem" }} />
-          <p>Anda telah berhasil membuat akun. Lanjutkan ke menu Login</p>
-          <Stack direction={"row"} spacing={2}>
-            <Button variant="contained" color="success" href="/">
-              Login
-            </Button>
-            {/* <Button variant="outlined" href="/register/shop">Buka Toko</Button> */}
-          </Stack>
-        </div>
-      </>
-    );
-  };
-
-  handleSubmitCredential = (e) => {
-    e.preventDefault();
-    const { errorMessage, form } = this.state;
-
-    if (!errorMessage.credential) {
       this.props.SendCodeOtp({ email: form.credential });
     }
   };
@@ -619,49 +282,46 @@ class Register extends React.Component {
     const { otp } = this.state;
 
     return (
-      <>
-        <Grid2 container spacing={2}>
-          <Grid2 size={3}>
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          <div className="absolute left-0 max-[321px]:hidden">
             <IconButton onClick={() => this.handleBackBox()}>
               <ArrowBackIosNew />
             </IconButton>
-          </Grid2>
-          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
-            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
-              Kode Verifikasi
-            </Typography>
-          </Grid2>
-          <Grid2 size={3}></Grid2>
-        </Grid2>
-        <div className={styles.Box_main}>
-          <p>
-            Kode telah dikirimkan ke email {`${this.state.form.credential}`}.
-            Silahkan cek email tersebut
-          </p>
-          <form onSubmit={this.handleSubmitOTP} className={styles.Box_main}>
-            <InputOTP
-              value={otp}
-              name="otp"
-              onChange={(event) => this.handleOTPinput(event)}
-              style={{
-                marginBottom: 50,
-              }}
-            />
-            <Button
-              variant="contained"
-              color="success"
-              sx={{ width: "85%" }}
-              type="submit"
-              loading={this.props.auth.isLoading}
-            >
-              Selanjutnya
-            </Button>
+          </div>
+          <h5 className="text-center font-medium ">Kode Verifikasi</h5>
+        </div>
+        <div className="px-2 w-full">
+          <form onSubmit={this.handleSubmitOTP} className="flex flex-col">
+            <p className="text-sm md:text-md text-center">
+              Kode telah dikirimkan ke email{" "}
+              <b>{`${this.state.form.credential}`}</b>. Silahkan cek email
+              tersebut
+            </p>
+            <div className="self-center">
+              <InputOTP
+                value={otp}
+                name="otp"
+                onChange={(event) => this.handleOTPinput(event)}
+              />
+            </div>
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                type="submit"
+                fullWidth
+                loading={this.props.auth.isLoading}
+              >
+                Selanjutnya
+              </Button>
+            </div>
           </form>
         </div>
-        <div className={styles.Box_footer}>
-          <p>Tidak mendapat token? Klik disini</p>
+        <div className="mt-4 p-2 flex items-center justify-center flex-col">
+          <p className="text-md">Tidak mendapat token? Klik disini</p>
         </div>
-      </>
+      </div>
     );
   };
 
@@ -687,28 +347,20 @@ class Register extends React.Component {
     const { errorMessage } = this.state;
 
     return (
-      <>
-        <Typography
-          variant="h5"
-          textAlign={"center"}
-          fontWeight={600}
-          sx={{ marginY: 2 }}
-        >
-          Informasi Penting
-        </Typography>
-        <Box
-          sx={{
-            paddingX: 2,
-          }}
-        >
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          <h5 className="text-center font-semibold ">Registrasi User</h5>
+        </div>
+        <div className="px-2 w-full">
           <form
             onSubmit={this.handleSubmitInformation}
-            className={styles.Box_main}
+            className="flex flex-col"
           >
             <InputText
               name="username"
-              label="Username *"
+              label="Username"
               fullWidth
+              required
               onBlur={(event) => this.handleInputInformation(event)}
               sx={{
                 marginY: 2,
@@ -718,10 +370,15 @@ class Register extends React.Component {
                   ? errorMessage.username
                   : undefined
               }
+              helperText={
+                errorMessage && errorMessage.username
+                  ? errorMessage.username
+                  : ""
+              }
             />
             <InputPassword
               name="password"
-              label="Password *"
+              label="Password"
               onBlur={(event) => this.handleInputInformation(event)}
               fullWidth
               sx={{
@@ -729,62 +386,66 @@ class Register extends React.Component {
               }}
               required
               error={
-                errorMessage && errorMessage.username
-                  ? errorMessage.username
+                errorMessage && errorMessage.password
+                  ? errorMessage.password
                   : undefined
               }
+              helperText={
+                errorMessage && errorMessage.password
+                  ? errorMessage.password
+                  : ""
+              }
             />
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              type="submit"
-              sx={{ marginY: 4 }}
-            >
-              Selanjutnya
-            </Button>
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                type="submit"
+              >
+                Selanjutnya
+              </Button>
+            </div>
           </form>
-        </Box>
-        <div className={styles.Box_footer}></div>
-      </>
+        </div>
+        {/* <div className="mt-4 p-2 flex items-center justify-center flex-col">
+            <p className="text-md">Tidak mendapat token? Klik disini</p>
+          </div> */}
+      </div>
     );
   };
 
   handleInputInformation = (event) => {
     const { name, value } = event.target;
     if (name === "username") {
-      if (value.length < 3) {
-        this.setState({
-          errorMessage: {
-            [name]: `Username must have more 3 character`,
-          },
-        });
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-          errorMessage: null,
-        });
-      }
+      this.handleDetectorError({
+        value,
+        required: true,
+        minLength: 3,
+        maxLength: 30,
+        name,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     }
     if (name === "password") {
-      if (value.length < 8) {
-        this.setState({
-          errorMessage: {
-            [name]: `Username must have more 3 character`,
-          },
-        });
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-          errorMessage: null,
-        });
-      }
+      this.handleDetectorError({
+        value,
+        required: true,
+        minLength: 9,
+        maxLength: 9,
+        name,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     }
   };
 
@@ -792,53 +453,85 @@ class Register extends React.Component {
     e.preventDefault();
     const { errorMessage, form } = this.state;
 
-    this.props.upProgress();
+    this.handleDetectorError({
+      value: form.username,
+      required: true,
+      minLength: 3,
+      maxLength: 20,
+      name: "username",
+    });
+
+    this.handleDetectorError({
+      value: form.password,
+      required: true,
+      minLength: 8,
+      maxLength: 8,
+      name: "password",
+    });
+
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
+
+    if (hasNoErrors) {
+      this.props.upProgress();
+    }
   };
 
   renderMoreInformation = () => {
-    const { firstname, lastname, gender } = this.state.form;
+    const { errorMessage } = this.state;
     return (
-      <>
-        <Grid2 container spacing={2}>
-          <Grid2 size={3}>
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          <div className="absolute left-0 max-[321px]:hidden">
             <IconButton onClick={() => this.handleBackBox()}>
               <ArrowBackIosNew />
             </IconButton>
-          </Grid2>
-          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
-            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
-              Lengkapi Data Diri
-            </Typography>
-          </Grid2>
-          <Grid2 size={3}></Grid2>
-        </Grid2>
-        <Box
-          sx={{
-            marginY: 2,
-            paddingX: 2,
-          }}
-        >
+          </div>
+          <h5 className="text-center font-medium ">Lengkapi Data Diri</h5>
+        </div>
+        <div className="px-2 w-full">
           <form
             onSubmit={this.handleSubmitMoreInformation}
-            className={styles.Box_main}
+            className="flex flex-col"
           >
             <InputText
               name="firstname"
-              label="Nama depan *"
+              label="Nama depan"
+              required
               fullWidth
               sx={{
                 marginY: 2,
               }}
               onBlur={(event) => this.handleInputMoreInformation(event)}
+              error={
+                errorMessage && errorMessage.firstname
+                  ? errorMessage.firstname
+                  : undefined
+              }
+              helperText={
+                errorMessage && errorMessage.firstname
+                  ? errorMessage.firstname
+                  : ""
+              }
             />
             <InputText
               name="lastname"
-              label="Nama akhir *"
+              label="Nama akhir"
               fullWidth
+              required
               sx={{
                 marginY: 2,
               }}
               onBlur={(event) => this.handleInputMoreInformation(event)}
+              error={
+                errorMessage && errorMessage.lastname
+                  ? errorMessage.lastname
+                  : undefined
+              }
+              helperText={
+                errorMessage && errorMessage.lastname
+                  ? errorMessage.lastname
+                  : ""
+              }
             />
             <InputGender
               fullWidth
@@ -847,21 +540,23 @@ class Register extends React.Component {
               }}
               change={(event) => this.handleChangeRadioGender(event)}
             />
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              type="submit"
-              sx={{ marginY: 4 }}
-            >
-              Kirim
-            </Button>
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                type="submit"
+                fullWidth
+                loading={this.props.auth.isLoading}
+              >
+                Selanjutnya
+              </Button>
+            </div>
           </form>
-        </Box>
-        <div className={styles.Box_footer} style={{ marginTop: "0.5rem" }}>
-          {/* <p style={{color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Lewati isi data tersebut</p> */}
         </div>
-      </>
+        {/* <div className="mt-4 p-2 flex items-center justify-center flex-col">
+          <p className="text-md"></p>
+        </div> */}
+      </div>
     );
   };
 
@@ -869,27 +564,33 @@ class Register extends React.Component {
     const { name, value } = event.target;
 
     if (name === "firstname") {
-      if (value.length < 3) {
-        console.log("error");
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-        });
-      }
+      this.handleDetectorError({
+        value,
+        name,
+        minLength: 3,
+        maxLength: 50,
+        required: true,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     } else if (name === "lastname") {
-      if (value.length < 3) {
-        console.log("error");
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-        });
-      }
+      this.handleDetectorError({
+        value,
+        name,
+        minLength: 3,
+        maxLength: 100,
+        required: true,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     }
   };
 
@@ -906,39 +607,68 @@ class Register extends React.Component {
     e.preventDefault();
     const { errorMessage, form } = this.state;
 
-    const params = {
-      role: "user",
-      email: form.credential,
-      username: form.username,
-      firstname: form.firstname || form.username,
-      lastname: form.lastname,
-      password: form.password,
-      gender:
-        form.gender == "1"
-          ? "Perempuan"
-          : form.gender == "2"
-          ? "Laki laki"
-          : "Tidak tau",
-    };
+    this.handleDetectorError({
+      value: form.firstname || form.username,
+      name: "firstname",
+      minLength: 3,
+      maxLength: 50,
+      required: true,
+    });
 
-    this.props.RegisterUser(params);
+    this.handleDetectorError({
+      value: form.lastname,
+      name: "lastname",
+      minLength: 3,
+      maxLength: 100,
+      required: true,
+    });
+
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
+
+    if (hasNoErrors) {
+      const params = {
+        role: "user",
+        email: form.credential,
+        username: form.username,
+        firstname: form.firstname || form.username,
+        lastname: form.lastname,
+        password: form.password,
+        gender:
+          form.gender == "1"
+            ? "Perempuan"
+            : form.gender == "2"
+            ? "Laki laki"
+            : "Tidak tau",
+      };
+
+      this.props.RegisterUser(params);
+    }
   };
 
   renderSuccess = () => {
     return (
-      <>
-        <div className={styles.Box_title}></div>
-        <div className={styles.Box_main}>
-          <CheckCircleRounded color="success" sx={{ fontSize: "5rem" }} />
-          <p>Anda telah berhasil membuat akun. Lanjutkan ke menu Login</p>
-          <Stack direction={"row"} spacing={2}>
-            <Button variant="contained" color="success" href="/">
-              Login
-            </Button>
-            {/* <Button variant="outlined" href="/register/shop">Buka Toko</Button> */}
-          </Stack>
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          {/* <h5 className="text-center font-medium ">Berhasil</h5> */}
         </div>
-      </>
+        <div className="px-2 w-full flex flex-col items-center justify-center space-y-2.5">
+          <CheckCircleRounded color="success" sx={{ fontSize: "5rem" }} />
+          <p className="text-md md:text-lg text-center">
+            Anda telah berhasil membuat akun. Silahkan lanjut ke halaman utama
+          </p>
+          <div className="my-4">
+            <Stack direction={"row"} spacing={2}>
+              <Button variant="contained" color="primary" href="/">
+                Halaman Utama
+              </Button>
+              <Button variant="outlined" color="primary" href="/register/shop">Buka Toko</Button>
+            </Stack>
+          </div>
+        </div>
+        <div className="mt-4 p-2 flex items-center justify-center flex-col">
+          {/* <p className="text-md">Tidak mendapat token? Klik disini</p> */}
+        </div>
+      </div>
     );
   };
 
@@ -948,12 +678,16 @@ class Register extends React.Component {
     return (
       <ThemeProvider theme={this.theme}>
         <div className="px-6 py-8">
-          <div className="grid grid-cols-2 gap-8 items-center justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
             <div className="flex flex-col items-center justify-center space-y-2">
-              <h3 className={`${playfair.className} text-gray-800 font-bold text-6xl`}>
+              <h3
+                className={`${playfair.className} text-gray-800 font-bold text-center text-4xl md:text-6xl`}
+              >
                 Popping Marketplace
               </h3>
-              <p className={`${playfair.className} text-gray-500 font-light text-2xl`}>
+              <p
+                className={`${playfair.className} text-gray-500 font-light text-center text-xl md:text-2xl`}
+              >
                 Tempat berbelanja secara daring
               </p>
             </div>
