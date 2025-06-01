@@ -524,7 +524,7 @@ class Register extends React.Component {
                 marginY: 2,
               }}
               onBlur={(event) => this.handleInputMoreInformation(event)}
-                            error={
+              error={
                 errorMessage && errorMessage.lastname
                   ? errorMessage.lastname
                   : undefined
@@ -643,25 +643,35 @@ class Register extends React.Component {
             : "Tidak tau",
       };
 
-      this.props.RegisterUser(params);
+      // this.props.RegisterUser(params);
+      this.props.upProgress()
     }
   };
 
   renderSuccess = () => {
     return (
-      <>
-        <div className={styles.Box_title}></div>
-        <div className={styles.Box_main}>
-          <CheckCircleRounded color="success" sx={{ fontSize: "5rem" }} />
-          <p>Anda telah berhasil membuat akun. Lanjutkan ke menu Login</p>
-          <Stack direction={"row"} spacing={2}>
-            <Button variant="contained" color="success" href="/">
-              Login
-            </Button>
-            {/* <Button variant="outlined" href="/register/shop">Buka Toko</Button> */}
-          </Stack>
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          {/* <h5 className="text-center font-medium ">Berhasil</h5> */}
         </div>
-      </>
+        <div className="px-2 w-full flex flex-col items-center justify-center space-y-2.5">
+          <CheckCircleRounded color="success" sx={{ fontSize: "5rem" }} />
+          <p className="text-md md:text-lg text-center">
+            Anda telah berhasil membuat akun. Silahkan lanjut ke halaman utama
+          </p>
+          <div className="my-4">
+            <Stack direction={"row"} spacing={2}>
+              <Button variant="contained" color="primary" href="/">
+                Halaman Utama
+              </Button>
+              <Button variant="outlined" color="primary" href="/register/shop">Buka Toko</Button>
+            </Stack>
+          </div>
+        </div>
+        <div className="mt-4 p-2 flex items-center justify-center flex-col">
+          {/* <p className="text-md">Tidak mendapat token? Klik disini</p> */}
+        </div>
+      </div>
     );
   };
 
