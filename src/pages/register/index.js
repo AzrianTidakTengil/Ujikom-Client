@@ -274,7 +274,7 @@ class Register extends React.Component {
     const hasNoErrors = Object.values(errorMessage).every((v) => v !== null);
 
     if (hasNoErrors) {
-      this.props.upProgress()
+      this.props.upProgress();
       // this.props.SendCodeOtp({ email: form.credential });
     }
   };
@@ -284,7 +284,7 @@ class Register extends React.Component {
 
     return (
       <>
-        <Grid2 container spacing={2}>
+        {/* <Grid2 container spacing={2}>
           <Grid2 size={3}>
             <IconButton onClick={() => this.handleBackBox()}>
               <ArrowBackIosNew />
@@ -324,6 +324,50 @@ class Register extends React.Component {
         </div>
         <div className={styles.Box_footer}>
           <p>Tidak mendapat token? Klik disini</p>
+        </div> */}
+        <div className="flex flex-col items-center">
+          <div className="relative w-full my-4 lg:text-4xl md:text-3xl text-xl">
+            <div className="absolute left-0">
+              <IconButton onClick={() => this.handleBackBox()}>
+                <ArrowBackIosNew />
+              </IconButton>
+            </div>
+            <h5 className="text-center font-medium ">
+              Kode Verifikasi
+            </h5>
+          </div>
+          <div className="px-2 w-full">
+            <form onSubmit={this.handleSubmitOTP} className="flex flex-col">
+              <p className="text-md text-center">
+                Kode telah dikirimkan ke email{" "}
+                <b>{`${this.state.form.credential}`}</b>. Silahkan cek email
+                tersebut
+              </p>
+              <div className="self-center">
+                <InputOTP
+                value={otp}
+                name="otp"
+                onChange={(event) => this.handleOTPinput(event)}
+              />
+              </div>
+              <div className="my-4">
+                <Button
+                  variant="contained"
+                  color="success"
+                  type="submit"
+                  fullWidth
+                  loading={this.props.auth.isLoading}
+                >
+                  Selanjutnya
+                </Button>
+              </div>
+            </form>
+          </div>
+          <div className="mt-4 p-2 flex items-center justify-center flex-col">
+            <p className="text-md">
+              Tidak mendapat token? Klik disini
+            </p>
+          </div>
         </div>
       </>
     );
@@ -614,10 +658,14 @@ class Register extends React.Component {
         <div className="px-6 py-8">
           <div className="grid grid-cols-2 gap-8 items-center justify-center">
             <div className="flex flex-col items-center justify-center space-y-2">
-              <h3 className={`${playfair.className} text-gray-800 font-bold text-6xl`}>
+              <h3
+                className={`${playfair.className} text-gray-800 font-bold text-6xl`}
+              >
                 Popping Marketplace
               </h3>
-              <p className={`${playfair.className} text-gray-500 font-light text-2xl`}>
+              <p
+                className={`${playfair.className} text-gray-500 font-light text-2xl`}
+              >
                 Tempat berbelanja secara daring
               </p>
             </div>
