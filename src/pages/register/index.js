@@ -609,15 +609,15 @@ class Register extends React.Component {
     return (
       <ThemeProvider theme={this.theme}>
         <div className="px-6 py-8">
-          <div className="grid grid-cols-2 gap-8 items-center justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
             <div className="flex flex-col items-center justify-center space-y-2">
               <h3
-                className={`${playfair.className} text-gray-800 font-bold text-6xl`}
+                className={`${playfair.className} text-gray-800 font-bold text-center text-4xl md:text-6xl`}
               >
                 Popping Marketplace
               </h3>
               <p
-                className={`${playfair.className} text-gray-500 font-light text-2xl`}
+                className={`${playfair.className} text-gray-500 font-light text-center text-xl md:text-2xl`}
               >
                 Tempat berbelanja secara daring
               </p>
