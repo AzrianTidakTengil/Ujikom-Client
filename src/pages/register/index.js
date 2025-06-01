@@ -481,33 +481,24 @@ class Register extends React.Component {
   renderMoreInformation = () => {
     const { firstname, lastname, gender } = this.state.form;
     return (
-      <>
-        <Grid2 container spacing={2}>
-          <Grid2 size={3}>
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          <div className="absolute left-0 max-[321px]:hidden">
             <IconButton onClick={() => this.handleBackBox()}>
               <ArrowBackIosNew />
             </IconButton>
-          </Grid2>
-          <Grid2 size={6} display={"flex"} justifyContent={"center"}>
-            <Typography variant="h5" textAlign={"center"} fontWeight={600}>
-              Lengkapi Data Diri
-            </Typography>
-          </Grid2>
-          <Grid2 size={3}></Grid2>
-        </Grid2>
-        <Box
-          sx={{
-            marginY: 2,
-            paddingX: 2,
-          }}
-        >
+          </div>
+          <h5 className="text-center font-medium ">Lengkapi Data Diri</h5>
+        </div>
+        <div className="px-2 w-full">
           <form
             onSubmit={this.handleSubmitMoreInformation}
-            className={styles.Box_main}
+            className="flex flex-col"
           >
             <InputText
               name="firstname"
-              label="Nama depan *"
+              label="Nama depan"
+              required
               fullWidth
               sx={{
                 marginY: 2,
@@ -516,8 +507,9 @@ class Register extends React.Component {
             />
             <InputText
               name="lastname"
-              label="Nama akhir *"
+              label="Nama akhir"
               fullWidth
+              required
               sx={{
                 marginY: 2,
               }}
@@ -530,21 +522,23 @@ class Register extends React.Component {
               }}
               change={(event) => this.handleChangeRadioGender(event)}
             />
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              type="submit"
-              sx={{ marginY: 4 }}
-            >
-              Kirim
-            </Button>
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                type="submit"
+                fullWidth
+                loading={this.props.auth.isLoading}
+              >
+                Selanjutnya
+              </Button>
+            </div>
           </form>
-        </Box>
-        <div className={styles.Box_footer} style={{ marginTop: "0.5rem" }}>
-          {/* <p style={{color: 'blue', textDecoration: 'underline', cursor: 'pointer'}}>Lewati isi data tersebut</p> */}
         </div>
-      </>
+        {/* <div className="mt-4 p-2 flex items-center justify-center flex-col">
+          <p className="text-md"></p>
+        </div> */}
+      </div>
     );
   };
 
