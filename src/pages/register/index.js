@@ -207,7 +207,7 @@ class Register extends React.Component {
     name,
   }) => {
     const trimmedValue = value?.toString().trim() || "";
-    let error = "";
+    let error = null;
 
     // Required check
     if (required && trimmedValue.length === 0) {
@@ -372,6 +372,11 @@ class Register extends React.Component {
                   ? errorMessage.username
                   : undefined
               }
+              helperText={
+                errorMessage && errorMessage.username
+                  ? errorMessage.username
+                  : ""
+              }
             />
             <InputPassword
               name="password"
@@ -383,9 +388,14 @@ class Register extends React.Component {
               }}
               required
               error={
-                errorMessage && errorMessage.username
-                  ? errorMessage.username
+                errorMessage && errorMessage.password
+                  ? errorMessage.password
                   : undefined
+              }
+              helperText={
+                errorMessage && errorMessage.password
+                  ? errorMessage.password
+                  : ""
               }
             />
             <div className="my-4">
@@ -410,38 +420,34 @@ class Register extends React.Component {
   handleInputInformation = (event) => {
     const { name, value } = event.target;
     if (name === "username") {
-      if (value.length < 3) {
-        this.setState({
-          errorMessage: {
-            [name]: `Username must have more 3 character`,
-          },
-        });
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-          errorMessage: null,
-        });
-      }
+      this.handleDetectorError({
+        value,
+        required: true,
+        minLength: 3,
+        maxLength: 30,
+        name,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     }
     if (name === "password") {
-      if (value.length < 8) {
-        this.setState({
-          errorMessage: {
-            [name]: `Username must have more 3 character`,
-          },
-        });
-      } else {
-        this.setState({
-          form: {
-            ...this.state.form,
-            [name]: value,
-          },
-          errorMessage: null,
-        });
-      }
+      this.handleDetectorError({
+        value,
+        required: true,
+        minLength: 8,
+        maxLength: 8,
+        name,
+      });
+      this.setState({
+        form: {
+          ...this.state.form,
+          [name]: value,
+        },
+      });
     }
   };
 
@@ -449,7 +455,27 @@ class Register extends React.Component {
     e.preventDefault();
     const { errorMessage, form } = this.state;
 
-    this.props.upProgress();
+    this.handleDetectorError({
+      value: form.username,
+      required: true,
+      minLength: 3,
+      maxLength: 20,
+      name: "username",
+    });
+
+    this.handleDetectorError({
+      value: form.password,
+      required: true,
+      minLength: 8,
+      maxLength: 8,
+      name: "password",
+    });
+
+    const hasNoErrors = Object.values(errorMessage).every((v) => v !== null);
+
+    if (hasNoErrors) {
+      this.props.upProgress();
+    }
   };
 
   renderMoreInformation = () => {
