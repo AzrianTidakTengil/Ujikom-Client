@@ -341,35 +341,28 @@ class Register extends React.Component {
     e.preventDefault();
     const { otp } = this.state;
 
-    this.props.VerifyCodeOtp({ code: otp });
+    this.props.upProgress();
+    // this.props.VerifyCodeOtp({ code: otp });
   };
 
   renderInformation = () => {
     const { errorMessage } = this.state;
 
     return (
-      <>
-        <Typography
-          variant="h5"
-          textAlign={"center"}
-          fontWeight={600}
-          sx={{ marginY: 2 }}
-        >
-          Informasi Penting
-        </Typography>
-        <Box
-          sx={{
-            paddingX: 2,
-          }}
-        >
+      <div className="flex flex-col items-center">
+        <div className="relative w-full my-4 md:text-3xl text-2xl">
+          <h5 className="text-center font-semibold ">Registrasi User</h5>
+        </div>
+        <div className="px-2 w-full">
           <form
             onSubmit={this.handleSubmitInformation}
-            className={styles.Box_main}
+            className="flex flex-col"
           >
             <InputText
               name="username"
-              label="Username *"
+              label="Username"
               fullWidth
+              required
               onBlur={(event) => this.handleInputInformation(event)}
               sx={{
                 marginY: 2,
@@ -382,7 +375,7 @@ class Register extends React.Component {
             />
             <InputPassword
               name="password"
-              label="Password *"
+              label="Password"
               onBlur={(event) => this.handleInputInformation(event)}
               fullWidth
               sx={{
@@ -395,19 +388,22 @@ class Register extends React.Component {
                   : undefined
               }
             />
-            <Button
-              variant="contained"
-              color="success"
-              fullWidth
-              type="submit"
-              sx={{ marginY: 4 }}
-            >
-              Selanjutnya
-            </Button>
+            <div className="my-4">
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                type="submit"
+              >
+                Selanjutnya
+              </Button>
+            </div>
           </form>
-        </Box>
-        <div className={styles.Box_footer}></div>
-      </>
+        </div>
+        {/* <div className="mt-4 p-2 flex items-center justify-center flex-col">
+            <p className="text-md">Tidak mendapat token? Klik disini</p>
+          </div> */}
+      </div>
     );
   };
 
