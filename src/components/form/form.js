@@ -93,7 +93,7 @@ class Auth extends Component {
   };
 
   render() {
-    const { open } = this.state;
+    const { open, errorMessage } = this.state;
 
     return (
       <ThemeProvider theme={theme}>
@@ -135,6 +135,14 @@ class Auth extends Component {
                   type="text"
                   label="Email"
                   fullWidth={true}
+                  error={
+                    errorMessage && errorMessage.email
+                      ? errorMessage.email
+                      : undefined
+                  }
+                  helperText={
+                    errorMessage && errorMessage.email ? errorMessage.email : ""
+                  }
                   onBlur={(event) => this.handleInput(event)}
                 />
                 <InputPassword
@@ -142,6 +150,16 @@ class Auth extends Component {
                   type="password"
                   label="Password"
                   fullWidth
+                  error={
+                    errorMessage && errorMessage.password
+                      ? errorMessage.password
+                      : undefined
+                  }
+                  helperText={
+                    errorMessage && errorMessage.password
+                      ? errorMessage.password
+                      : ""
+                  }
                   onBlur={(event) => this.handleInput(event)}
                 />
                 <p>Forgot Password</p>
