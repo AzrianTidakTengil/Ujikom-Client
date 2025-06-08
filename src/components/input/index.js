@@ -1,7 +1,7 @@
 'use client'
 
 import { Visibility, VisibilityOff } from "@mui/icons-material"
-import { createTheme, FormControl, FormControlLabel, FormLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, Radio, RadioGroup, TextField, ThemeProvider } from "@mui/material"
+import { createTheme, FormControl, FormControlLabel, FormHelperText, FormLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, Radio, RadioGroup, TextField, ThemeProvider } from "@mui/material"
 import { useState } from "react"
 
 export const InputEmail = ({fullWidth, placeholder = "", value, label, style = {}, error, ...props}) => {
@@ -51,6 +51,9 @@ export const InputPassword = ({type, placeholder = "", value, label, ...props}) 
                 }
                 label={label}
             />
+            <FormHelperText>
+                {...props.helperText}
+            </FormHelperText>
         </FormControl>
     )
 }
