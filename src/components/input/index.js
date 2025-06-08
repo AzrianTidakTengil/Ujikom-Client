@@ -23,9 +23,8 @@ export const InputEmail = ({fullWidth, placeholder = "", value, label, style = {
     )
 }
 
-export const InputPassword = ({type, placeholder = "", value, label, ...props}) => {
+export const InputPassword = ({type, placeholder = "", defaultValue, label, ...props}) => {
     const [showPassword, isShow] = useState(false)
-
     return (
         <FormControl
             variant="outlined"
@@ -50,6 +49,7 @@ export const InputPassword = ({type, placeholder = "", value, label, ...props}) 
                     </InputAdornment>
                 }
                 label={label}
+                defaultValue={defaultValue}
             />
             <FormHelperText>
                 {...props.helperText}
@@ -102,7 +102,7 @@ export const InputOTP = ({style = {}, value, ...props}) => {
     )
 }
 
-export const InputGender = ({style = {}, change = {}, ...props}) => {
+export const InputGender = ({style = {}, change = {}, value, ...props}) => {
     return (
         <FormControl 
             style={style}
@@ -111,6 +111,7 @@ export const InputGender = ({style = {}, change = {}, ...props}) => {
             <RadioGroup
                 row
                 name="gender"
+                value={value}
                 onChange={change}
             >
                 <FormControlLabel value="1" control={<Radio/>} label="Perempuan"/>
