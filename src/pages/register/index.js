@@ -246,6 +246,13 @@ class Register extends React.Component {
         if (isNaN(Number(trimmedValue))) {
           error = `Input must be a valid number`;
         }
+      } else if (type === "password") {
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~])[A-Za-z\d@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~]{8,}$/;
+        if (!passwordRegex.test(trimmedValue)) {
+          error =
+            "Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.";
+        }
       }
     }
 
@@ -436,8 +443,7 @@ class Register extends React.Component {
       this.handleDetectorError({
         value,
         required: true,
-        minLength: 9,
-        maxLength: 9,
+        type: "password",
         name,
       });
       this.setState({
@@ -661,7 +667,9 @@ class Register extends React.Component {
               <Button variant="contained" color="primary" href="/">
                 Halaman Utama
               </Button>
-              <Button variant="outlined" color="primary" href="/register/shop">Buka Toko</Button>
+              <Button variant="outlined" color="primary" href="/register/shop">
+                Buka Toko
+              </Button>
             </Stack>
           </div>
         </div>
