@@ -10,12 +10,13 @@ import {
   ThemeProvider,
   Backdrop,
   CircularProgress,
+  Paper,
 } from "@mui/material";
 import { buttonPrimary, container, input, mainItem } from "./theme";
 import { useState, Component } from "react";
 import styles from "./style.module.css";
 import { Close, Google } from "@mui/icons-material";
-import { Input, InputEmail, InputPassword } from "../input";
+import { Input, InputEmail, InputPassword, InputText } from "../input";
 import { Poppins } from "next/font/google";
 import { palleteV1 } from "@/assets/css/template";
 import Link from "next/link";
@@ -107,93 +108,103 @@ class Auth extends Component {
         </Button>
         <Modal
           open={open}
-          sx={container}
           onClose={this.handleModal}
           keepMounted
           BackdropComponent={this.renderCustomBackDrop}
+          className="flex justify-center p-8"
         >
-          <Box
-            sx={{
-              ...mainItem,
-              zIndex: theme.zIndex.modal,
-            }}
-          >
-            <div className={styles.head}>
-              <h2>Login</h2>
-              <IconButton onClick={this.handleModal}>
-                <Close />
-              </IconButton>
-            </div>
-            <Box
-              sx={{
-                paddingX: 2,
-              }}
-            >
-              <form className={styles.body} onSubmit={this.handleSubmit}>
-                <InputEmail
-                  name="email"
-                  type="text"
-                  label="Email"
-                  fullWidth={true}
-                  error={
-                    errorMessage && errorMessage.email
-                      ? errorMessage.email
-                      : undefined
-                  }
-                  helperText={
-                    errorMessage && errorMessage.email ? errorMessage.email : ""
-                  }
-                  onBlur={(event) => this.handleInput(event)}
-                />
-                <InputPassword
-                  name="password"
-                  type="password"
-                  label="Password"
-                  fullWidth
-                  error={
-                    errorMessage && errorMessage.password
-                      ? errorMessage.password
-                      : undefined
-                  }
-                  helperText={
-                    errorMessage && errorMessage.password
-                      ? errorMessage.password
-                      : ""
-                  }
-                  onBlur={(event) => this.handleInput(event)}
-                />
-                <p>Forgot Password</p>
-                <Button
-                  variant="contained"
-                  color="success"
-                  fullWidth
-                  sx={{ marginY: 4 }}
-                  type="submit"
+          <Paper className="relative px-4 w-lg h-fit">
+            <div className="flex flex-col items-center">
+              <div className="relative w-full my-4 md:text-3xl text-2xl">
+                <div className="absolute right-0">
+                  <IconButton onClick={this.handleModal}>
+                    <Close />
+                  </IconButton>
+                </div>
+                <h5 className="text-center font-medium ">Login</h5>
+              </div>
+              <div className="px-2 w-full">
+                <form
+                  onSubmit={this.handleSubmit}
+                  className="flex flex-col space-y-4"
                 >
-                  Submit
-                </Button>
-              </form>
-              <Divider />
-              <Button
-                startIcon={<Google />}
-                variant="contained"
-                fullWidth
-                sx={{
-                  textTransform: "capitalize",
-                  marginY: 4,
-                }}
-                href="http://localhost:3001/api/auth/google"
-              >
-                Google
-              </Button>
-            </Box>
-            <div className={styles.footer}>
-              <p>
-                Tidak memiliki Akun?{" "}
-                <Link href="/register">Daftar sekarang</Link>
-              </p>
+                  <div>
+                    <InputText
+                      name="email"
+                      label="Email *"
+                      onBlur={this.handleInput}
+                      error={
+                        errorMessage && errorMessage.email
+                          ? errorMessage.email
+                          : undefined
+                      }
+                      helperText={
+                        errorMessage && errorMessage.email
+                          ? errorMessage.email
+                          : ""
+                      }
+                      fullWidth={true}
+                    />
+                  </div>
+                  <div>
+                    <InputPassword
+                      name="password"
+                      type="password"
+                      label="Password *"
+                      fullWidth
+                      error={
+                        errorMessage && errorMessage.password
+                          ? errorMessage.password
+                          : undefined
+                      }
+                      helperText={
+                        errorMessage && errorMessage.password
+                          ? errorMessage.password
+                          : ""
+                      }
+                      onBlur={this.handleInput}
+                    />
+                    <Link href={"/resetpassword"}>
+                      <p className="text-md underline">Forgot Password</p>
+                    </Link>
+                  </div>
+                  <div className="my-4">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      fullWidth
+                      type="submit"
+                    >
+                      Submit
+                    </Button>
+                  </div>
+                </form>
+                <hr className="my-2 bg-gray-400" />
+                <div className="my-4 flex flex-col space-y-2">
+                  <Button
+                    variant="contained"
+                    startIcon={<Google />}
+                    fullWidth
+                    sx={{
+                      textTransform: "capitalize",
+                    }}
+                    href="http://localhost:3001/api/auth/google"
+                  >
+                    Google
+                  </Button>
+                  {/* Add Button */}
+                </div>
+              </div>
+              <div className="my-4 p-2 flex items-center justify-center flex-col">
+                <p className="text-md text-center">
+                  Belum Memiliki akun?{" "}
+                  <Link href="/register" className="font-bold">
+                    Daftar sekarang
+                  </Link>
+                </p>
+              </div>
             </div>
-          </Box>
+          </Paper>
         </Modal>
       </ThemeProvider>
     );
