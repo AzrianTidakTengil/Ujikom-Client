@@ -23,9 +23,8 @@ export const InputEmail = ({fullWidth, placeholder = "", value, label, style = {
     )
 }
 
-export const InputPassword = ({type, placeholder = "", value, label, ...props}) => {
+export const InputPassword = ({type, placeholder = "", defaultValue, label, ...props}) => {
     const [showPassword, isShow] = useState(false)
-
     return (
         <FormControl
             variant="outlined"
@@ -50,6 +49,7 @@ export const InputPassword = ({type, placeholder = "", value, label, ...props}) 
                     </InputAdornment>
                 }
                 label={label}
+                defaultValue={defaultValue}
             />
             <FormHelperText>
                 {...props.helperText}
