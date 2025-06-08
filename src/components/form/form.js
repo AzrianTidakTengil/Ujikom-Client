@@ -66,10 +66,26 @@ class Auth extends Component {
     const { name, value } = event.target;
 
     if (name === "email") {
+      this.handleDetectorError({
+        value,
+        type: "email",
+        required: true,
+        minLength: 3,
+        maxLength: 255,
+        name,
+      });
       this.setState({
         [name]: value,
       });
     } else if (name === "password") {
+      this.handleDetectorError({
+        value,
+        type: "password",
+        required: true,
+        minLength: 8,
+        maxLength: 8,
+        name,
+      });
       this.setState({
         [name]: value,
       });
@@ -91,6 +107,73 @@ class Auth extends Component {
         <CircularProgress color="inherit" />
       </Backdrop>
     );
+  };
+
+  handleDetectorError = ({
+    type,
+    value,
+    required = true,
+    minLength = 1,
+    maxLength = 255,
+    name,
+  }) => {
+    const trimmedValue = value?.toString().trim() || "";
+    let error = null;
+
+    // Required check
+    if (required && trimmedValue.length === 0) {
+      error = `${name} is required`;
+    }
+    // Whitespace-only check
+    else if (/^\s+$/.test(value)) {
+      error = `${name} cannot be only whitespace`;
+    }
+    // Length check
+    else if (trimmedValue.length < minLength) {
+      error = `Minimum length is ${minLength} characters`;
+    } else if (trimmedValue.length > maxLength) {
+      error = `Maximum length is ${maxLength} characters`;
+    }
+    // Dangerous content check
+    else {
+      const dangerousPatterns = [
+        /</g,
+        />/g,
+        /<script.*?>.*?<\/script>/gi,
+        /--/,
+        /;/g,
+        /\b(DROP|SELECT|INSERT|DELETE)\b/gi,
+      ];
+      if (dangerousPatterns.some((pattern) => pattern.test(trimmedValue))) {
+        error = `Input contains potentially dangerous characters`;
+      }
+      // Type-specific validation
+      else if (type === "email") {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedValue)) {
+          error = `Invalid email format`;
+        }
+      } else if (type === "number") {
+        if (isNaN(Number(trimmedValue))) {
+          error = `Input must be a valid number`;
+        }
+      } else if (type === "password") {
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~])[A-Za-z\d@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~]{8,}$/;
+        if (!passwordRegex.test(trimmedValue)) {
+          error =
+            "Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.";
+        }
+      }
+    }
+
+    // Set or clear error
+    this.setState((prevState) => ({
+      errorMessage: {
+        ...prevState.errorMessage,
+        [name]: error,
+      },
+    }));
   };
 
   render() {
