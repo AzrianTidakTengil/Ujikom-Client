@@ -403,6 +403,7 @@ class Register extends React.Component {
                   ? errorMessage.password
                   : ""
               }
+              defaultValue={form.password}
             />
             <div className="my-4">
               <Button
