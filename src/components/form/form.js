@@ -47,10 +47,11 @@ class Auth extends Component {
   handleSubmit = (e) => {
     e.preventDefault();
     const { email, password, errorMessage } = this.state;
-    if (!errorMessage) {
+
+    const hasNoErrors = Object.values(errorMessage).every((v) => v === null);
+
+    if (hasNoErrors) {
       this.props.login({ user: email, password });
-    } else {
-      console.log("cannot");
     }
   };
 
