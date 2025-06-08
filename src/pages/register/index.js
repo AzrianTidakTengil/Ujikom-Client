@@ -246,6 +246,13 @@ class Register extends React.Component {
         if (isNaN(Number(trimmedValue))) {
           error = `Input must be a valid number`;
         }
+      } else if (type === "password") {
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~])[A-Za-z\d@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~]{8,}$/;
+        if (!passwordRegex.test(trimmedValue)) {
+          error =
+            "Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.";
+        }
       }
     }
 
@@ -344,7 +351,7 @@ class Register extends React.Component {
   };
 
   renderInformation = () => {
-    const { errorMessage } = this.state;
+    const { errorMessage, form } = this.state;
 
     return (
       <div className="flex flex-col items-center">
@@ -375,6 +382,7 @@ class Register extends React.Component {
                   ? errorMessage.username
                   : ""
               }
+              defaultValue={form.username}
             />
             <InputPassword
               name="password"
@@ -395,6 +403,7 @@ class Register extends React.Component {
                   ? errorMessage.password
                   : ""
               }
+              defaultValue={form.password}
             />
             <div className="my-4">
               <Button
@@ -436,8 +445,7 @@ class Register extends React.Component {
       this.handleDetectorError({
         value,
         required: true,
-        minLength: 9,
-        maxLength: 9,
+        type: "password",
         name,
       });
       this.setState({
@@ -477,7 +485,7 @@ class Register extends React.Component {
   };
 
   renderMoreInformation = () => {
-    const { errorMessage } = this.state;
+    const { errorMessage, form } = this.state;
     return (
       <div className="flex flex-col items-center">
         <div className="relative w-full my-4 md:text-3xl text-2xl">
@@ -512,6 +520,7 @@ class Register extends React.Component {
                   ? errorMessage.firstname
                   : ""
               }
+              defaultValue={form.firstname}
             />
             <InputText
               name="lastname"
@@ -532,6 +541,7 @@ class Register extends React.Component {
                   ? errorMessage.lastname
                   : ""
               }
+              defaultValue={form.lastname}
             />
             <InputGender
               fullWidth
@@ -661,7 +671,9 @@ class Register extends React.Component {
               <Button variant="contained" color="primary" href="/">
                 Halaman Utama
               </Button>
-              <Button variant="outlined" color="primary" href="/register/shop">Buka Toko</Button>
+              <Button variant="outlined" color="primary" href="/register/shop">
+                Buka Toko
+              </Button>
             </Stack>
           </div>
         </div>
