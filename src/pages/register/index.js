@@ -548,6 +548,7 @@ class Register extends React.Component {
               sx={{
                 marginY: 2,
               }}
+              value={form.gender}
               change={(event) => this.handleChangeRadioGender(event)}
             />
             <div className="my-4">
