@@ -485,7 +485,7 @@ class Register extends React.Component {
   };
 
   renderMoreInformation = () => {
-    const { errorMessage } = this.state;
+    const { errorMessage, form } = this.state;
     return (
       <div className="flex flex-col items-center">
         <div className="relative w-full my-4 md:text-3xl text-2xl">
@@ -520,6 +520,7 @@ class Register extends React.Component {
                   ? errorMessage.firstname
                   : ""
               }
+              defaultValue={form.firstname}
             />
             <InputText
               name="lastname"
@@ -540,6 +541,7 @@ class Register extends React.Component {
                   ? errorMessage.lastname
                   : ""
               }
+              defaultValue={form.lastname}
             />
             <InputGender
               fullWidth
