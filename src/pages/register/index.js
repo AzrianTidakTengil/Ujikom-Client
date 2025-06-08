@@ -351,7 +351,7 @@ class Register extends React.Component {
   };
 
   renderInformation = () => {
-    const { errorMessage } = this.state;
+    const { errorMessage, form } = this.state;
 
     return (
       <div className="flex flex-col items-center">
@@ -382,6 +382,7 @@ class Register extends React.Component {
                   ? errorMessage.username
                   : ""
               }
+              defaultValue={form.username}
             />
             <InputPassword
               name="password"
