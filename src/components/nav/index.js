@@ -264,7 +264,7 @@ class Navbar extends React.Component {
       <ThemeProvider theme={this.theme}>
         <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Link href='/'><h1 className={styles.title}>Popping</h1></Link>
+            <Link href='/' style={{textDecoration: 'none'}}><h1 className={styles.title}>Popping</h1></Link>
             <TextField
               sx={{ width: '40%' }}
               size="small"
@@ -348,7 +348,7 @@ class Navbar extends React.Component {
               : 
               <div>
                 <Auth/>
-                <Link href="/register"><Button variant="contained" color="white">Register</Button></Link>
+                <Link href="/register"><Button variant="contained" color="plain">Register</Button></Link>
               </div>}
             </div>
           </Toolbar>
