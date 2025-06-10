@@ -348,7 +348,7 @@ class Navbar extends React.Component {
               : 
               <div>
                 <Auth/>
-                <Link href="/register"><Button variant="contained" color="white">Register</Button></Link>
+                <Link href="/register"><Button variant="contained" color="plain">Register</Button></Link>
               </div>}
             </div>
           </Toolbar>
