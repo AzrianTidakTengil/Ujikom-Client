@@ -22,6 +22,7 @@ import { palleteV1 } from "@/assets/css/template";
 import Link from "next/link";
 import { connect } from "react-redux";
 import { login } from "@/store/auth";
+import { withRouter } from "next/router";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -42,6 +43,21 @@ class Auth extends Component {
       password: "",
       errorMessage: null,
     };
+  }
+
+  componentDidMount() {
+    const { router } = this.props;
+
+    const queryString = window.location.search
+    const urlParams = new URLSearchParams(queryString);
+
+    const queryLogin = router.query.login ?? urlParams.get('login')
+
+    if (queryLogin && queryLogin === "true") {
+      this.setState({
+        open: true,
+      });
+    }
   }
 
   handleSubmit = (e) => {
@@ -305,4 +321,4 @@ const mapDispatchToProps = {
   login,
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(Auth);
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Auth));
