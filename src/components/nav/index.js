@@ -22,18 +22,29 @@ import {
   ListItem,
   ListItemButton,
   ListItemText,
-  ListItemIcon
+  ListItemIcon,
 } from "@mui/material";
 import styles from "./style.module.css";
-import { outlinedInputClasses } from '@mui/material/OutlinedInput';
-import { AccountCircle, AddBusiness, HistoryOutlined, LocalGroceryStoreOutlined, Logout, MailLockOutlined, MailOutlineOutlined, SearchOutlined, StoreOutlined, TrendingUp } from "@mui/icons-material";
+import { outlinedInputClasses } from "@mui/material/OutlinedInput";
+import {
+  AccountCircle,
+  AddBusiness,
+  HistoryOutlined,
+  LocalGroceryStoreOutlined,
+  Logout,
+  MailLockOutlined,
+  MailOutlineOutlined,
+  SearchOutlined,
+  StoreOutlined,
+  TrendingUp,
+} from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
 import React, { useState } from "react";
 import { containerModal, mainItem } from "./theme";
 import Link from "next/link";
 import { connect } from "react-redux";
-import { login, logout} from "@/store/auth";
+import { login, logout } from "@/store/auth";
 import { getUser } from "@/store/user";
 import { getAllItemTrolley } from "@/store/trolley";
 import { withRouter } from "next/router";
@@ -42,79 +53,83 @@ import { KeywordCreate, KeywordDelete, KeywordFind } from "@/store/keyword";
 
 class Navbar extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
       showModal: false,
       disableInput: false,
       user: {
-        username: '',
-        firstname: '',
-        lastname: '',
-        email: '',
-        telephone: '',
-        avatar: '',
+        username: "",
+        firstname: "",
+        lastname: "",
+        email: "",
+        telephone: "",
+        avatar: "",
       },
       badgeTrolley: 0,
       popover: {
         id: null,
-        anchorEL: null
+        anchorEL: null,
       },
       isSeller: false,
       inputSearch: {
         width: 0,
         left: 0,
       },
-      valueSearch: '',
+      valueSearch: "",
       keyword: {
         list: [],
         popular: [],
       },
-    }
+    };
     this.theme = createTheme({
       palette: {
         ...palleteV1.palette,
       },
       components: {
         MuiTextField: {
-            styleOverrides: {
-                root: {
-                    '--TextField-brandBorderColor': palleteV1.palette.white.main,
-                    '--TextField-brandBorderHoverColor': palleteV1.palette.white.main,
-                    '--TextField-brandBorderFocusedColor': palleteV1.palette.white.main,
-                    '& label.Mui-focused': {
-                        color: 'var(--TextField-brandBorderFocusedColor)',
-                    },
-                },
+          styleOverrides: {
+            root: {
+              "--TextField-brandBorderColor": palleteV1.palette.white.main,
+              "--TextField-brandBorderHoverColor": palleteV1.palette.white.main,
+              "--TextField-brandBorderFocusedColor":
+                palleteV1.palette.white.main,
+              "& label.Mui-focused": {
+                color: "var(--TextField-brandBorderFocusedColor)",
+              },
             },
+          },
         },
         MuiOutlinedInput: {
-            styleOverrides: {
-                notchedOutline: {
-                    borderColor: 'var(--TextField-brandBorderColor)',
-                },
-                root: {
-                    [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
-                        borderColor: 'var(--TextField-brandBorderHoverColor)',
-                    },
-                    [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
-                        borderColor: 'var(--TextField-brandBorderFocusedColor)',
-                    },
-                },
-            }
+          styleOverrides: {
+            notchedOutline: {
+              borderColor: "var(--TextField-brandBorderColor)",
+            },
+            root: {
+              [`&:hover .${outlinedInputClasses.notchedOutline}`]: {
+                borderColor: "var(--TextField-brandBorderHoverColor)",
+              },
+              [`&.Mui-focused .${outlinedInputClasses.notchedOutline}`]: {
+                borderColor: "var(--TextField-brandBorderFocusedColor)",
+              },
+            },
+          },
         },
-      }
-    })
+      },
+    });
   }
 
   componentDidMount() {
-    const {showModal} = this.state
+    const { showModal } = this.state;
     if (showModal) {
       setTimeout(() => {
-        this.setState({
-          showModal: false
-        }, 12000)
-      })
+        this.setState(
+          {
+            showModal: false,
+          },
+          12000
+        );
+      });
     }
   }
 
@@ -122,10 +137,10 @@ class Navbar extends React.Component {
     this.props.getUser();
     this.props.getAllItemTrolley();
   }
-  
+
   componentDidUpdate(prevProps) {
     const { user, trolley, keyword } = this.props;
-  
+
     if (user !== prevProps.user && user.isSuccess) {
       this.setState({
         user: {
@@ -134,171 +149,182 @@ class Navbar extends React.Component {
           lastname: user.lastname,
           email: user.email,
           telephone: user.telephone,
-          avatar: user.avatar
+          avatar: user.avatar,
         },
-        isSeller: user.isSeller
+        isSeller: user.isSeller,
       });
     }
-  
+
     if (trolley !== prevProps.trolley && trolley.isSuccess) {
       this.setState({
-        badgeTrolley: trolley.data.length
+        badgeTrolley: trolley.data.length,
       });
     }
-  
+
     if (keyword !== prevProps.keyword && keyword.isSuccess) {
       this.setState({
         keyword: {
-          list: keyword.data.filter(d => d.status !== 'popular'),
-          popular: keyword.data.filter(d => d.status === 'popular'),
-        }
+          list: keyword.data.filter((d) => d.status !== "popular"),
+          popular: keyword.data.filter((d) => d.status === "popular"),
+        },
       });
     }
   }
 
   handleFocus = (event) => {
-    const {showModal} = this.state
+    const { showModal } = this.state;
     const rect = event.currentTarget.getBoundingClientRect();
 
-    this.props.KeywordFind({keyword: null})
+    this.props.KeywordFind({ keyword: null });
 
     this.setState({
       showModal: true,
       inputSearch: {
         width: rect.width,
-        left: rect.left
-      }
-    })
-  }
+        left: rect.left,
+      },
+    });
+  };
 
   handleOutFocus = () => {
-    const {showModal} = this.state
-    
+    const { showModal } = this.state;
+
     this.setState({
-      showModal: false
-    })
-  }
+      showModal: false,
+    });
+  };
 
   handleChange = (val) => {
-    
-    this.props.KeywordFind({keyword: val})
+    this.props.KeywordFind({ keyword: val });
 
     this.setState({
-      valueSearch: val
-    })
-  }
+      valueSearch: val,
+    });
+  };
 
   handleRandomColor = (string) => {
-      let hash = 0;
-      let i;
+    let hash = 0;
+    let i;
 
-      /* eslint-disable no-bitwise */
-      for (i = 0; i < string.length; i += 1) {
-          hash = string.charCodeAt(i) + ((hash << 5) - hash);
-      }
+    /* eslint-disable no-bitwise */
+    for (i = 0; i < string.length; i += 1) {
+      hash = string.charCodeAt(i) + ((hash << 5) - hash);
+    }
 
-      let color = '#';
+    let color = "#";
 
-      for (i = 0; i < 3; i += 1) {
-          const value = (hash >> (i * 8)) & 0xff;
-          color += `00${value.toString(16)}`.slice(-2);
-      }
-      /* eslint-enable no-bitwise */
+    for (i = 0; i < 3; i += 1) {
+      const value = (hash >> (i * 8)) & 0xff;
+      color += `00${value.toString(16)}`.slice(-2);
+    }
+    /* eslint-enable no-bitwise */
 
-      return color;
-  }
+    return color;
+  };
 
   handleSplitCharacter = (value) => {
-      return {
-          sx: {
-              bgcolor: this.handleRandomColor(value),
-            },
-          children: `${value.split(' ')[0][0]}${value.split(' ')[1][0]}`,
-      }
-  }
+    return {
+      sx: {
+        bgcolor: this.handleRandomColor(value),
+      },
+      children: `${value.split(" ")[0][0]}${value.split(" ")[1][0]}`,
+    };
+  };
 
   handleOpenPopever = (event) => {
     this.setState({
       popover: {
         ...this.state.popover,
-        anchorEL: event.currentTarget
-      }
-    })
-  }
+        anchorEL: event.currentTarget,
+      },
+    });
+  };
 
   handleClosePopever = () => {
     this.setState({
       popover: {
         ...this.state.popover,
-        anchorEL: null
-      }
-    })
-  }
+        anchorEL: null,
+      },
+    });
+  };
 
   handlePush = (val) => {
-    const {router} = this.props
+    const { router } = this.props;
 
     router.push({
-      pathname: '/search',
+      pathname: "/search",
       query: {
-        keyword: val
-      }
-    })
+        keyword: val,
+      },
+    });
 
-    this.props.KeywordCreate({keyword: val})
+    this.props.KeywordCreate({ keyword: val });
 
     this.setState({
       showModal: false,
-    })
-  }
+    });
+  };
 
   handleLogOut = () => {
-    this.props.logout()
-  }
+    this.props.logout();
+  };
 
   render() {
-    const {showModal, user, badgeTrolley, popover, isSeller, inputSearch, valueSearch, keyword} = this.state
-    const {auth} = this.props
+    const {
+      showModal,
+      user,
+      badgeTrolley,
+      popover,
+      isSeller,
+      inputSearch,
+      valueSearch,
+      keyword,
+    } = this.state;
+    const { auth } = this.props;
 
     return (
       <ThemeProvider theme={this.theme}>
         <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
-            <Link href='/' style={{textDecoration: 'none'}}><h1 className={styles.title}>Popping</h1></Link>
+            <Link href="/" style={{ textDecoration: "none" }}>
+              <h1 className={styles.title}>Popping</h1>
+            </Link>
             <TextField
-              sx={{ width: '40%' }}
+              sx={{ width: "40%" }}
               size="small"
               hiddenLabel
-              slotProps={{ input: {
-                startAdornment: (
+              slotProps={{
+                input: {
+                  startAdornment: (
                     <InputAdornment position="start">
-                        <SearchOutlined color="white"/>
+                      <SearchOutlined color="white" />
                     </InputAdornment>
-                )
-              }}}
+                  ),
+                },
+              }}
               onChange={(event) => this.handleChange(event.target.value)}
               onClick={this.handleFocus}
               autoComplete="off"
             />
             <div>
-              {user.username ? 
-              <Grid container direction={'row'} spacing={2}>
-                <Grid>
-                  <Link href={'/trolley'}>
+              {user.username ? (
+                <Grid container direction={"row"} spacing={2}>
+                  <Grid>
+                    <Link href={"/trolley"}>
+                      <IconButton>
+                        <Badge badgeContent={badgeTrolley} color="secondary">
+                          <LocalGroceryStoreOutlined />
+                        </Badge>
+                      </IconButton>
+                    </Link>
+                  </Grid>
+                  <Grid>
                     <IconButton>
-                      <Badge badgeContent={badgeTrolley} color="secondary">
-                        <LocalGroceryStoreOutlined/>
-                      </Badge>
+                      <MailOutlineOutlined />
                     </IconButton>
-                  </Link>
-                </Grid>
-                <Grid>
-                <IconButton>
-                    <MailOutlineOutlined />
-                  </IconButton>
-                </Grid>
-                {
-                  isSeller ? (
+                  </Grid>
+                  {isSeller ? (
                     <IconButton href="/seller/">
                       <StoreOutlined />
                     </IconButton>
@@ -306,135 +332,138 @@ class Navbar extends React.Component {
                     <IconButton href="/register/openshop">
                       <AddBusiness />
                     </IconButton>
-                  )
-                }
-                <Grid>
-                  <div style={{cursor: 'pointer'}} onClick={this.handleOpenPopever}>
-                    <Avatar src={Cld.image(user.avatar).toURL()}/>
-                  </div>
-                  <Popover
-                    open={Boolean(popover.anchorEL)}
-                    anchorEl={popover.anchorEL}
-                    onClose={this.handleClosePopever}
-                    anchorOrigin={{
-                      vertical: 'bottom',
-                      horizontal: 'right',
-                    }}
-                    transformOrigin={{
-                      vertical: 'top',
-                      horizontal: 'right',
-                    }}
-                  >
-                    <Box
-                      sx={{
-                        p: 2
+                  )}
+                  <Grid>
+                    <div
+                      style={{ cursor: "pointer" }}
+                      onClick={this.handleOpenPopever}
+                    >
+                      <Avatar src={Cld.image(user.avatar).toURL()} />
+                    </div>
+                    <Popover
+                      open={Boolean(popover.anchorEL)}
+                      anchorEl={popover.anchorEL}
+                      onClose={this.handleClosePopever}
+                      anchorOrigin={{
+                        vertical: "bottom",
+                        horizontal: "right",
+                      }}
+                      transformOrigin={{
+                        vertical: "top",
+                        horizontal: "right",
                       }}
                     >
-                      <Stack
-                        divider={<Divider flexItem />}
-                        spacing={2}
+                      <Box
+                        sx={{
+                          p: 2,
+                        }}
                       >
-                        <Button href="/profile" startIcon={<AccountCircle/>}>
-                          Profile
-                        </Button>
-                        <Button startIcon={<Logout/>} onClick={this.handleLogOut}>
-                          Log out
-                        </Button>
-                      </Stack>
-                    </Box>
-                  </Popover>
+                        <Stack divider={<Divider flexItem />} spacing={2}>
+                          <Button href="/profile" startIcon={<AccountCircle />}>
+                            Profile
+                          </Button>
+                          <Button
+                            startIcon={<Logout />}
+                            onClick={this.handleLogOut}
+                          >
+                            Log out
+                          </Button>
+                        </Stack>
+                      </Box>
+                    </Popover>
+                  </Grid>
                 </Grid>
-              </Grid> 
-              : 
-              <div>
-                <Auth/>
-                <Link href="/register"><Button variant="contained" color="plain">Register</Button></Link>
-              </div>}
+              ) : (
+                <div>
+                  <Auth />
+                  <Link href="/register">
+                    <Button variant="contained" color="plain">
+                      Register
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </Toolbar>
         </AppBar>
-          <Modal
-              open={showModal}
-              onClose={this.handleOutFocus}
-              sx={containerModal}
-              disableAutoFocus
+        <Modal
+          open={showModal}
+          onClose={this.handleOutFocus}
+          sx={containerModal}
+          disableAutoFocus
+        >
+          <Box
+            sx={{
+              ...mainItem,
+              width: inputSearch.width,
+              left: `${parseInt(inputSearch.left)}px`,
+              maxHeight: 500,
+              overflowY: "scroll",
+            }}
           >
-              <Box
-                sx={{
-                  ...mainItem,
-                  width: inputSearch.width,
-                  left: `${parseInt(inputSearch.left)}px`,
-                  maxHeight: 500,
-                  overflowY: 'scroll',
-                }}
-              >
-                  {
-                    this.props.keyword.isLoading ? (
-                      <CircularProgress sx={{marginX: 'auto', marginY: 2}}/>
-                    ) : (
-                      <List>
-                      {
-                        valueSearch ? (
-                          <ListItem
-                          sx={{
-                            paddingY: 0,
-                          }}
-                          >
-                            <ListItemButton onClick={() => this.handlePush(valueSearch)}>
-                              <ListItemIcon>
-                                <SearchOutlined/>
-                              </ListItemIcon>
-                              <ListItemText primary={valueSearch}/>
-                            </ListItemButton>
-                          </ListItem>
-                        ) : ''
-                      }
-                      {
-                        keyword.list.map((val, index) => (
-                          <ListItem
-                            key={index}
-                            sx={{
-                              paddingY: 0,
-                            }}
-                          >
-                            <ListItemButton onClick={() => this.handlePush(val.label)}>
-                              <ListItemIcon>
-                                {
-                                  val.status == 'history' ? <HistoryOutlined/> : <SearchOutlined/>
-                                }
-                              </ListItemIcon>
-                              <ListItemText primary={val.label}/>
-                            </ListItemButton>
-                          </ListItem>
-                        ))
-                      }
-                      {
-                        keyword.list.length != 0 ? <Divider/> : ''
-                      }
-                      {
-                        keyword.popular.map((val, index) => (
-                          <ListItem
-                            key={index}
-                            sx={{
-                              paddingY: 0,
-                            }}
-                          >
-                            <ListItemButton onClick={() => this.handlePush(val.label)}>
-                              <ListItemIcon>
-                                <TrendingUp/>
-                              </ListItemIcon>
-                              <ListItemText primary={val.label}/>
-                            </ListItemButton>
-                          </ListItem>
-                        ))
-                      }
-                    </List>
-                    )
-                  }
-              </Box>
-          </Modal>
+            {this.props.keyword.isLoading ? (
+              <CircularProgress sx={{ marginX: "auto", marginY: 2 }} />
+            ) : (
+              <List>
+                {valueSearch ? (
+                  <ListItem
+                    sx={{
+                      paddingY: 0,
+                    }}
+                  >
+                    <ListItemButton
+                      onClick={() => this.handlePush(valueSearch)}
+                    >
+                      <ListItemIcon>
+                        <SearchOutlined />
+                      </ListItemIcon>
+                      <ListItemText primary={valueSearch} />
+                    </ListItemButton>
+                  </ListItem>
+                ) : (
+                  ""
+                )}
+                {keyword.list.map((val, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      paddingY: 0,
+                    }}
+                  >
+                    <ListItemButton onClick={() => this.handlePush(val.label)}>
+                      <ListItemIcon>
+                        {val.status == "history" ? (
+                          <HistoryOutlined />
+                        ) : (
+                          <SearchOutlined />
+                        )}
+                      </ListItemIcon>
+                      <ListItemText primary={val.label} />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+                {keyword.list.length != 0 ? <Divider /> : ""}
+                {keyword.popular.map((val, index) => (
+                  <ListItem
+                    key={index}
+                    sx={{
+                      paddingY: 0,
+                    }}
+                  >
+                    <ListItemButton onClick={() => this.handlePush(val.label)}>
+                      <ListItemIcon>
+                        <TrendingUp />
+                      </ListItemIcon>
+                      <ListItemText primary={val.label} />
+                    </ListItemButton>
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </Box>
+        </Modal>
       </ThemeProvider>
-    )
+    );
   }
 }
 
@@ -466,7 +495,7 @@ const mapStateToProps = (state) => ({
     isSuccess: state.keyword.isSuccess,
     data: state.keyword.data,
   },
-})
+});
 
 const mapDispatchToProps = {
   getUser,
@@ -474,7 +503,7 @@ const mapDispatchToProps = {
   logout,
   KeywordFind,
   KeywordCreate,
-  KeywordDelete
-}
+  KeywordDelete,
+};
 
-export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Navbar))
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(Navbar));
