@@ -41,13 +41,13 @@ export const palleteV1 = createTheme({
     info: {
       light: "#0092E0",
       main: "#0077B6",
-      dark: "#264422",
+      dark: "#005D8F",
       contrastText: "#FAF9F0",
     },
     success: {
       light: "#4C8844",
       main: "#31572C",
-      dark: "#005D8F",
+      dark: "#264422",
       contrastText: "#FAF9F0",
     },
     plain: {
