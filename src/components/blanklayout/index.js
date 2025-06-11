@@ -1,11 +1,18 @@
 import Navbar from "../nav";
 import Footer from "../footer";
 import Link from "next/link";
-import { AppBar, Toolbar, Typography, Box } from "@mui/material";
+import { AppBar, Toolbar, Typography, Box, ThemeProvider, createTheme } from "@mui/material";
+import { palleteV1 } from "@/assets/css/template";
+
+const theme = createTheme({
+    palette: {
+        ...palleteV1.palette
+    }
+})
 
 export default function BlankLayout({children}) {
     return (
-        <>
+        <ThemeProvider theme={theme}>
             <AppBar position="fixed">
                 <Toolbar sx={{ justifyContent: "space-between" }}>
                     <Link href="/" style={{textDecoration: 'none', color: '#fff'}}><Typography variant='h4' fontSize={'1.25rem'} fontWeight={800}>Popping</Typography></Link>
@@ -28,6 +35,6 @@ export default function BlankLayout({children}) {
             }}>
                 <Footer></Footer>
             </div>
-        </>
+        </ThemeProvider>
     )
 }
