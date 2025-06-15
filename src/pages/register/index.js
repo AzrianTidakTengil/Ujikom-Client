@@ -52,6 +52,10 @@ import {
 
 const playfair = Playfair_Display({ subsets: ["latin"], weight: "700" });
 
+const theme = createTheme({
+  ...palleteV1,
+});
+
 class Register extends React.Component {
   constructor(props) {
     super(props);
@@ -70,11 +74,6 @@ class Register extends React.Component {
       otp: "",
       errorMessage: null,
     };
-    this.theme = createTheme({
-      pallete: {
-        ...palleteV1.palette,
-      },
-    });
   }
 
   componentDidUpdate(prevProps) {
@@ -689,7 +688,7 @@ class Register extends React.Component {
     const { progressIndex } = this.props.auth;
 
     return (
-      <ThemeProvider theme={this.theme}>
+      <ThemeProvider theme={theme}>
         <div className="px-6 py-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center justify-center">
             <div className="flex flex-col items-center justify-center space-y-2">
@@ -712,7 +711,7 @@ class Register extends React.Component {
                     position: "absolute",
                     top: 0,
                     left: 0,
-                    zIndex: this.theme.zIndex.modal + 1,
+                    zIndex: theme.zIndex.modal + 1,
                     backgroundColor: "rgba(236, 236, 236, 0.3)",
                   }}
                 >
