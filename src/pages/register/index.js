@@ -711,7 +711,7 @@ class Register extends React.Component {
                     position: "absolute",
                     top: 0,
                     left: 0,
-                    zIndex: this.theme.zIndex.modal + 1,
+                    zIndex: theme.zIndex.modal + 1,
                     backgroundColor: "rgba(236, 236, 236, 0.3)",
                   }}
                 >
