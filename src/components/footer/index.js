@@ -38,7 +38,7 @@ class Footer extends Component {
         >
           <div className="grid grid-cols-3 gap-4">
             <div className="px-4">
-              <h5 className="text-4xl font-semibold mb-4">Help</h5>
+              <h5 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-4">Help</h5>
               <Link href={"/"}>
                 <p className="text-md font-light">Customer Support</p>
               </Link>
@@ -50,7 +50,7 @@ class Footer extends Component {
               </Link>
             </div>
             <div className="px-4">
-              <h5 className="text-4xl font-semibold mb-4">About the Company</h5>
+              <h5 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-4">About</h5>
               <Link href={"/"}>
                 <p className="text-md font-light">Our Story</p>
               </Link>
@@ -62,8 +62,8 @@ class Footer extends Component {
               </Link>
             </div>
             <div className="px-4">
-              <h5 className="text-4xl font-semibold mb-4">Follow Us</h5>
-              <div className="flex space-x-2">
+              <h5 className="text-xl md:text-2xl lg:text-3xl font-semibold mb-4">Follow</h5>
+              <div className="flex space-x-2 flex-col md:flex-row">
                 <IconButton
                   href="https://www.instagram.com/"
                   target="_blank"
