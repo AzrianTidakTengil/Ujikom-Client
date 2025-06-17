@@ -1,3 +1,5 @@
+'use client'
+
 const { Component } = require("react");
 import {
   Container,
