@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 const { Component } = require("react");
 import {
@@ -14,7 +14,7 @@ import {
 import InstagramIcon from "@mui/icons-material/Instagram";
 import { palleteV1 } from "@/assets/css/template";
 import Link from "next/link";
-import { Facebook, Twitter } from "@mui/icons-material";
+import { Facebook, Twitter, X } from "@mui/icons-material";
 
 const theme = createTheme({
   ...palleteV1,
@@ -64,39 +64,27 @@ class Footer extends Component {
             <div className="px-4">
               <h5 className="text-4xl font-semibold mb-4">Follow Us</h5>
               <div className="flex space-x-2">
-                <Link href={"/"}>
-                  <p className="text-md font-light">
-                    <IconButton
-                      href="https://www.instagram.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <InstagramIcon fontSize="large" />
-                    </IconButton>
-                  </p>
-                </Link>
-                <Link href={"/"}>
-                  <p className="text-md font-light">
-                    <IconButton
-                      href="https://www.facebook.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Facebook fontSize="large" />
-                    </IconButton>
-                  </p>
-                </Link>
-                <Link href={"/"}>
-                  <p className="text-md font-light">
-                    <IconButton
-                      href="https://www.facebook.com/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <Twitter fontSize="large" />
-                    </IconButton>
-                  </p>
-                </Link>
+                <IconButton
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <InstagramIcon/>
+                </IconButton>
+                <IconButton
+                  href="https://www.facebook.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Facebook/>
+                </IconButton>
+                <IconButton
+                  href="https://www.x.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <X/>
+                </IconButton>
               </div>
             </div>
           </div>
