@@ -1,4 +1,4 @@
-import { Auth } from "./form/form";
+import Auth from "./form/form";
 import Navbar from "./nav";
 import Layout from "./layout";
 import Carousel from "./carousel";
@@ -11,6 +11,8 @@ import ImageInput from "./imageinput";
 import TimePick from "./timepicker";
 import CropImage from "./cropimage";
 import BlankLayout from "./blanklayout";
+import NavbarMobile from "./navMobile";
+import Footer from "./footer";
 
 export {
     Auth,
@@ -25,5 +27,7 @@ export {
     ImageInput,
     TimePick,
     CropImage,
-    BlankLayout
+    BlankLayout,
+    NavbarMobile,
+    Footer,
 }
