@@ -1,19 +1,22 @@
-import Navbar from "../nav";
-import Footer from "../footer";
+import { useBreakpoint } from "@/config";
+import { NavbarMobile, Navbar, Footer } from "..";
 
 export default function Layout({children}) {
+    const breakpoint = useBreakpoint()
+
     return (
         <>
-            <Navbar></Navbar>
-            <main style={{
-                marginTop: '4.5rem',
-                padding: '1rem 0.5rem'
-            }}>
+            {
+                breakpoint === 'default' ? (
+                    <NavbarMobile></NavbarMobile>
+                ) : (
+                    <Navbar></Navbar>
+                )
+            }
+            <main className="px-2 py-4 mt-24">
                 {children}
             </main>
-            <div style={{
-                width: '100%'
-            }}>
+            <div className="w-full">
                 <Footer></Footer>
             </div>
         </>
