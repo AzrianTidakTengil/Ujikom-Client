@@ -74,25 +74,25 @@ class Main extends Component {
         ];
 
         return (
-            <Container sx={{ mt: 5, p: 3, backgroundColor: "#f9f9f9", borderRadius: 2, boxShadow: 3  }}>
-                <div>
-                    <Typography variant="h4" textAlign="start" mb={3} className={playfair.className}>Kategori</Typography>
+            <Paper className='p-2'>
+                <h5 className='font-semibold text-2xl md:text-4xl mb-4'>Kategori</h5>
+                <div className='flex overflow-x-scroll gap-4 grid-cols-5 pb-4'>
+                    {
+                        categories.map((category, index) => (
+                            <div key={index} className="min-w-28 md:min-w-32">
+                                <Card sx={{ textAlign: "center", bgcolor: category.color }}>
+                                    <CardActionArea>
+                                        <CardContent>
+                                            <h6 className='font-medium md:text-lg text-md'>{category.icon}</h6>
+                                            <h6 className='font-medium md:text-lg text-md'>{category.name}</h6>
+                                        </CardContent>
+                                    </CardActionArea>
+                                </Card>
+                            </div>
+                        ))
+                    }
                 </div>
-                <Grid container columns={10} rowSpacing={2} columnSpacing={2}>
-                    {categories.map((category, index) => (
-                        <Grid key={index} size={{md:2.5, lg:2}}>
-                            <Card sx={{ textAlign: "center", bgcolor: category.color }}>
-                                <CardActionArea>
-                                    <CardContent>
-                                        {category.icon}
-                                        <Typography variant="h6">{category.name}</Typography>
-                                    </CardContent>
-                                </CardActionArea>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
-            </Container>
+            </Paper>
         )
     }
 
@@ -188,8 +188,9 @@ class Main extends Component {
         return(
             <ThemeProvider theme={theme}>
                 <Container maxWidth="lg">
-                    <Carousel/>
-                    <hr style={{marginTop: 64}}/>
+                    <div className='mb-10'>
+                        <Carousel/>
+                    </div>
                     {this.renderCategorySection()}
                     {this.renderProducts()}
                 </Container>
