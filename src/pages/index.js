@@ -188,8 +188,9 @@ class Main extends Component {
         return(
             <ThemeProvider theme={theme}>
                 <Container maxWidth="lg">
-                    <Carousel/>
-                    <hr style={{marginTop: 64}}/>
+                    <div className='md:block hidden'>
+                        <Carousel/>
+                    </div>
                     {this.renderCategorySection()}
                     {this.renderProducts()}
                 </Container>
