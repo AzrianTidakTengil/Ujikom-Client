@@ -1,4 +1,3 @@
-import { BlankLayout, Layout, SellerLayout } from "../components";
 import { Playfair_Display, Poppins } from "next/font/google";
 import { Provider } from "react-redux";
 import store from "@/store";
@@ -9,6 +8,10 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
 import { Backdrop, CircularProgress } from '@mui/material';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
+import Layout from "@/components/layout/default";
+import BlankLayout from "@/components/layout/blank";
+import SellerLayout from "@/components/layout/seller";
+import AdminLayout from "@/components/layout/admin";
 
 const font = Poppins({
   weight: '400',
@@ -68,9 +71,9 @@ export default function MyApp({ Component, pageProps }) {
                         <Component {...pageProps} />
                     </BlankLayout>
                 : regex.admin.test(router.route) ? 
-                    <>
+                    <AdminLayout>
                         <Component {...pageProps} />
-                    </>
+                    </AdminLayout>
                 : getLayout ? (
                     getLayout(<Component {...pageProps} />)
                 ) : (<Layout>

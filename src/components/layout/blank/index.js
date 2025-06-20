@@ -1,5 +1,4 @@
-import Navbar from "../nav";
-import Footer from "../footer";
+import Footer from "@/components/footer";
 import Link from "next/link";
 import { AppBar, Toolbar, Typography, Box, ThemeProvider, createTheme } from "@mui/material";
 import { palleteV1 } from "@/assets/css/template";

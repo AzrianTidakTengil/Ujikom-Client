@@ -1,5 +1,4 @@
 import { palleteV1 } from "@/assets/css/template";
-import { SellerLayout } from "@/components";
 import { BalanceInformation, getSeller, MyProductInTrolley, PopularAnalysisProduct } from "@/store/shop";
 import { Favorite, ShoppingCart, TravelExplore, Visibility, VisibilityOff } from "@mui/icons-material";
 import { Container, createTheme, Paper, ThemeProvider, Grid2 as Grid, Typography, Box, IconButton, Stack, Divider, Button, TableContainer, Table, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
