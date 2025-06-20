@@ -19,6 +19,7 @@ const font = Poppins({
 const regex = {
     seller: /seller/i,
     blank: /register/i,
+    admin: /admin/i,
 }
 
 const theme = createTheme(); 
@@ -66,6 +67,10 @@ export default function MyApp({ Component, pageProps }) {
                     <BlankLayout>
                         <Component {...pageProps} />
                     </BlankLayout>
+                : regex.admin.test(router.route) ? 
+                    <>
+                        <Component {...pageProps} />
+                    </>
                 : getLayout ? (
                     getLayout(<Component {...pageProps} />)
                 ) : (<Layout>
