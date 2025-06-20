@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { AppBar, Toolbar, Typography, IconButton, Drawer, List, ListItem, ListItemText, Box, ThemeProvider, createTheme, ListItemButton, ListItemIcon, TextField, InputAdornment, outlinedInputClasses, Popover, Container, Backdrop, CircularProgress, Avatar, Stack, Divider, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { Logout, AccountCircle } from "@mui/icons-material";
-import MiniDrawer from "../minidrawer";
+import MiniDrawer from "@/components/minidrawer";
 import { AccountBalance, AccountBalanceWallet, Assignment, Feedback, Home, House, Inventory, Settings, Wallet, SearchOutlined } from "@mui/icons-material";
 import { withRouter } from "next/router";
 import { palleteV1 } from "@/assets/css/template";

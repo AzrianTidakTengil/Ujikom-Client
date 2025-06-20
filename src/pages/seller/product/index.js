@@ -3,7 +3,6 @@ import { Container, createTheme, Paper, ThemeProvider, Typography, Grid2 as Grid
 import { withRouter } from "next/router"
 import {Component} from "react"
 import { connect } from "react-redux"
-import { SellerLayout } from "@/components"
 import { DataGrid } from "@mui/x-data-grid"
 import { Delete, Edit, SearchOutlined } from "@mui/icons-material"
 import { MyProductShop } from "@/store/shop"
