@@ -1,13 +1,27 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
 @import "tailwindcss";
 
+@plugin "tailwind-scrollbar" {
+  nocompatible: true;
+}
+
 @theme {
   --font-playfair-display: "Playfair Display", serif;
   --font-lato: "Lato", sans-serif;
+
+  --color-primary-light: #E58E76;
+  --color-primary-main: #E07A5F;
+  --color-primary-dark: #D85531;
+  --color-primary-contrastText: #1B1B1B;
+
+  --color-secondary-light: #52567A;
+  --color-secondary-main: #3D405B;
+  --color-secondary-dark: #313349;
+  --color-secondary-contrastText: #F4F1DE;
 }
 
 body {
-    margin: 0;
-    font-family: "lato", sans-serif;
-    background-color: #FAF9F0;
+  margin: 0;
+  font-family: "lato", sans-serif;
+  background-color: #FAF9F0;
 }
