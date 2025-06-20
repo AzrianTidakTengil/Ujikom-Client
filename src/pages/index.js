@@ -74,9 +74,9 @@ class Main extends Component {
         ];
 
         return (
-            <Paper className='p-2'>
+            <Paper className='p-4'>
                 <h5 className='font-semibold text-2xl md:text-4xl mb-4'>Kategori</h5>
-                <div className='flex overflow-x-scroll gap-4 grid-cols-5 pb-4'>
+                <div className='flex overflow-x-scroll gap-4 grid-cols-5 pb-4 scrollbar-thin scrollbar-thumb-secondary-light scrollbar-track-transparent'>
                     {
                         categories.map((category, index) => (
                             <div key={index} className="min-w-28 md:min-w-32">
