@@ -226,7 +226,7 @@ class NavbarMobile extends React.Component {
         <AppBar position="fixed">
           <Toolbar sx={{ justifyContent: "space-between" }}>
             <Link href="/" className="">
-              <h1 className={`font-bold text-xl`}>Popping</h1>
+              <h1 className={`font-bold text-xl text-plain-main`}>Popping</h1>
             </Link>
             {true ? (
               <div className="flex !space-x-1.5">
