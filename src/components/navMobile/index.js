@@ -19,10 +19,27 @@ import {
   InputAdornment,
   Modal,
   Paper,
+  Popover,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Divider,
+  ListItemButton,
+  ListItemIcon,
 } from "@mui/material";
 import { palleteV1 } from "@/assets/css/template";
 import Link from "next/link";
-import { LocalGroceryStore, Mail, Search } from "@mui/icons-material";
+import {
+  AccountCircle,
+  AddBusiness,
+  LocalGroceryStore,
+  Logout,
+  Mail,
+  Receipt,
+  Search,
+  StoreOutlined,
+} from "@mui/icons-material";
 import { Auth } from "..";
 import { outlinedInputClasses } from "@mui/material/OutlinedInput";
 
@@ -84,6 +101,10 @@ class NavbarMobile extends React.Component {
       inputSearch: {
         width: 0,
         bottom: 0,
+      },
+      popover: {
+        anchorEl: null,
+        open: false,
       },
     };
   }
@@ -180,8 +201,26 @@ class NavbarMobile extends React.Component {
     });
   };
 
+  handleOpenPopever = (event) => {
+    this.setState({
+      popover: {
+        ...this.state.popover,
+        anchorEl: event.currentTarget,
+      },
+    });
+  };
+
+  handleClosePopever = () => {
+    this.setState({
+      popover: {
+        ...this.state.popover,
+        anchorEl: null,
+      },
+    });
+  };
+
   render() {
-    const { user, badgeTrolley, showModal, inputSearch } = this.state;
+    const { user, badgeTrolley, showModal, inputSearch, popover } = this.state;
     return (
       <ThemeProvider theme={theme}>
         <AppBar position="fixed">
@@ -189,7 +228,7 @@ class NavbarMobile extends React.Component {
             <Link href="/" className="">
               <h1 className={`font-bold text-xl`}>Popping</h1>
             </Link>
-            {false ? (
+            {true ? (
               <div className="flex !space-x-1.5">
                 <IconButton href="/trolley">
                   <Badge badgeContent={badgeTrolley} color="secondary">
@@ -201,8 +240,8 @@ class NavbarMobile extends React.Component {
                     <Mail color="plain" />
                   </Badge>
                 </IconButton>
-                <IconButton>
-                  <Avatar sx={{ width: 40, height: 40 }} />
+                <IconButton onClick={this.handleOpenPopever}>
+                  <Avatar src={Cld.image(user.avatar).toURL()} />
                 </IconButton>
               </div>
             ) : (
@@ -240,7 +279,7 @@ class NavbarMobile extends React.Component {
           onClose={this.handleOutFocus}
           disableAutoFocus
           sx={{
-            zIndex: theme.zIndex.appBar - 1
+            zIndex: theme.zIndex.appBar - 1,
           }}
           className="w-full h-screen px-2"
         >
@@ -252,6 +291,80 @@ class NavbarMobile extends React.Component {
             className="p-2 overflow-y-auto max-h-1/2 absolute"
           ></Paper>
         </Modal>
+        <Popover
+          open={Boolean(popover.anchorEl)}
+          anchorEl={popover.anchorEl}
+          onClose={this.handleClosePopever}
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "right",
+          }}
+          transformOrigin={{
+            vertical: "top",
+            horizontal: "right",
+          }}
+        >
+          <List>
+            <ListItemButton disablePadding component={Link} href="/profile">
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                <AccountCircle />
+              </ListItemIcon>
+              <ListItemText primary="Profile" />
+            </ListItemButton>
+            <ListItemButton disablePadding component={Link} href="/receipt">
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                <Receipt />
+              </ListItemIcon>
+              <ListItemText primary="Kuitansi" />
+            </ListItemButton>
+            {user.isSeller && (
+              <ListItem button component={Link} href="/seller/dashboard">
+                Seller Dashboard
+              </ListItem>
+            )}
+            {user.isSeller ? (
+              <>
+                <Divider />
+                <ListItemButton
+                  disablePadding
+                  component={Link}
+                  href="/seller/Dashboard"
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    <StoreOutlined />
+                  </ListItemIcon>
+                  <ListItemText primary="Dashboard" />
+                </ListItemButton>
+              </>
+            ) : (
+              <>
+                <Divider />
+                <ListItemButton
+                  disablePadding
+                  component={Link}
+                  href="/register/openshop"
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    <AddBusiness />
+                  </ListItemIcon>
+                  <ListItemText primary="Buka Toko" />
+                </ListItemButton>
+              </>
+            )}
+            <Divider />
+            <ListItemButton
+              disablePadding
+              component={Link}
+              href="/register/openshop"
+              sx={{ color: "error.main" }}
+            >
+              <ListItemIcon sx={{ minWidth: 40 }}>
+                <Logout color="error" />
+              </ListItemIcon>
+              <ListItemText primary="Logout" color="error" />
+            </ListItemButton>
+          </List>
+        </Popover>
       </ThemeProvider>
     );
   }
