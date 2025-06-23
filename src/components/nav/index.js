@@ -37,6 +37,7 @@ import {
   SearchOutlined,
   StoreOutlined,
   TrendingUp,
+  Receipt,
 } from "@mui/icons-material";
 import Auth from "../form/form";
 import { palleteV1 } from "@/assets/css/template";
@@ -353,23 +354,49 @@ class Navbar extends React.Component {
                         horizontal: "right",
                       }}
                     >
-                      <Box
-                        sx={{
-                          p: 2,
-                        }}
-                      >
-                        <Stack divider={<Divider flexItem />} spacing={2}>
-                          <Button href="/profile" startIcon={<AccountCircle />}>
-                            Profile
-                          </Button>
-                          <Button
-                            startIcon={<Logout />}
-                            onClick={this.handleLogOut}
+                      <List>
+                        <ListItemButton
+                          disablePadding
+                          component={Link}
+                          href="/profile"
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            <AccountCircle />
+                          </ListItemIcon>
+                          <ListItemText primary="Profile" />
+                        </ListItemButton>
+                        <ListItemButton
+                          disablePadding
+                          component={Link}
+                          href="/receipt"
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            <Receipt />
+                          </ListItemIcon>
+                          <ListItemText primary="Kuitansi" />
+                        </ListItemButton>
+                        {user.isSeller && (
+                          <ListItem
+                            button
+                            component={Link}
+                            href="/seller/dashboard"
                           >
-                            Log out
-                          </Button>
-                        </Stack>
-                      </Box>
+                            Seller Dashboard
+                          </ListItem>
+                        )}
+                        <Divider />
+                        <ListItemButton
+                          disablePadding
+                          component={Link}
+                          href="/register/openshop"
+                          sx={{ color: "error.main" }}
+                        >
+                          <ListItemIcon sx={{ minWidth: 40 }}>
+                            <Logout color="error" />
+                          </ListItemIcon>
+                          <ListItemText primary="Logout" color="error" />
+                        </ListItemButton>
+                      </List>
                     </Popover>
                   </Grid>
                 </Grid>
