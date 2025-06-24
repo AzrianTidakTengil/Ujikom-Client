@@ -3,6 +3,7 @@
 import { Visibility, VisibilityOff } from "@mui/icons-material"
 import { createTheme, FormControl, FormControlLabel, FormHelperText, FormLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, Radio, RadioGroup, TextField, ThemeProvider } from "@mui/material"
 import { useState } from "react"
+import { NumericFormat } from "react-number-format"
 
 export const InputEmail = ({fullWidth, placeholder = "", value, label, style = {}, error, ...props}) => {
     return (
@@ -119,5 +120,19 @@ export const InputGender = ({style = {}, change = {}, value, ...props}) => {
                 <FormControlLabel value="3" control={<Radio/>} label="Saya tidak ingin memberi tau"/>
             </RadioGroup>
         </FormControl>
+    )
+}
+
+export const InputPrice = ({style = {}, value, ...props}) => {
+    return (
+        <NumericFormat
+            thousandSeparator="."
+            decimalSeparator=","
+            prefix="Rp "
+            customInput={TextField}
+            variant="outlined"
+            fullWidth
+            {...props}
+        />
     )
 }
