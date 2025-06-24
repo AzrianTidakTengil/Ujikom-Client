@@ -1,11 +1,11 @@
 import { Component } from 'react';
-import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider } from '@mui/material';
+import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider, Paper, RadioGroup, Radio } from '@mui/material';
 import { Playfair_Display, Poppins } from "next/font/google";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useRouter, withRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
 import { ExpandMore, Filter, FilterAlt, SearchOff, SearchOutlined, Star } from '@mui/icons-material';
-import { InputText } from '@/components/input';
+import { InputPrice, InputText } from '@/components/input';
 import { palleteV1 } from '@/assets/css/template';
 import Link from 'next/link';
 import { Cld } from '@/config';
@@ -19,6 +19,8 @@ class Search extends Component {
         this.state = {
             keyword: null,
             listProduct: [],
+            city: [],
+            filter: {},
         }
         this.theme = createTheme({
             palette: {
@@ -158,70 +160,114 @@ class Search extends Component {
     // };
 
     renderFilter = () => {
+        const { city, filter } = this.state;
+
+        const dummyCity = [
+            { id: 1, name: 'Jakarta' },
+            { id: 2, name: 'Bandung' },
+            { id: 3, name: 'Surabaya' },
+            { id: 4, name: 'Medan' },
+        ];
+
         return (
-            <Card>
-                <CardContent>
-                    <div style={{display: 'flex', justifyContent: 'center'}}>
-                        <FilterAlt/>
-                        <Typography variant='h5'>Filter</Typography>
+            <Paper
+                className='p-4 w-full'
+            >
+                <h4 className='font-bold text-2xl'>Filter</h4>
+                <Divider className='my-2'/>
+                <div className='flex flex-col my-2 space-y-1.5'>
+                    <div>
+                        <h5 className='font-semibold text-lg'>Lokasi</h5>
+                        <FormControl>
+                            <RadioGroup name='location' onChange={this.handleLocationChange} value={filter.location || ''}>
+                                {
+                                    dummyCity.map((item) => (
+                                        <FormControlLabel 
+                                            key={item.id} 
+                                            value={item.name} 
+                                            control={<Radio />} 
+                                            label={item.name} 
+                                        />
+                                    ))
+                                }
+                            </RadioGroup>
+                        </FormControl>
                     </div>
-                    <Grid container rowSpacing={2} columns={1} sx={{marginTop: 4}}>
-                        <Grid size={1}>
-                            <Accordion defaultExpanded>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMore/>}
-                                    aria-controls="panel-content"
-                                >
-                                    <Typography variant='subtitle1' sx={{marginBottom: 2}}>Kategori bersangkutan</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    <FormGroup>
-                                        <FormControlLabel control={<Checkbox />} label="Handphone" />
-                                        <FormControlLabel control={<Checkbox />} label="Eletronic" />
-                                    </FormGroup>
-                                </AccordionDetails>
-                            </Accordion>
-                        </Grid>
-                        <Grid size={1}>
-                            <Typography variant='subtitle1' sx={{marginBottom: 2}}>Rating</Typography>
-                            <div style={{width: '100%', margin: 'auto'}}>
-                                <Rating
-                                    name='rating'
-                                    defaultValue={4}
-                                />
-                            </div>
-                        </Grid>
-                        <Grid size={1}>
-                            <Typography variant='subtitle1'>Harga</Typography>
-                            <InputText label="Min. Harga" style={{marginTop: 5}}/>
-                            <InputText label="Max. Harga" style={{marginTop: 5}}/>
-                        </Grid>
-                        <Grid size={1}>
-                            <Typography variant='subtitle1'>Tipe Toko</Typography>
-                            <FormGroup>
-                                <FormControlLabel control={<Checkbox />} label="Official" />
-                                <FormControlLabel control={<Checkbox />} label="Top Star" />
-                            </FormGroup>
-                        </Grid>
-                    </Grid>
-                    <Button variant='contained' sx={{marginTop: 6, width: '100%'}}>Riset</Button>
-                </CardContent>
-            </Card>
+                    <div>
+                        <h5 className='font-semibold text-lg'>Harga</h5>
+                        <InputPrice label="Min. Harga" name="minPrice" className="!my-2" onValueChange={this.handlePriceChange} value={filter.minPrice || 0}/>
+                        <InputPrice label="Max. Harga" name="maxPrice" className="!my-2" onValueChange={this.handlePriceChange} value={filter.maxPrice || 0}/>
+                    </div>
+                    <div>
+                        <h5 className='font-semibold text-lg'>Perngiriman</h5>
+                        <FormControl>
+                            <RadioGroup name="shipping" onChange={this.handleShippingChange} value={filter.shipping || ''}>
+                                <FormControlLabel value="instan" control={<Radio/>} label="Instan" />
+                                <FormControlLabel value="same day" control={<Radio/>} label="Same day" />
+                                <FormControlLabel value="reguler" control={<Radio/>} label="Reguler" />
+                            </RadioGroup>
+                        </FormControl>
+                    </div>
+                </div>
+                <Button variant='contained' className='!my-2' fullWidth onClick={this.handleRisetFilter}>Riset</Button>
+            </Paper>
         )
     }
+
+    handleLocationChange = (event) => {
+        const { value } = event.target;
+        this.setState((prevState) => ({
+            filter: {
+                ...prevState.filter,
+                location: value,
+            },
+        }));
+    };
+
+    handleMinPriceChange = (values) => {
+        this.setState((prevState) => ({
+            filter: {
+                ...prevState.filter,
+                minPrice: parseInt(values.value) || '',
+            },
+        }));
+    };
+
+    handleMaxPriceChange = (values) => {
+        this.setState((prevState) => ({
+            filter: {
+                ...prevState.filter,
+                maxPrice: parseInt(values.value) || '',
+            },
+        }));
+    };
+
+    handleShippingChange = (event) => {
+        const { value } = event.target;
+        this.setState((prevState) => ({
+            filter: {
+                ...prevState.filter,
+                shipping: value,
+            },
+        }));
+    };
+
+    handleRisetFilter = () => {
+        const { filter } = this.state;
+        const { router } = this.props;
+        this.setState({ filter: {} });
+        const query = { ...router.query, ...filter };
+        this.props.findProduct(query);
+    };
 
     render() {
         return(
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
-                    <Grid container columnSpacing={3}>
-                        <Grid size={2.5}>
-                            {this.renderFilter()}
-                        </Grid>
-                        <Grid size="grow">
-                            {this.renderProducts()}
-                        </Grid>
-                    </Grid>
+                    <div className='grid grid-cols-6 gap-4 mt-4'>
+                        <div className='col-span-5 h-[2000px]'>{this.renderProducts()}</div>
+                        <div>{this.renderFilter()}</div>
+                    </div>
                 </Container>
             </ThemeProvider>
         )
