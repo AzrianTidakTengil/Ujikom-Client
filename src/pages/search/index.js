@@ -1,10 +1,10 @@
-import { Component } from 'react';
-import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider, Paper, RadioGroup, Radio } from '@mui/material';
+import { Component, createRef } from 'react';
+import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider, Paper, RadioGroup, Radio, Popover, IconButton } from '@mui/material';
 import { Playfair_Display, Poppins } from "next/font/google";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useRouter, withRouter } from 'next/router';
 import { useSearchParams } from 'next/navigation';
-import { ExpandMore, Filter, FilterAlt, SearchOff, SearchOutlined, Star } from '@mui/icons-material';
+import { Close, ExpandMore, Filter, FilterAlt, SearchOff, SearchOutlined, Star } from '@mui/icons-material';
 import { InputPrice, InputText } from '@/components/input';
 import { palleteV1 } from '@/assets/css/template';
 import Link from 'next/link';
@@ -21,12 +21,15 @@ class Search extends Component {
             listProduct: [],
             city: [],
             filter: {},
+            popover: false,
+            findLocation: '',
         }
         this.theme = createTheme({
             palette: {
                 ...palleteV1.palette
             }
         })
+        this.anchorEl = createRef();
     }
 
     componentDidMount() {
@@ -172,6 +175,7 @@ class Search extends Component {
         return (
             <Paper
                 className='p-4 w-full'
+                ref={this.anchorEl}
             >
                 <h4 className='font-bold text-2xl'>Filter</h4>
                 <Divider className='my-2'/>
@@ -192,6 +196,7 @@ class Search extends Component {
                                 }
                             </RadioGroup>
                         </FormControl>
+                        <Button variant='text' className='text-thin italic' size='small' onClick={this.handleOpenOrCloseSearchLocation}>Cari Tempat Anda</Button>
                     </div>
                     <div>
                         <h5 className='font-semibold text-lg'>Harga</h5>
@@ -209,7 +214,7 @@ class Search extends Component {
                         </FormControl>
                     </div>
                 </div>
-                <Button variant='contained' className='!my-2' fullWidth onClick={this.handleRisetFilter}>Riset</Button>
+                <Button variant='contained' className='!my-2' fullWidth onClick={this.handleRisetFilter} color='secondary'>Riset</Button>
             </Paper>
         )
     }
@@ -260,6 +265,48 @@ class Search extends Component {
         this.props.findProduct(query);
     };
 
+    handleOpenOrCloseSearchLocation = () => {
+        this.setState((prevState) => ({
+            popover: !prevState.popover,
+        }));
+    }
+
+    renderSearchLocation = () => {
+        const { anchorEl, state } = this;
+        const { popover, findLocation } = state;
+
+        return (
+            <Popover
+                open={popover}
+                anchorEl={anchorEl.current}
+                onClose={this.handleOpenOrCloseSearchLocation}
+                anchorOrigin={{
+                    vertical: 'top',
+                    horizontal: 'left',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
+                <div className='p-4 w-[400px]'>
+                    <div className='flex items-center justify-between mb-4'>
+                        <InputText fullWidth size="small" sx={{mr: 2}} onChange={this.handleFindLocation}/>
+                        <IconButton onClick={this.handleOpenOrCloseSearchLocation}><Close/></IconButton>
+                    </div>
+                    <div className='h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-secondary-light scrollbar-track-secondary-main'>
+                        <div className='h-[1000px]'></div>
+                    </div>
+                </div>  
+            </Popover>
+        )
+    }
+
+    handleFindLocation = (event) => {
+        this.setState({ findLocation: event.target.value });
+    };
+
+
     render() {
         return(
             <ThemeProvider theme={this.theme}>
@@ -268,6 +315,7 @@ class Search extends Component {
                         <div className='col-span-5 h-[2000px]'>{this.renderProducts()}</div>
                         <div>{this.renderFilter()}</div>
                     </div>
+                    {this.renderSearchLocation()}
                 </Container>
             </ThemeProvider>
         )
