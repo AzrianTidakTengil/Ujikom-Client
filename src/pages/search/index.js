@@ -61,9 +61,9 @@ class Search extends Component {
         const {visibleProducts, offeringProduct, limitProduct, keyword, listProduct} = this.state
 
         return(
-            <>
-                <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16}}>
-                    <div style={{display: 'flex', alignItems: 'center'}}>
+            <div>
+                <div className='flex flex-row items-center justify-between mb-4'>
+                    <div className='flex items-center gap-2'>
                         <SearchOutlined/>
                         <Typography variant='subtitle1'>Hasil pencarian untuk <b>{keyword}</b></Typography>
                     </div>
@@ -81,64 +81,66 @@ class Search extends Component {
                         </FormControl>
                     </div>
                 </div>
-                <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={10}>
-                    {listProduct.map((product) => (
-                       <Grid key={product.id} size={{xs: 6, sm: 4, md:2.5, lg: 2}}>
-                            <Link href={{
-                                pathname: `/p/${encodeURIComponent(product.name)}`,
-                                query: {id: product.id}
-                                }}
-                                style={{textDecoration: 'none'}}
-                            >
-                                <Card sx={{textDecoration: 'none'}}>
-                                    <CardMedia
-                                        component="img"
-                                        height={160}
-                                        width={160}
-                                        image={Cld.image(product.productToImage.length != 0 ? product.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
-                                        alt={product.name}
-                                    />
-                                    <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
-                                        <Typography 
-                                            variant="subtitle1"
-                                            sx={{
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                WebkitLineClamp: 2,
-                                                WebkitBoxOrient: 'vertical',
-                                                display: "-webkit-box",
-                                            }}
-                                        >
-                                            {product.name}
-                                        </Typography>
-                                        <Typography variant="subtitle1" fontWeight={600}>
-                                        {
-                                            new Intl.NumberFormat('id-ID', {
-                                                style: "currency",
-                                                currency: "IDR"
-                                            }).format(product.productToProductVariant.length != 0 ? product.productToProductVariant[0].price : product.price)
-                                        }
-                                        </Typography>
-                                        <Typography variant="body2" color="textSecondary">
-                                        {product.productToOwner.ownerToStore.name}
-                                        </Typography>
-                                        <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
-                                            <div style={{display: 'flex', alignItems: 'center'}}>
-                                                <Star fontSize='small' color='yellow'/>
-                                                <Typography variant="body2" color="textSecondary">
-                                                    4
-                                                </Typography>
-                                            </div>
-                                            <Typography variant='body2' color='textSecondary'>
-                                                100 terjual
+                <div className='overflow-y-auto max-h-[85dvh] scrollbar-thin scrollbar-thumb-secondary-main scrollbar-track-secondary-light/50'>
+                    <Grid container spacing={4} rowSpacing={2} columnSpacing={2} columns={10} height={3000}>
+                        {listProduct.map((product) => (
+                        <Grid key={product.id} size={{xs: 6, sm: 4, md:2.5, lg: 2}}>
+                                <Link href={{
+                                    pathname: `/p/${encodeURIComponent(product.name)}`,
+                                    query: {id: product.id}
+                                    }}
+                                    style={{textDecoration: 'none'}}
+                                >
+                                    <Card sx={{textDecoration: 'none'}}>
+                                        <CardMedia
+                                            component="img"
+                                            height={160}
+                                            width={160}
+                                            image={Cld.image(product.productToImage.length != 0 ? product.productToImage[0].public_id : 'product-not-found').resize(thumbnail().width(160).height(160)).toURL()}
+                                            alt={product.name}
+                                        />
+                                        <CardContent sx={{'*': {marginBottom: 0.5, textDecoration: 'none'}}}>
+                                            <Typography 
+                                                variant="subtitle1"
+                                                sx={{
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    WebkitLineClamp: 2,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    display: "-webkit-box",
+                                                }}
+                                            >
+                                                {product.name}
                                             </Typography>
-                                        </Stack>
-                                    </CardContent>
-                                </Card>
-                            </Link>
-                        </Grid>
-                    ))}
-                </Grid>
+                                            <Typography variant="subtitle1" fontWeight={600}>
+                                            {
+                                                new Intl.NumberFormat('id-ID', {
+                                                    style: "currency",
+                                                    currency: "IDR"
+                                                }).format(product.productToProductVariant.length != 0 ? product.productToProductVariant[0].price : product.price)
+                                            }
+                                            </Typography>
+                                            <Typography variant="body2" color="textSecondary">
+                                            {product.productToOwner.ownerToStore.name}
+                                            </Typography>
+                                            <Stack direction={'row'} spacing={1} divider={<Divider orientation='vertical' flexItem/>}>
+                                                <div style={{display: 'flex', alignItems: 'center'}}>
+                                                    <Star fontSize='small' color='yellow'/>
+                                                    <Typography variant="body2" color="textSecondary">
+                                                        4
+                                                    </Typography>
+                                                </div>
+                                                <Typography variant='body2' color='textSecondary'>
+                                                    100 terjual
+                                                </Typography>
+                                            </Stack>
+                                        </CardContent>
+                                    </Card>
+                                </Link>
+                            </Grid>
+                        ))}
+                    </Grid>
+                </div>
                 {/* <Pagination
                     count={Math.ceil(products.length / limitProduct)}
                     page={offeringProduct}
@@ -146,7 +148,7 @@ class Search extends Component {
                     color="primary"
                     sx={{ display: "flex", justifyContent: "center", marginTop: 4 }}
                 /> */}
-            </>
+            </div>
         )
     }
 
@@ -169,7 +171,6 @@ class Search extends Component {
             { id: 1, name: 'Jakarta' },
             { id: 2, name: 'Bandung' },
             { id: 3, name: 'Surabaya' },
-            { id: 4, name: 'Medan' },
         ];
 
         return (
@@ -312,7 +313,7 @@ class Search extends Component {
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
                     <div className='grid grid-cols-6 gap-4 mt-4'>
-                        <div className='col-span-5 h-[2000px]'>{this.renderProducts()}</div>
+                        <div className='col-span-5'>{this.renderProducts()}</div>
                         <div>{this.renderFilter()}</div>
                     </div>
                     {this.renderSearchLocation()}
