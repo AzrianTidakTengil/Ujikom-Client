@@ -1,5 +1,5 @@
 import { Component, createRef } from 'react';
-import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider, Paper, RadioGroup, Radio, Popover, IconButton } from '@mui/material';
+import { Container, Stack, createTheme, Typography, Grid2 as Grid, Card, CardActionArea, CardContent, CardMedia, Pagination, Button, Rating, Divider, FormGroup, FormControlLabel, Checkbox, Accordion, AccordionSummary, AccordionDetails, FormControl, Select, MenuItem, ThemeProvider, Paper, RadioGroup, Radio, Popover, IconButton, useTheme, useMediaQuery, Modal, SwipeableDrawer } from '@mui/material';
 import { Playfair_Display, Poppins } from "next/font/google";
 import InfiniteScroll from 'react-infinite-scroll-component';
 import { useRouter, withRouter } from 'next/router';
@@ -23,6 +23,8 @@ class Search extends Component {
             filter: {},
             popover: false,
             findLocation: '',
+            isMobile: false,
+            openFilterMobile: false,
         }
         this.theme = createTheme({
             palette: {
@@ -39,6 +41,16 @@ class Search extends Component {
           this.props.findProduct({ keyword: router.query.keyword });
           this.setState({ keyword: router.query.keyword });
         }
+
+        this.mediaQuery = window.matchMedia('(max-width: 48rem)');
+        this.setState({ isMobile: this.mediaQuery.matches });
+        this.mediaQuery.addEventListener('change', (e) => {
+            this.setState({ isMobile: e.matches });
+        });
+    }
+
+    componentWillUnmount() {
+        this.mediaQuery.removeEventListener('change', this.handleMediaQueryChange);
     }
       
     componentDidUpdate(prevProps) {
@@ -58,12 +70,12 @@ class Search extends Component {
       
 
     renderProducts = () => {
-        const {visibleProducts, offeringProduct, limitProduct, keyword, listProduct} = this.state
+        const {visibleProducts, offeringProduct, limitProduct, keyword, listProduct, isMobile} = this.state
 
         return(
             <div>
-                <div className='flex flex-row items-center justify-between mb-4'>
-                    <div className='flex items-center gap-2'>
+                <div className='flex flex-row items-center justify-end md:justify-between mb-4'>
+                    <div className='md:flex items-center gap-2 hidden'>
                         <SearchOutlined/>
                         <Typography variant='subtitle1'>Hasil pencarian untuk <b>{keyword}</b></Typography>
                     </div>
@@ -73,12 +85,18 @@ class Search extends Component {
                                 displayEmpty
                                 inputProps={{ 'aria-label': 'Without label' }}
                                 defaultValue={1}
+                                size={isMobile ? 'small' : 'medium'}
                             >
                                 <MenuItem value={1}>Terkait</MenuItem>
                                 <MenuItem value={2}>Terbaik</MenuItem>
                                 <MenuItem value={3}>Terlaris</MenuItem>
                             </Select>
                         </FormControl>
+                        <div className='inline-block ml-2 lg:hidden'>
+                            <IconButton onClick={this.handleOpenOrCloseModalFilterMobile}>
+                                <FilterAlt fontSize='medium'/>
+                            </IconButton>
+                        </div>
                     </div>
                 </div>
                 <div className='overflow-y-auto max-h-[85dvh] scrollbar-thin scrollbar-thumb-secondary-main scrollbar-track-secondary-light/50'>
@@ -152,17 +170,35 @@ class Search extends Component {
         )
     }
 
-    // handlePageChange = (event, value) => {
-    //     const {limitProduct} = this.state
-    //     const startIndex = (value - 1) * limitProduct
+    handleOpenOrCloseModalFilterMobile = () => {
+        this.setState((prevState) => ({
+            openFilterMobile: !prevState.openFilterMobile,
+        }));
+    };
 
-    //     this.setState({
-    //         offeringProduct: value,
-    //         visibleProducts: products.slice(startIndex, startIndex + limitProduct)
-    //     });
+    renderFilterMobile = () => {
+        const { openFilterMobile } = this.state;
 
-    //     window.scroll(0,0)
-    // };
+        return (
+            <SwipeableDrawer
+                open={openFilterMobile}
+                onClose={this.handleOpenOrCloseModalFilterMobile}
+                anchor='right'
+                keepMounted
+            >
+                <Paper className='w-64 h-full p-4'>
+                    <div className='flex items-center justify-between mb-4'>
+                        <h4 className='font-bold text-2xl'>Filter</h4>
+                        <IconButton onClick={this.handleOpenOrCloseModalFilterMobile}>
+                            <Close/>
+                        </IconButton>
+                    </div>
+                    <Divider className='my-2'/>
+                    { this.renderInputFilter() }
+                </Paper>
+            </SwipeableDrawer>
+        )
+    }
 
     renderFilter = () => {
         const { city, filter } = this.state;
@@ -180,6 +216,22 @@ class Search extends Component {
             >
                 <h4 className='font-bold text-2xl'>Filter</h4>
                 <Divider className='my-2'/>
+                {this.renderInputFilter()}
+            </Paper>
+        )
+    }
+
+    renderInputFilter = () => {
+        const { city, filter } = this.state;
+
+        const dummyCity = [
+            { id: 1, name: 'Jakarta' },
+            { id: 2, name: 'Bandung' },
+            { id: 3, name: 'Surabaya' },
+        ];
+
+        return (
+            <>
                 <div className='flex flex-col my-2 space-y-1.5'>
                     <div>
                         <h5 className='font-semibold text-lg'>Lokasi</h5>
@@ -216,7 +268,7 @@ class Search extends Component {
                     </div>
                 </div>
                 <Button variant='contained' className='!my-2' fullWidth onClick={this.handleRisetFilter} color='secondary'>Riset</Button>
-            </Paper>
+            </>
         )
     }
 
@@ -309,14 +361,17 @@ class Search extends Component {
 
 
     render() {
+        const { isMobile } = this.state;
+
         return(
             <ThemeProvider theme={this.theme}>
                 <Container maxWidth="xl">
                     <div className='grid grid-cols-6 gap-4 mt-4'>
-                        <div className='col-span-5'>{this.renderProducts()}</div>
-                        <div>{this.renderFilter()}</div>
+                        <div className='col-span-6 lg:col-span-5'>{this.renderProducts()}</div>
+                        <div className='hidden lg:block'>{this.renderFilter()}</div>
                     </div>
                     {this.renderSearchLocation()}
+                    {isMobile ? this.renderFilterMobile() : null}
                 </Container>
             </ThemeProvider>
         )
