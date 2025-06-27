@@ -1,4 +1,4 @@
-import { palleteV1 } from "@/assets/css/template";
+import { breakpointsTw, palleteV1 } from "@/assets/css/template";
 import { Box, Container, Paper, createTheme, Divider, Avatar, Chip, Grid2 as Grid, Rating, Typography, Button, IconButton, ThemeProvider, Stack, AppBar, Toolbar, Tabs, Tab, Pagination, Card, CardContent, CardMedia } from "@mui/material";
 import { withRouter } from "next/router";
 import Image from "next/image";
@@ -60,10 +60,14 @@ class Product extends Component{
             indexVariant: 0,
             selectedVariant1: null,
             selectedVariant2: null,
+            isMobile: false,
         }
         this.theme = createTheme({
             palette: {
                 ...palleteV1.palette
+            },
+            breakpoints: {
+                ...breakpointsTw.breakpoints
             },
             components: {
                 MuiAppBar: {
@@ -91,6 +95,12 @@ class Product extends Component{
             limit: 36,
             offset: 0
         })
+
+        this.mediaQuery = window.matchMedia('(max-width: 48rem)');
+        this.setState({ isMobile: this.mediaQuery.matches });
+        this.mediaQuery.addEventListener('change', (e) => {
+            this.setState({ isMobile: e.matches });
+        });
     }
 
     componentDidUpdate(prevProps) {
@@ -169,8 +179,12 @@ class Product extends Component{
         })
     }
 
+    componentWillUnmount() {
+        this.mediaQuery.removeEventListener('change', this.handleMediaQueryChange);
+    }
+
     renderProduct = () => {
-        const {query, favorite, product, quantityEditor, indexImage, indexVariant, selectedVariant1, selectedVariant2} = this.state
+        const {query, favorite, product, quantityEditor, indexImage, indexVariant, selectedVariant1, selectedVariant2, isMobile} = this.state
         const {id, name, description, price, stock, shop, category, condition, images, variant} = product
 
         const dummy_color = [
@@ -180,9 +194,9 @@ class Product extends Component{
         ]
 
         return(
-            <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
+            <Box>
                 <Grid container columnSpacing={4}>
-                    <Grid size={{lg: 3.5, xs: 4.5}}>
+                    <Grid size={{lg: 3.5, md: 4.5, xs:12}}>
                         <Box
                             sx={{
                                 position: 'relative'
@@ -199,14 +213,8 @@ class Product extends Component{
                                     <ChevronLeft/>
                                 </IconButton>
                             </Box>
-                            <img 
-                                style={{
-                                    width: '100%',
-                                    height: 320,
-                                    objectFit: 'cover',
-                                    objectPosition: 'center',
-                                    border: '1px solid #a5a5a5'
-                                }} 
+                            <img
+                                className="aspect-square object-cover object-center w-128 rounded-md"
                                 src={Cld.image(images.length != 0 ? images[indexImage] : 'product-not-found').toURL()}
                             />
                             <Box
@@ -246,12 +254,12 @@ class Product extends Component{
                             }
                         </Stack>
                     </Grid>
-                    <Grid size={{lg: 5.5, xs: 7.5}}>
+                    <Grid size={{lg: 5.5, md: 7.5, xs:12}}>
                         <Box sx={{width: '100%'}}>
-                            <Box sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+                            <Box className="flex justify-between items-start">
                                 <Typography variant="h5">{name}</Typography>
-                                <Stack direction="row" spacing={2}>
-                                    <div style={{display: 'flex', alignItems: 'center'}}>
+                                <Stack direction="row" spacing={isMobile ? 0 : 2} sx={{alignItems: 'center'}}>
+                                    <div className="flex items-center">
                                         <IconButton onClick={() => this.handleFavorite()}>
                                             {favorite ? <Favorite color="pink"/> : <FavoriteBorderOutlined color="pink"/>}
                                         </IconButton>
@@ -343,15 +351,14 @@ class Product extends Component{
                             <Divider sx={{marginBottom: 4}}/>
                             <Box>
                                 <Box sx={{marginBottom: 2}}>
-                                    <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
-                                    <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
+                                    <Box className="xl:inline-flex xl:items-center flex flex-col xl:flex-row">
                                         <QuantityEditor
                                             initialQuantity={quantityEditor}
                                             min={1}
                                             max={stock}
                                             onChange={(name, value) => {this.setState({quantityEditor: value})}}
                                         />
-                                        <Typography variant="subtitle1" sx={{marginLeft: 2}}>
+                                        <Typography variant="subtitle1" className="xl:mt-0 !mt-2">
                                             Total Stok: {stock}
                                         </Typography>
                                     </Box>
@@ -437,7 +444,7 @@ class Product extends Component{
         const {id, name, description, price, stock, shop, category, condition, images, variant} = product
 
         return (
-            <Box sx={{bgcolor: 'white', border: 1, borderColor: 'gray', p: 4, borderRadius: 2}}>
+            <Box>
                 <Typography variant="h6" sx={{fontWeight: 600}}>Atur Pembelian</Typography>
                     <Divider sx={{marginBottom: 4}}/>
                     <Box>
@@ -488,7 +495,6 @@ class Product extends Component{
                                 ) : ''
                             }
                             <Box>
-                                <Typography variant="subtitle1" sx={{marginBottom: 1}}>Kuantitas:</Typography>
                                 <Box sx={{display: 'inline-flex', alignItems: 'center'}}>
                                     <QuantityEditor
                                         initialQuantity={quantityEditor}
@@ -564,7 +570,7 @@ class Product extends Component{
         return(
             <Container maxWidth="xl">
                 <Container maxWidth="lg" sx={{p: 2, marginBottom: 4}}>
-                    <Box sx={{border:1 ,borderRadius: 1, borderColor: '#ababab', py:2, px:4, display: 'flex', alignItems: 'center', justifyContent: 'space-around'}}>
+                    <Box>
                         <Grid container columnSpacing={4}>
                             <Grid container direction={"column"} size={'auto'} rowSpacing={1} sx={{alignItems: 'center'}}>
                                 <Grid>
@@ -897,7 +903,7 @@ class Product extends Component{
                     <Container maxWidth="xl" sx={{marginY: 4}}>{this.renderProduct()}</Container>
                     <Container maxWidth="xl" sx={{marginY: 4, [this.theme.breakpoints.up('lg')]: {display: 'none'}}}>{this.renderSetBuy()}</Container>
                     <Container maxWidth="xl" sx={{marginY: 4}}>
-                        <Box sx={{border: '1px solid gray', borderRadius: 2, p:2}}>
+                        <Box>
                             <Box sx={{borderBottom: 1, borderColor: 'divider'}}>
                                 <Tabs value={appBar} onChange={this.handleChangeAppBar} aria-label="tabel panel product">
                                     <Tab label="Description" value="description"/>
