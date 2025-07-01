@@ -6,12 +6,13 @@ import { getAll as getAllAddress, find } from "@/store/address";
 import { getAllTransaction, findTransaction } from "@/store/transaction";
 import { CropImage, DateRangePicker, Dropdown } from "@/components";
 import dayjs from "dayjs";
-import { palleteV1 } from '@/assets/css/template'
+import { breakpointsTw, palleteV1 } from '@/assets/css/template'
 import { deleteAvatarUser, updateAvatarUser } from "@/store/user";
 import { Cld } from "@/config";
 import UserMessage from '@/store/user/message'
 import { thumbnail } from "@cloudinary/url-gen/actions/resize";
 import { withRouter } from "next/router";
+import { InputDate, InputGender, InputText } from "@/components/input";
 
 class Profile extends Component {
   constructor(props) {
@@ -20,7 +21,7 @@ class Profile extends Component {
       user: {
         username: "",
         fullname: "",
-        birthDay: "",
+        birthDay: null,
         gender: "",
         email: "",
         telephone: "",
@@ -33,6 +34,9 @@ class Profile extends Component {
         offset: 0,
         data: [],
         status: 'pending',
+        startDate: null,
+        endDate: null,
+        search: '',
       },
       image: null,
       previewImage: null,
@@ -44,7 +48,10 @@ class Profile extends Component {
     this.theme = createTheme({
         palette: {
             ...palleteV1.palette
-        }
+        },
+        breakpoints: {
+          ...breakpointsTw.breakpoints
+        },
     })
   }
 
@@ -97,8 +104,8 @@ class Profile extends Component {
           paddingY: 2
         }}
       >
-        <Grid container spacing={2}>
-          <Grid size={10}>
+        <div className="flex space-x-2">
+          <div className="flex-2/3">
             <TextField
               fullWidth
               size="small"
@@ -112,19 +119,13 @@ class Profile extends Component {
               }}}
               onChange={this.handleChangeSearchAddress}
             />
-          </Grid>
-          <Grid 
-            size={2}
-            sx={{
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
+          </div>
+          <div className="flex-1/3">
             <Button variant="contained" fullWidth>
               Tambah Alamat
             </Button>
-          </Grid>
-        </Grid>
+          </div>
+        </div>
         <Box sx={{
           minHeight: '30rem'
         }}>
@@ -206,7 +207,7 @@ class Profile extends Component {
   }
 
   renderTransaction = () => {
-    const {data, offset, limit} = this.state.transaction
+    const {data, offset, limit, search, startDate, endDate} = this.state.transaction
     const {transaction} = this.props
 
     const optionFilter = [
@@ -246,35 +247,54 @@ class Profile extends Component {
           paddingY: 2
         }}
       >
-        <Grid container spacing={2}>
-          <Grid size={4.5}>
-            <TextField
-              fullWidth
-              size="small"
-              hiddenLabel
-              slotProps={{ input: {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchOutlined/>
-                  </InputAdornment>
-                )
-              }}}
-              onChange={this.handleChangeSearchAddress}
-            />
-          </Grid>
-          <Grid size={4.5}>
-              <DateRangePicker/>
-          </Grid>
-          <Grid size={3}>
-              <Dropdown
-                label={'Status'}
-                options={optionFilter}
-                size="small"
-                value={this.state.transaction.status}
-                onChange={this.handleChangeDropDown}
-              />
-          </Grid>
-        </Grid>
+        <div className="flex flex-col space-y-4">
+            <div className="flex space-x-2">
+              <div className="flex-2/3">
+                <TextField
+                  fullWidth
+                  size="small"
+                  hiddenLabel
+                  slotProps={{ input: {
+                    startAdornment: (
+                      <InputAdornment position="start">
+                        <SearchOutlined/>
+                      </InputAdornment>
+                    )
+                  }}}
+                  onChange={this.handleChangeSearchAddress}
+                />
+              </div>
+              <div className="flex-1/3">
+                <Dropdown
+                  label={'Status'}
+                  options={optionFilter}
+                  size="small"
+                  value={this.state.transaction.status}
+                  onChange={this.handleChangeDropDown}
+                />
+              </div>
+            </div>
+            <div className="flex space-x-2">
+              <div className="flex-1/2">
+                  <InputDate
+                    label="Tanggal Mulai"
+                    size="small"
+                    fullWidth
+                    onChange={this.handleFilterStartDateTransaction}
+                    value={startDate}
+                  />
+              </div>
+              <div className="flex-1/2">
+                  <InputDate
+                    label="Tanggal Selesai"
+                    size="small"
+                    fullWidth
+                    onChange={this.handleFilterEndDateTransaction}
+                    value={endDate}
+                  />
+              </div>
+            </div>
+        </div>
         <Box
           sx={{
             minHeight: '30rem'
@@ -475,6 +495,24 @@ class Profile extends Component {
     reader.readAsDataURL(file);
   }
 
+  handleFilterStartDateTransaction = (value) => {
+    this.setState((prevState) => ({
+      transaction: {
+        ...prevState.transaction,
+        startDate: value
+      }
+    }))
+  }
+
+  handleFilterEndDateTransaction = (value) => {
+    this.setState((prevState) => ({
+      transaction: {
+        ...prevState.transaction,
+        endDate: value
+      }
+    }))
+  }
+
   renderModalEditorAvatar = () => {
     const {modalEditorAvatar, previewImage} = this.state
 
@@ -538,95 +576,72 @@ class Profile extends Component {
     this.props.deleteAvatarUser()
   }
 
+  handleEditDateBirth = (value) => {
+    this.setState((prevState) => ({
+      user: {
+        ...prevState.user,
+        birthDay: value
+      }
+    }))
+  }
+
   render() {
     const { user, renderTabs } = this.state;
     const {address} = this.props
+    const {birthDay} = user
     return (
       <ThemeProvider theme={this.theme}>
-        <Container>
-          <Card sx={{ p: 3, textAlign: "center"}}>
-            <CardContent>
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center'
-                }}
+        <Container maxWidth="lg">
+          <div className="flex justify-start items-start gap-8">
+            <div className="flex flex-col items-center w-fit">
+              <Avatar
+                className="!w-64 !h-64 !aspect-square !object-center !object-cover !mb-4"
+                src={Cld.image(user.avatar).toURL()}
+              />
+              <Stack
+                direction={'row'}
+                spacing={2}
               >
-                <Avatar sx={{ width: 124, height: 124, marginBottom: 2}} src={Cld.image(user.avatar).toURL()}/>
-                <Stack
-                  direction={'row'}
-                  spacing={2}
-                >
-                  <Button variant="contained" onClick={this.handleTriggerModalEditorAvatar} size="small">Upload Foto Baru</Button>
-                  <input
-                    ref={this.inputImageReff}
-                    type="file"
-                    accept="image/*"
-                    style={{ display: "none" }}
-                    onChange={this.handleFileChange}
-                  />
-                  <Button variant="outlined" size="small" onClick={this.handleRemoveAvatar}>Hapus Foto</Button>
-                </Stack>
-              </Box>
-              <Typography variant="h5" sx={{ marginY: 2 }} fontWeight={600}>{user.username}</Typography>
+                <Button variant="contained" onClick={this.handleTriggerModalEditorAvatar} size="small">Upload</Button>
+                <input
+                  ref={this.inputImageReff}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: "none" }}
+                  onChange={this.handleFileChange}
+                />
+                <Button variant="outlined" size="small" onClick={this.handleRemoveAvatar}>Hapus</Button>
+              </Stack>
+            </div>
+            <div className="w-full">
+              <Typography variant="h3" className="!font-semibold">{user.username || "Azrii-27"}</Typography>
               <Stack
                 direction="row"
                 divider={<Divider orientation="vertical" flexItem />}
-                spacing={2}       
+                spacing={2}
+                justifyContent={"space-evenly"}
+                width={"100%"}
               >
-                <Box
-                  width={'50%'}
-                >
-                  <Grid container sx={{marginY: 2}}>
-                    <Grid size={4}>
-                      <Typography variant="body1" textAlign={'left'}>Nama</Typography>
-                    </Grid>
-                    <Grid size={8}>
-                      <Typography variant="body1" textAlign={'left'}>{user.fullname}</Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container sx={{marginY: 2}}>
-                    <Grid size={4}>
-                      <Typography variant="body1" textAlign={'left'}>Tanggal Lahir</Typography>
-                    </Grid>
-                    <Grid size={8}>
-                      <Typography variant="body1" textAlign={'left'}>{user.birthDay}</Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container sx={{marginY: 2}}>
-                    <Grid size={4}>
-                      <Typography variant="body1" textAlign={'left'}>Jenis Kelamin</Typography>
-                    </Grid>
-                    <Grid size={8}>
-                      <Typography variant="body1" textAlign={'left'}>{user.gender}</Typography>
-                    </Grid>
-                  </Grid>
+                <Box className="flex-1/2">
+                  <div>
+                    <p className="font-light">Nama Lengkap</p>
+                    <InputText size="small" fullWidth/>
+                  </div>
+                  <div>
+                    <p className="font-light">Tanggal Lahir</p>
+                    <InputDate size="small" onChange={this.handleEditDateBirth} value={birthDay} fullWidth/>
+                  </div>
+                  <div>
+                    <p className="font-light">Jenis Kelamin</p>
+                    <InputGender showLabel={false}/>
+                  </div>
                 </Box>
-                <Box
-                  width={'50%'}
-                >
-                  <Grid container sx={{marginY: 2}}>
-                    <Grid size={4}>
-                      <Typography variant="body1" textAlign={'left'}>Email</Typography>
-                    </Grid>
-                    <Grid size={8}>
-                      <Typography variant="body1" textAlign={'left'}>{user.email}</Typography>
-                    </Grid>
-                  </Grid>
-                  <Grid container sx={{marginY: 2}}>
-                    <Grid size={4}>
-                      <Typography variant="body1" textAlign={'left'}>Nomor HP</Typography>
-                    </Grid>
-                    <Grid size={8}>
-                      <Typography variant="body1" textAlign={'left'}>{user.telephone}</Typography>
-                    </Grid>
-                  </Grid>
+                <Box className="flex-1/2">
+                  <p className="">Badge</p>
                 </Box>
               </Stack>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
           <Card sx={{ p: 3, textAlign: "center", marginTop: 4}}>
             <Box>
               <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
