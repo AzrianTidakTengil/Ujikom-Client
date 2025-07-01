@@ -1,9 +1,15 @@
 'use client'
 
-import { Visibility, VisibilityOff } from "@mui/icons-material"
-import { createTheme, FormControl, FormControlLabel, FormHelperText, FormLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, Radio, RadioGroup, TextField, ThemeProvider } from "@mui/material"
-import { useState } from "react"
+import { CalendarMonth, Visibility, VisibilityOff } from "@mui/icons-material"
+import { createTheme, FormControl, FormControlLabel, FormHelperText, FormLabel, IconButton, InputAdornment, InputLabel, OutlinedInput, Popover, Radio, RadioGroup, TextField, ThemeProvider, Box } from "@mui/material"
+import { DateCalendar, LocalizationProvider } from "@mui/x-date-pickers"
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
+import { useRef, useState } from "react"
+import { Calendar } from "react-date-range"
+import "react-date-range/dist/styles.css";
+import "react-date-range/dist/theme/default.css";
 import { NumericFormat } from "react-number-format"
+import dayjs from "dayjs"
 
 export const InputEmail = ({fullWidth, placeholder = "", value, label, style = {}, error, ...props}) => {
     return (
@@ -103,17 +109,17 @@ export const InputOTP = ({style = {}, value, ...props}) => {
     )
 }
 
-export const InputGender = ({style = {}, change = {}, value, ...props}) => {
+export const InputGender = ({style = {}, value, label, showLabel, ...props}) => {
     return (
         <FormControl 
             style={style}
         >
-            <FormLabel>Jenis Kelamin</FormLabel>
+            <FormLabel>{showLabel ? label || "Jenis Kelamin" : ""}</FormLabel>
             <RadioGroup
                 row
                 name="gender"
                 value={value}
-                onChange={change}
+                {...props}
             >
                 <FormControlLabel value="1" control={<Radio/>} label="Perempuan"/>
                 <FormControlLabel value="2" control={<Radio/>} label="Laki Laki"/>
@@ -136,3 +142,61 @@ export const InputPrice = ({style = {}, value, ...props}) => {
         />
     )
 }
+
+export const InputDate = ({style = {}, value, label, onChange, ...props}) => {
+    const [anchorEl, setAnchorEl] = useState(null);
+    const dateValue = value ? dayjs(value, 'DD-MM-YYYY') : null;
+
+    const handleOpen = (event) => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleDateChange = (newValue) => {
+        onChange?.(dayjs(newValue).format('DD-MM-YYYY'));
+        handleClose();
+    };
+
+
+    return (
+        <>
+            <TextField
+                variant="outlined"
+                style={style}
+                value={value}
+                label={label}
+                InputProps={{
+                    startAdornment: (
+                    <InputAdornment position="start">
+                        <CalendarMonth />
+                    </InputAdornment>
+                    ),
+                    readOnly: true,
+                }}
+                {...props}
+                onClick={handleOpen}
+            />
+            <Popover
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'center',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'center',
+                }}
+            >
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DateCalendar value={dateValue} onChange={handleDateChange} />
+                </LocalizationProvider>
+            </Popover>
+        </>
+    )
+}
+
