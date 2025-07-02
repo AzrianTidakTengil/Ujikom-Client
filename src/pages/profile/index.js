@@ -1,7 +1,7 @@
 import React, { Component, createRef } from "react";
-import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress, Modal, createTheme, ThemeProvider } from "@mui/material";
+import { Container, Card, CardContent, Typography, Avatar, AppBar, Toolbar, Button, Box, Stack, Grid2 as Grid, Divider, Tab, Tabs, InputAdornment, TextField, Paper, Chip, CircularProgress, Modal, createTheme, ThemeProvider, List, IconButton, ListItemAvatar, ListItemText, ListItem } from "@mui/material";
 import { connect } from "react-redux";
-import { SearchOutlined, Update } from "@mui/icons-material";
+import { ChevronRight, Email, Phone, SearchOutlined, Update } from "@mui/icons-material";
 import { getAll as getAllAddress, find } from "@/store/address";
 import { getAllTransaction, findTransaction } from "@/store/transaction";
 import { CropImage, DateRangePicker, Dropdown } from "@/components";
@@ -585,6 +585,55 @@ class Profile extends Component {
     }))
   }
 
+  renderSettings = () => {
+    const {user} = this.state
+
+    const options = [
+      {
+        label: 'Email',
+        link: '/profile/email',
+        value: user.email,
+        icon: <Email />
+      },
+      {
+        label: 'Telepon',
+        link: '/profile/telephone',
+        value: user.telephone,
+        icon: <Phone />
+      }
+    ]
+
+    return (
+      <div className="p-4">
+        <List>
+          {options.map((option, index) => (
+            <ListItem
+              key={index}
+              secondaryAction={
+                <IconButton edge="end" aria-label={option.label} onClick={() => this.props.router.push(option.link)}>
+                  <ChevronRight />
+                </IconButton>
+              }
+            >
+              <ListItemAvatar>
+                {option.icon}
+              </ListItemAvatar>
+              <ListItemText
+                primary={option.value}
+              />
+            </ListItem>
+          ))}
+        </List>
+        <div className="text-start">
+          <h5 className="font-medium text-xl">Terhubung</h5>
+        </div>
+        <div>
+          <Button variant="text" href="/auth/reset-password">Ganti Password</Button>
+        </div>
+      </div>
+    )
+  }
+
   render() {
     const { user, renderTabs } = this.state;
     const {address} = this.props
@@ -651,11 +700,13 @@ class Profile extends Component {
                 >
                   <Tab value="address" label="Detail Alamat"/>
                   <Tab value="transaction" label="Riwayat Transaksi"/>
+                  <Tab value="setting" label="Pengaturan"/>
                 </Tabs>
               </Box>
               {
                 renderTabs === 'address' ? this.renderMoreAddress() :
                 renderTabs === 'transaction' ? this.renderTransaction() :
+                renderTabs === 'setting' ? this.renderSettings() :
                 ''
               }
             </Box>
