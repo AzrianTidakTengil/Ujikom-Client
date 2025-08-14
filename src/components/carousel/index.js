@@ -30,23 +30,16 @@ const Carousel = () => {
     <Box position="relative" margin="auto">
       <Slider ref={sliderRef} {...settings}>
         {images.map((img, index) => (
-          <Card key={index}>
-            <Image src={img} alt={`Slide ${index + 1}`} width={760} height={130} layout="responsive" />
-          </Card>
+          <div className="w-full aspect-[3/1] relative rounded" key={index}>
+            <Image
+              src={img}
+              alt={`Top Banner Ads: ${index + 1}`}
+              fill
+              className="object-cover"
+            />
+          </div>
         ))}
       </Slider>
-      <IconButton
-        sx={{ position: "absolute", top: "50%", left: 10, transform: "translateY(-50%)", background: "rgba(255,255,255,0.5)" }}
-        onClick={() => sliderRef.current.slickPrev()}
-      >
-        <ArrowBackIos />
-      </IconButton>
-      <IconButton
-        sx={{ position: "absolute", top: "50%", right: 10, transform: "translateY(-50%)", background: "rgba(255,255,255,0.5)" }}
-        onClick={() => sliderRef.current.slickNext()}
-      >
-        <ArrowForwardIos />
-      </IconButton>
     </Box>
   );
 };
