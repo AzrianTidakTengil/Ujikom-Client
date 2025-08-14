@@ -176,10 +176,10 @@ class Auth extends Component {
         }
       } else if (type === "password") {
         const passwordRegex =
-          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~])[A-Za-z\d@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~]{8,}$/;
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d@$!%*?&#^()\-_=+{}[\]|;:'",.<>\/?\\`~]{8,}$/;
         if (!passwordRegex.test(trimmedValue)) {
           error =
-            "Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 digit, and 1 special character.";
+            "Password must be at least 8 characters long, include at least 1 uppercase letter, 1 lowercase letter, 1 digit";
         }
       }
     }
